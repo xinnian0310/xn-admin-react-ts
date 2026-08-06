@@ -1,0 +1,169 @@
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-scrollbar-thumb) var(--app-scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: var(--app-scrollbar-size);
+  height: var(--app-scrollbar-size);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--app-scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--app-scrollbar-thumb);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--app-scrollbar-thumb-hover);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  /* Ant Design 默认字体栈气质 */
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  background: var(--app-page-bg, #f5f5f5);
+  color: var(--app-text-primary, rgba(0, 0, 0, 0.88));
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-card {
+  background: var(--app-card-bg, #fff);
+  border-radius: 8px;
+  padding: 24px;
+  border: 1px solid var(--app-border-color, #f0f0f0);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ========== 全局 UI 变量（Ant Design 默认；启动时由 theme 覆盖） ========== */
+:root {
+  --app-dialog-max-height: 70vh;
+  --app-font-size-sidebar: 14px;
+  --app-font-size-header: 14px;
+  --app-font-size-tags-view: 14px;
+  --app-font-size-main: 14px;
+  --app-tags-view-height: 40px;
+
+  /* Ant Design Pro：深色侧栏 */
+  --app-sidebar-bg: #001529;
+  --app-sidebar-bg-elevated: #000c17;
+  --app-sidebar-text: rgba(255, 255, 255, 0.65);
+  --app-sidebar-text-active: #ffffff;
+  --app-sidebar-active: #ffffff;
+  --app-sidebar-active-bg: #1677ff;
+  --app-sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  --app-sidebar-border: transparent;
+  --app-sidebar-rail-bg: #000c17;
+
+  /* 白顶栏 */
+  --app-header-bg: #ffffff;
+  --app-header-text: rgba(0, 0, 0, 0.88);
+  --app-header-border: #f0f0f0;
+
+  /* Ant Design 主色 */
+  --app-color-primary: #1677ff;
+  --app-color-primary-light-3: #4096ff;
+  --app-color-primary-light-5: #69b1ff;
+  --app-color-primary-light-7: #91caff;
+  --app-color-primary-light-8: #bae0ff;
+  --app-color-primary-light-9: #e6f4ff;
+  --app-color-primary-dark-2: #0958d9;
+  --app-color-primary-rgb: 22, 119, 255;
+
+  /* tags-view */
+  --app-tags-bg: #ffffff;
+  --app-tags-border: #f0f0f0;
+  --app-tags-item-bg: #fafafa;
+  --app-tags-item-text: rgba(0, 0, 0, 0.65);
+  --app-tags-item-hover-bg: #e6f4ff;
+  --app-tags-item-active-bg: #1677ff;
+  --app-tags-item-active-text: #ffffff;
+  --app-tags-scrollbar: #d9d9d9;
+
+  /* 页面表面 */
+  --app-page-bg: #f5f5f5;
+  --app-main-bg: #f5f5f5;
+  --app-main-bg-image: none;
+  --app-card-bg: #ffffff;
+  --app-fill-color: #fafafa;
+  --app-border-color: #f0f0f0;
+  --app-text-muted: rgba(0, 0, 0, 0.45);
+  --app-text-primary: rgba(0, 0, 0, 0.88);
+  --app-surface-soft: #e6f4ff;
+  --app-surface-soft-border: #91caff;
+  --app-card-hover-border: #69b1ff;
+
+  /* 滚动条 */
+  --app-scrollbar-size: 6px;
+  --app-scrollbar-thumb: color-mix(in srgb, var(--app-text-muted) 42%, transparent);
+  --app-scrollbar-thumb-hover: color-mix(in srgb, var(--app-text-muted) 68%, transparent);
+  --app-scrollbar-track: transparent;
+}
+
+/* 卡片网格 hover（Ant Card） */
+.page-card-grid .ant-card {
+  border: 1px solid var(--app-border-color);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.page-card-grid .ant-card:hover {
+  border-color: var(--app-card-hover-border);
+  box-shadow: 0 4px 12px rgba(var(--app-color-primary-rgb), 0.12);
+}
+
+/* 公告 WebSocket 通知 */
+.notice-ws-notify {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.notice-ws-notify__text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.notice-ws-notify__actions {
+  flex-shrink: 0;
+  padding-top: 0;
+}

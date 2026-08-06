@@ -1,0 +1,41 @@
+.xn-search.ant-form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 8px;
+  column-gap: 0;
+}
+
+.xn-search.ant-form-inline .ant-form-item {
+  margin-inline-end: 16px;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+/* 强制标签在左、控件在右（避免 antd 在部分容器里落到 vertical） */
+.xn-search.ant-form-inline .ant-form-item-row {
+  flex-direction: row !important;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.xn-search.ant-form-inline .ant-form-item-label {
+  padding: 0 8px 0 0 !important;
+  white-space: nowrap;
+}
+
+.xn-search.ant-form-inline .ant-form-item-label > label {
+  height: auto;
+}
+
+.xn-search.ant-form-inline .ant-form-item-control {
+  max-width: none;
+}
+
+.xn-search__control {
+  min-width: 160px;
+}
+
+.xn-search__actions {
+  margin-inline-end: 0 !important;
+}

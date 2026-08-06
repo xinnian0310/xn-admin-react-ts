@@ -1,0 +1,37 @@
+.xn-tags-view {
+  height: var(--app-tags-view-height, 40px);
+  background: var(--app-tags-bg, #fff);
+  border-bottom: 1px solid var(--app-tags-border, #f0f0f0);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.xn-tags-view__scroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  width: 100%;
+  scrollbar-width: thin;
+}
+
+.xn-tags-view .ant-tag {
+  cursor: pointer;
+  margin-inline-end: 0;
+  background: var(--app-tags-item-bg, #fafafa);
+  color: var(--app-tags-item-text, rgba(0, 0, 0, 0.65));
+  border-color: var(--app-tags-border, #f0f0f0);
+  border-radius: 4px;
+}
+
+.xn-tags-view .ant-tag.is-active {
+  background: var(--app-tags-item-active-bg, #1677ff);
+  color: var(--app-tags-item-active-text, #fff);
+  border-color: transparent;
+}
+
+.xn-tags-view .ant-tag:hover:not(.is-active) {
+  background: var(--app-tags-item-hover-bg, #e6f4ff);
+  color: var(--app-color-primary, #1677ff);
+}

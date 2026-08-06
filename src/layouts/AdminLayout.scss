@@ -1,0 +1,159 @@
+.admin-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-layout > .layout-shell,
+.admin-layout > .ant-layout {
+  flex: 1;
+  min-height: 0;
+}
+
+.admin-layout__content {
+  margin: 0;
+  border: none;
+  padding: 0;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--app-page-bg, #f5f5f5);
+  background-image: var(--app-main-bg-image, none);
+  background-size: cover;
+  background-position: center;
+}
+
+.admin-layout__page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.admin-layout__page > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.admin-layout.is-fullscreen .admin-layout__content {
+  margin: 0;
+  height: 100vh;
+}
+
+.exit-fullscreen {
+  position: fixed !important;
+  top: 16px;
+  right: 16px;
+  z-index: 3000;
+}
+
+.layout-shell {
+  height: 100%;
+  min-height: 0;
+  background: var(--app-page-bg, #f5f5f5) !important;
+}
+
+.layout-shell.ant-layout {
+  height: 100%;
+}
+
+.layout-shell > .ant-layout {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: transparent !important;
+}
+
+.layout-aside {
+  background: var(--app-sidebar-bg, #001529) !important;
+  border-right: 1px solid var(--app-sidebar-border, transparent) !important;
+  transition: background 0.2s ease;
+}
+
+.layout-aside .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: inherit;
+}
+
+.layout-aside .ant-menu {
+  background: transparent !important;
+  border-inline-end: none !important;
+  flex: 1;
+  overflow: auto;
+  color: var(--app-sidebar-text) !important;
+}
+
+/* 强制菜单项跟随主题 CSS 变量（覆盖 ant-menu-dark 默认色） */
+.layout-aside .ant-menu-item,
+.layout-aside .ant-menu-submenu-title {
+  color: var(--app-sidebar-text) !important;
+}
+
+.layout-aside .ant-menu-item:hover,
+.layout-aside .ant-menu-submenu-title:hover {
+  background: var(--app-sidebar-hover-bg) !important;
+  color: var(--app-sidebar-text-active) !important;
+}
+
+.layout-aside .ant-menu-item-selected {
+  background: var(--app-sidebar-active-bg) !important;
+  color: var(--app-sidebar-text-active) !important;
+}
+
+.layout-aside .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  color: var(--app-sidebar-text-active) !important;
+}
+
+.layout-aside .ant-menu-item .anticon,
+.layout-aside .ant-menu-submenu-title .anticon,
+.layout-aside .ant-menu-item .xn-app-icon,
+.layout-aside .ant-menu-submenu-title .xn-app-icon {
+  color: inherit !important;
+}
+
+.layout-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px !important;
+  background: var(--app-header-bg, #fff) !important;
+  color: var(--app-header-text, rgba(0, 0, 0, 0.88)) !important;
+  border-bottom: 1px solid var(--app-header-border, #f0f0f0);
+  height: 56px;
+  line-height: 56px;
+  box-shadow: none;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.layout-header-tools {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: inherit;
+}
+
+.layout-header-tools .anticon,
+.layout-header-tools .ant-badge {
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.layout-brand {
+  color: var(--app-sidebar-text-active, #fff);
+  padding: 16px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}

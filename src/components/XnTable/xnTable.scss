@@ -1,0 +1,50 @@
+.xn-table {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  gap: 0;
+}
+
+.xn-table__body {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.xn-table__body .ant-table-wrapper,
+.xn-table__body .ant-spin-nested-loading,
+.xn-table__body .ant-spin,
+.xn-table__body .ant-spin-container,
+.xn-table__body .ant-table,
+.xn-table__body .ant-table-container {
+  height: 100% !important;
+  max-height: none;
+}
+
+.xn-table__body .ant-spin-nested-loading,
+.xn-table__body .ant-spin,
+.xn-table__body .ant-spin-container {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+
+.xn-table__body .ant-table-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.xn-table__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  padding: 8px 0;
+  border-top: 1px solid var(--app-border-color, #f0f0f0);
+  background: var(--app-card-bg, #fff);
+}
