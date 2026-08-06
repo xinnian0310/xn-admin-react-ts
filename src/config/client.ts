@@ -11,7 +11,4 @@
 export const APP_CLIENT_ID = 'xn-admin-react-ts' as const
 
 export type AppClientId =
-  | 'xn-admin-vue3-ts'
-  | 'xn-admin-vue3-js'
-  | 'xn-admin-vue2-js'
-  | 'xn-admin-react-ts'
+  'xn-admin-vue3-ts' | 'xn-admin-vue3-js' | 'xn-admin-vue2-js' | 'xn-admin-react-ts'

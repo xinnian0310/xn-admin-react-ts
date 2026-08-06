@@ -142,11 +142,7 @@ const UnitSave = forwardRef<UnitSaveHandle, { onSuccess?: () => void }>(function
             disabled={lockBuiltIn}
           />
         </Form.Item>
-        <Form.Item
-          name="roleIds"
-          label="默认角色"
-          extra="单位下用户自动继承这些角色"
-        >
+        <Form.Item name="roleIds" label="默认角色" extra="单位下用户自动继承这些角色">
           <Select
             mode="multiple"
             allowClear

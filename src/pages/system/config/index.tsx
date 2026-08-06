@@ -242,7 +242,8 @@ export default function SystemConfigPage() {
             <Form.Item label="当前前端工程">
               <Input value={clientId} disabled />
               <div style={{ marginTop: 6, color: '#94a3b8', fontSize: 12, lineHeight: 1.5 }}>
-                项目名称 / 应用介绍按此 clientId 写入数据库（app.clients），各技术栈互不影响；页脚与品牌图标仍共享。
+                项目名称 / 应用介绍按此 clientId
+                写入数据库（app.clients），各技术栈互不影响；页脚与品牌图标仍共享。
               </div>
             </Form.Item>
             <Form.Item label="项目名称" required>
@@ -423,7 +424,8 @@ export default function SystemConfigPage() {
             <div>
               <h3 style={{ marginTop: 0 }}>布局与字号</h3>
               <p style={{ color: '#64748b', fontSize: 13 }}>
-                通用默认；登录用户可在右下角悬浮入口单独覆盖。字号 / 高度填正整数，单位 px 自动带入。
+                通用默认；登录用户可在右下角悬浮入口单独覆盖。字号 / 高度填正整数，单位 px
+                自动带入。
               </p>
               <Form labelCol={{ span: 8 }}>
                 <Form.Item label="布局模式">
@@ -509,7 +511,8 @@ export default function SystemConfigPage() {
             <div>
               <h3 style={{ marginTop: 0 }}>组件全局</h3>
               <p style={{ color: '#64748b', fontSize: 13 }}>
-                对应后端 ui.elementPlus 契约字段；Ant Design 由 ConfigProvider 映射。主题色请用右上角主题面板。
+                对应后端 ui.elementPlus 契约字段；Ant Design 由 ConfigProvider
+                映射。主题色请用右上角主题面板。
               </p>
               <Form labelCol={{ span: 8 }}>
                 <Form.Item label="语言">
@@ -830,8 +833,17 @@ export default function SystemConfigPage() {
         >
           <div>
             <h2 style={{ margin: 0, fontSize: 18 }}>系统配置</h2>
-            <p style={{ margin: '6px 0 0', color: '#64748b', fontSize: 13, lineHeight: 1.5, maxWidth: 760 }}>
-              与前端 app.ts 对齐：保存后即时生效。登录页背景/验证码请在「登录页设置」中配置；主题色请在右上角主题面板调整。
+            <p
+              style={{
+                margin: '6px 0 0',
+                color: '#64748b',
+                fontSize: 13,
+                lineHeight: 1.5,
+                maxWidth: 760,
+              }}
+            >
+              与前端 app.ts
+              对齐：保存后即时生效。登录页背景/验证码请在「登录页设置」中配置；主题色请在右上角主题面板调整。
               「项目名称 / 应用介绍」按当前前端工程（{clientId}）单独存储，不影响其他前端项目。
             </p>
           </div>
@@ -849,12 +861,7 @@ export default function SystemConfigPage() {
           </Space>
         </div>
 
-        <Tabs
-          tabPosition="left"
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          items={tabItems}
-        />
+        <Tabs tabPosition="left" activeKey={activeTab} onChange={setActiveTab} items={tabItems} />
       </Spin>
 
       <Image

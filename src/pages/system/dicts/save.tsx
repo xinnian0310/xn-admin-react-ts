@@ -79,7 +79,11 @@ const DictTypeSave = forwardRef<DictTypeSaveHandle, Props>(function DictTypeSave
       confirmLoading={submitting}
     >
       <Form form={form} labelCol={{ span: 5 }} disabled={readonly} style={{ marginTop: 16 }}>
-        <Form.Item name="name" label="字典名称" rules={[{ required: true, message: '请输入字典名称' }]}>
+        <Form.Item
+          name="name"
+          label="字典名称"
+          rules={[{ required: true, message: '请输入字典名称' }]}
+        >
           <Input />
         </Form.Item>
         <Form.Item

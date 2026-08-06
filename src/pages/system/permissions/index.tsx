@@ -38,10 +38,7 @@ function methodColor(method?: string) {
   return 'default'
 }
 
-function collectAssignable(
-  permByCode: Map<string, Permission>,
-  route: MenuNode,
-): Permission[] {
+function collectAssignable(permByCode: Map<string, Permission>, route: MenuNode): Permission[] {
   const result: Permission[] = []
   const menuPerm = route.permission ? permByCode.get(route.permission) : undefined
   if (menuPerm?.children?.length) {
@@ -299,7 +296,10 @@ export default function RolePermissionsPage() {
   const locked = currentRole?.code === 'SUPER_ADMIN'
 
   return (
-    <div className="page-card" style={{ display: 'flex', gap: 12, minHeight: 560, opacity: loading ? 0.7 : 1 }}>
+    <div
+      className="page-card"
+      style={{ display: 'flex', gap: 12, minHeight: 560, opacity: loading ? 0.7 : 1 }}
+    >
       <Card size="small" title="角色" style={{ width: 240, flexShrink: 0 }}>
         <Input
           allowClear
@@ -339,9 +339,18 @@ export default function RolePermissionsPage() {
                   ? `为「${currentRole.name}」配置权限`
                   : '请选择角色'}
             </strong>
-            {dirty ? <Tag color="warning" style={{ marginLeft: 8 }}>未保存</Tag> : null}
+            {dirty ? (
+              <Tag color="warning" style={{ marginLeft: 8 }}>
+                未保存
+              </Tag>
+            ) : null}
           </div>
-          <Button type="primary" disabled={!currentRole || locked} loading={saving} onClick={() => void handleSave()}>
+          <Button
+            type="primary"
+            disabled={!currentRole || locked}
+            loading={saving}
+            onClick={() => void handleSave()}
+          >
             保存
           </Button>
         </div>
@@ -383,7 +392,13 @@ export default function RolePermissionsPage() {
                     const someChecked = g.items.some((i) => checkedIds.has(i.id))
                     return (
                       <div key={g.key}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            marginBottom: 8,
+                          }}
+                        >
                           <strong>{g.title}</strong>
                           <Checkbox
                             checked={allChecked}

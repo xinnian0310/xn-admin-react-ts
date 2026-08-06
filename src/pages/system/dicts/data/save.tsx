@@ -102,10 +102,18 @@ const DictDataSave = forwardRef<DictDataSaveHandle, Props>(function DictDataSave
       confirmLoading={submitting}
     >
       <Form form={form} labelCol={{ span: 5 }} disabled={readonly} style={{ marginTop: 16 }}>
-        <Form.Item name="label" label="字典标签" rules={[{ required: true, message: '请输入字典标签' }]}>
+        <Form.Item
+          name="label"
+          label="字典标签"
+          rules={[{ required: true, message: '请输入字典标签' }]}
+        >
           <Input />
         </Form.Item>
-        <Form.Item name="value" label="字典键值" rules={[{ required: true, message: '请输入字典键值' }]}>
+        <Form.Item
+          name="value"
+          label="字典键值"
+          rules={[{ required: true, message: '请输入字典键值' }]}
+        >
           <Input />
         </Form.Item>
         <Form.Item name="listClass" label="标签样式">

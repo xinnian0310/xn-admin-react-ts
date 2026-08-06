@@ -274,7 +274,8 @@ export default function SystemCodegenPage() {
   return (
     <>
       <XnPageLayout
-        showViewSwitch={false}
+        showViewSwitch={false}
+
         search={
           <XnSearch
             searchItem={searchItems}
@@ -289,7 +290,9 @@ export default function SystemCodegenPage() {
             }}
           />
         }
-        toolbar={<XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />}
+        toolbar={
+          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+        }
         table={
           <XnTable
             data={tableData as unknown as Record<string, unknown>[]}

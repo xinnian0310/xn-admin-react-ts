@@ -125,7 +125,12 @@ const PermissionSave = forwardRef<PermissionSaveHandle, { onSuccess?: () => void
             <Input />
           </Form.Item>
           <Form.Item name="parentId" label="上级">
-            <TreeSelect allowClear treeDefaultExpandAll placeholder="无（顶级）" treeData={toTree(tree)} />
+            <TreeSelect
+              allowClear
+              treeDefaultExpandAll
+              placeholder="无（顶级）"
+              treeData={toTree(tree)}
+            />
           </Form.Item>
           <Form.Item name="path" label="路径">
             <Input placeholder="/system/roles" />

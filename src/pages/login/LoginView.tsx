@@ -213,7 +213,10 @@ export default function LoginView() {
                       onClick={() => void refreshCaptcha()}
                     />
                   ) : (
-                    <div className="captcha-canvas captcha-placeholder" onClick={() => void refreshCaptcha()}>
+                    <div
+                      className="captcha-canvas captcha-placeholder"
+                      onClick={() => void refreshCaptcha()}
+                    >
                       刷新
                     </div>
                   )}
@@ -224,7 +227,9 @@ export default function LoginView() {
                   <div className="slider-wrap">
                     <div className="slider-track">
                       <div className="slider-progress" style={{ width: `${sliderPercent}%` }} />
-                      <span className="slider-text">{sliderOk ? '验证通过' : '拖动滑块完成验证'}</span>
+                      <span className="slider-text">
+                        {sliderOk ? '验证通过' : '拖动滑块完成验证'}
+                      </span>
                     </div>
                     <div
                       className="slider-thumb"
@@ -237,7 +242,13 @@ export default function LoginView() {
                 </Form.Item>
               ) : null}
               <Form.Item>
-                <Button type="primary" htmlType="submit" block loading={loading} className="login-btn">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  loading={loading}
+                  className="login-btn"
+                >
                   登 录
                 </Button>
               </Form.Item>

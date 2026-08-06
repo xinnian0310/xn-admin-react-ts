@@ -153,7 +153,9 @@ export default function MonitorSqlPage() {
             }}
           />
         }
-        toolbar={<XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />}
+        toolbar={
+          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+        }
         toolbarExtra={<Tag>累计 {queryCount} 条</Tag>}
         table={
           <XnTable

@@ -59,11 +59,7 @@ interface XnTableProps {
   rowKey?: string | ((row: Record<string, unknown>) => Key)
   onPageChange?: (page: number, pageSize: number) => void
   onSelectionChange?: (rows: unknown[]) => void
-  onSwitchChange?: (payload: {
-    row: Record<string, unknown>
-    prop: string
-    value: unknown
-  }) => void
+  onSwitchChange?: (payload: { row: Record<string, unknown>; prop: string; value: unknown }) => void
   onDataChange?: (rows: unknown[]) => void
   onSuccess?: () => void
   slots?: Record<string, (ctx: { row: Record<string, unknown>; index: number }) => ReactNode>
@@ -88,7 +84,10 @@ function formatText(row: Record<string, unknown>, col: TableColumnItem) {
   return `${col.prefix || ''}${text}${col.suffix || ''}`
 }
 
-function resolveOption(row: Record<string, unknown>, col: TableColumnItem): TableColumnOption | undefined {
+function resolveOption(
+  row: Record<string, unknown>,
+  col: TableColumnItem,
+): TableColumnOption | undefined {
   const raw = getCellValue(row, col.prop)
   return (col.options || []).find((o) => String(o.value) === String(raw))
 }
@@ -503,7 +502,11 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
               </Tooltip>
               {tableKey ? (
                 <Tooltip title="列设置">
-                  <Button shape="circle" icon={<SettingOutlined />} onClick={() => void openColumnSetting()} />
+                  <Button
+                    shape="circle"
+                    icon={<SettingOutlined />}
+                    onClick={() => void openColumnSetting()}
+                  />
                 </Tooltip>
               ) : null}
             </Space>

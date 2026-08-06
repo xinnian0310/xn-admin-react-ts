@@ -1,6 +1,11 @@
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
 import { Alert, Button, Modal, Space, Table, Upload, message } from 'antd'
-import { DownloadOutlined, InboxOutlined, CheckCircleFilled, LoadingOutlined } from '@ant-design/icons'
+import {
+  DownloadOutlined,
+  InboxOutlined,
+  CheckCircleFilled,
+  LoadingOutlined,
+} from '@ant-design/icons'
 import type { ExcelImportColumn, ExcelImportSubmit, ImportResult } from '@/types/excel'
 import {
   downloadExcelTemplate,
@@ -145,7 +150,12 @@ const XnImport = forwardRef<XnImportHandle, XnImportProps>(function XnImport(
       footer={
         <Space>
           <Button onClick={() => setVisible(false)}>关闭</Button>
-          <Button type="primary" loading={submitting} disabled={!rows.length} onClick={() => void handleSubmit()}>
+          <Button
+            type="primary"
+            loading={submitting}
+            disabled={!rows.length}
+            onClick={() => void handleSubmit()}
+          >
             开始导入
           </Button>
         </Space>
@@ -185,7 +195,9 @@ const XnImport = forwardRef<XnImportHandle, XnImportProps>(function XnImport(
               <div>
                 <CheckCircleFilled style={{ fontSize: 28, color: '#52c41a' }} />
                 <div style={{ marginTop: 8 }}>{fileName}</div>
-                <div style={{ color: '#94a3b8' }}>共 {rows.length} 行有效数据 · 点击或拖拽可重新选择</div>
+                <div style={{ color: '#94a3b8' }}>
+                  共 {rows.length} 行有效数据 · 点击或拖拽可重新选择
+                </div>
               </div>
             ) : (
               <div>

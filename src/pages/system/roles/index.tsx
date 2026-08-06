@@ -198,7 +198,9 @@ export default function RolesPage() {
             }}
           />
         }
-        toolbar={<XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />}
+        toolbar={
+          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+        }
         table={
           <XnTable
             data={tableData}
@@ -276,7 +278,9 @@ export default function RolesPage() {
                     items={tableButtonItems}
                     row={row as unknown as Record<string, unknown>}
                     disabled={tableActionDisabled}
-                    onActionClick={({ action, row: r }) => onRowAction(action, r as unknown as Role)}
+                    onActionClick={({ action, row: r }) =>
+                      onRowAction(action, r as unknown as Role)
+                    }
                   />
                 </div>
               </Card>

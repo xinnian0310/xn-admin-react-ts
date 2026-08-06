@@ -88,7 +88,12 @@ export default function ProfilePage() {
         <h2 className="page-title">个人信息</h2>
         <Space>
           <Button onClick={() => void loadProfile()}>刷新</Button>
-          <Button type="primary" disabled={!canEdit || saving} loading={saving} onClick={() => void handleSave()}>
+          <Button
+            type="primary"
+            disabled={!canEdit || saving}
+            loading={saving}
+            onClick={() => void handleSave()}
+          >
             保存资料
           </Button>
         </Space>
@@ -125,7 +130,11 @@ export default function ProfilePage() {
             <Form.Item label="用户名" name="username">
               <Input disabled />
             </Form.Item>
-            <Form.Item label="昵称" name="nickname" rules={[{ required: true, message: '请输入昵称' }]}>
+            <Form.Item
+              label="昵称"
+              name="nickname"
+              rules={[{ required: true, message: '请输入昵称' }]}
+            >
               <Input maxLength={50} />
             </Form.Item>
             <Form.Item label="邮箱" name="email">
@@ -150,9 +159,18 @@ export default function ProfilePage() {
             </Form.Item>
           </Form>
 
-          <Form form={pwdForm} labelCol={{ span: 4 }} disabled={!canEdit} style={{ maxWidth: 560, marginTop: 24 }}>
+          <Form
+            form={pwdForm}
+            labelCol={{ span: 4 }}
+            disabled={!canEdit}
+            style={{ maxWidth: 560, marginTop: 24 }}
+          >
             <div style={{ fontWeight: 600, marginBottom: 12 }}>修改密码</div>
-            <Form.Item label="原密码" name="oldPassword" rules={[{ required: true, message: '请输入原密码' }]}>
+            <Form.Item
+              label="原密码"
+              name="oldPassword"
+              rules={[{ required: true, message: '请输入原密码' }]}
+            >
               <Input.Password autoComplete="current-password" />
             </Form.Item>
             <Form.Item
@@ -161,7 +179,10 @@ export default function ProfilePage() {
               rules={[{ required: true, message: '请输入新密码' }]}
               extra={pwdRules?.tip}
             >
-              <Input.Password autoComplete="new-password" placeholder={pwdRules?.tip || '请输入新密码'} />
+              <Input.Password
+                autoComplete="new-password"
+                placeholder={pwdRules?.tip || '请输入新密码'}
+              />
             </Form.Item>
             <Form.Item
               label="确认密码"

@@ -7,10 +7,7 @@ interface XnErrorPageProps {
   subTitle?: string
 }
 
-const PRESETS: Record<
-  number,
-  { status: 403 | 404 | 500; title: string; subTitle: string }
-> = {
+const PRESETS: Record<number, { status: 403 | 404 | 500; title: string; subTitle: string }> = {
   403: {
     status: 403,
     title: '403',

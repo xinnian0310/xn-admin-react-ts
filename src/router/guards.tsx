@@ -54,13 +54,7 @@ export function TagsViewSync({
 }
 
 /** 鉴权 + 动态路由注册 + 权限校验 */
-export function AuthGuard({
-  meta,
-  children,
-}: {
-  meta?: AppRouteMeta
-  children?: ReactNode
-}) {
+export function AuthGuard({ meta, children }: { meta?: AppRouteMeta; children?: ReactNode }) {
   const location = useLocation()
   const token = useUserStore((s) => s.token)
   const user = useUserStore((s) => s.user)

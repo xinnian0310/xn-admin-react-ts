@@ -222,7 +222,9 @@ export default function SiteContactPage() {
       (c) => c.label === row.label && c.value === row.value && c.link === row.link,
     )
     const resolved =
-      index >= 0 ? index : resolveRowIndex(row as unknown as Record<string, unknown>, contacts.length)
+      index >= 0
+        ? index
+        : resolveRowIndex(row as unknown as Record<string, unknown>, contacts.length)
     if (resolved < 0) {
       message.warning('未找到选中项')
       return
@@ -239,7 +241,9 @@ export default function SiteContactPage() {
     const row = qrSelected[0]
     const index = qrcodes.findIndex((q) => q.label === row.label && q.src === row.src)
     const resolved =
-      index >= 0 ? index : resolveRowIndex(row as unknown as Record<string, unknown>, qrcodes.length)
+      index >= 0
+        ? index
+        : resolveRowIndex(row as unknown as Record<string, unknown>, qrcodes.length)
     if (resolved < 0) {
       message.warning('未找到选中项')
       return

@@ -237,7 +237,9 @@ export default function RoutesPage() {
             }}
           />
         }
-        toolbar={<XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />}
+        toolbar={
+          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+        }
         table={
           <Table
             rowKey="id"

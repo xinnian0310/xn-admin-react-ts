@@ -3,7 +3,13 @@ import { BrowserRouter } from 'react-router-dom'
 import { App as AntdApp, ConfigProvider, Spin, theme as antdTheme } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
 import AppRouter from '@/router'
-import { applyAppConfig, applyRemoteAppConfig, captureGlobalUiBaseline, mapAntdComponentSize, appConfig } from '@/config/app'
+import {
+  applyAppConfig,
+  applyRemoteAppConfig,
+  captureGlobalUiBaseline,
+  mapAntdComponentSize,
+  appConfig,
+} from '@/config/app'
 import { isLightColor } from '@/utils/color'
 import { getPublicConfig } from '@/api/system-config'
 import { useUserStore } from '@/stores/user'

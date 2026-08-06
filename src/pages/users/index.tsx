@@ -86,7 +86,8 @@ export default function UsersPage() {
       {
         key: 'roleCodes',
         title: '角色',
-        example: roleOptions.find((o) => o.value === 'USER')?.label || roleOptions[0]?.label || '普通用户',
+        example:
+          roleOptions.find((o) => o.value === 'USER')?.label || roleOptions[0]?.label || '普通用户',
         width: 16,
         options: roleOptions,
       },
@@ -100,7 +101,10 @@ export default function UsersPage() {
       {
         key: 'postCode',
         title: '岗位',
-        example: postOptions.find((o) => o.value === 'staff')?.label || postOptions[0]?.label || '普通员工',
+        example:
+          postOptions.find((o) => o.value === 'staff')?.label ||
+          postOptions[0]?.label ||
+          '普通员工',
         width: 14,
         options: postOptions,
       },
@@ -321,7 +325,9 @@ export default function UsersPage() {
             }}
           />
         }
-        toolbar={<XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />}
+        toolbar={
+          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+        }
         table={
           <XnTable
             data={tableData}
@@ -411,7 +417,8 @@ export default function UsersPage() {
                 <div>单位：{row.unitName || '—'}</div>
                 <div>
                   角色：
-                  {(row.effectiveRoleList || row.roleList || []).map((r) => r.name).join('、') || '—'}
+                  {(row.effectiveRoleList || row.roleList || []).map((r) => r.name).join('、') ||
+                    '—'}
                 </div>
                 <div>邮箱：{row.email || '—'}</div>
                 <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between' }}>

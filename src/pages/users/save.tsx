@@ -1,13 +1,5 @@
 ﻿import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
-import {
-  Form,
-  Input,
-  Modal,
-  Radio,
-  Select,
-  TreeSelect,
-  message,
-} from 'antd'
+import { Form, Input, Modal, Radio, Select, TreeSelect, message } from 'antd'
 import { getPasswordRules, type PasswordRules } from '@/api/auth'
 import { getOptions as getRoleOptions } from '@/api/role'
 import { getTree as getUnitTree } from '@/api/unit'
@@ -25,7 +17,9 @@ interface Props {
   onSuccess?: () => void
 }
 
-function toTreeData(nodes: SysUnit[]): { title: string; value: number; children?: ReturnType<typeof toTreeData> }[] {
+function toTreeData(
+  nodes: SysUnit[],
+): { title: string; value: number; children?: ReturnType<typeof toTreeData> }[] {
   return nodes.map((n) => ({
     title: n.name,
     value: n.id,
@@ -147,7 +141,11 @@ const UserSave = forwardRef<UserSaveHandle, Props>(function UserSave({ onSuccess
       onOk={() => void handleSubmit()}
     >
       <Form form={form} labelCol={{ span: 5 }} disabled={mode === 'view'}>
-        <Form.Item name="username" label="用户名" rules={[{ required: true, message: '请输入用户名' }]}>
+        <Form.Item
+          name="username"
+          label="用户名"
+          rules={[{ required: true, message: '请输入用户名' }]}
+        >
           <Input disabled={usernameDisabled} />
         </Form.Item>
         <Form.Item
@@ -195,11 +193,7 @@ const UserSave = forwardRef<UserSaveHandle, Props>(function UserSave({ onSuccess
         <Form.Item name="phone" label="手机号">
           <Input disabled={sensitiveFieldsLocked} />
         </Form.Item>
-        <Form.Item
-          name="roleIds"
-          label="角色"
-          extra="可与单位默认角色叠加；二者至少其一有角色即可"
-        >
+        <Form.Item name="roleIds" label="角色" extra="可与单位默认角色叠加；二者至少其一有角色即可">
           <Select
             mode="multiple"
             allowClear

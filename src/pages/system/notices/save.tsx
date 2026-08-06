@@ -76,11 +76,7 @@ const NoticeSave = forwardRef<NoticeSaveHandle, Props>(function NoticeSave({ onS
       confirmLoading={submitting}
     >
       <Form form={form} labelCol={{ span: 3 }} disabled={readonly} style={{ marginTop: 16 }}>
-        <Form.Item
-          name="title"
-          label="标题"
-          rules={[{ required: true, message: '请输入标题' }]}
-        >
+        <Form.Item name="title" label="标题" rules={[{ required: true, message: '请输入标题' }]}>
           <Input maxLength={200} showCount placeholder="请输入公告标题" />
         </Form.Item>
         <Form.Item

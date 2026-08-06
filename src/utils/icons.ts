@@ -170,7 +170,10 @@ export function resolveIconifyName(name?: string): string | undefined {
   if (!parsed) return undefined
   if (parsed.type === 'iconify') return parsed.name
   if (parsed.type === 'element') {
-    return ELEMENT_TO_ICONIFY[parsed.name] || `mdi:${parsed.name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}`
+    return (
+      ELEMENT_TO_ICONIFY[parsed.name] ||
+      `mdi:${parsed.name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}`
+    )
   }
   if (parsed.type === 'antd') return undefined
   return undefined

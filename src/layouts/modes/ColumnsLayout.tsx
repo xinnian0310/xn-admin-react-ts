@@ -26,7 +26,10 @@ export default function ColumnsLayout({ menus, isFullscreen, children }: Props) 
   const sidebarBg = useThemeStore((s) => s.currentTheme.colors.sidebar.bg)
   const sideMenuTheme = isLightColor(sidebarBg) ? 'light' : 'dark'
   const visible = useMemo(() => filterHiddenMenus(menus), [menus])
-  const top = useMemo(() => findTopLevelMenu(visible, location.pathname), [visible, location.pathname])
+  const top = useMemo(
+    () => findTopLevelMenu(visible, location.pathname),
+    [visible, location.pathname],
+  )
   const sideMenus = top?.children?.length ? top.children : []
 
   return (

@@ -77,8 +77,7 @@ export default function PostsPage() {
     setLoading(true)
     try {
       const statusRaw = nextQuery.status
-      const status =
-        statusRaw === '' || statusRaw == null ? undefined : Number(statusRaw)
+      const status = statusRaw === '' || statusRaw == null ? undefined : Number(statusRaw)
       const res = await list({
         page: nextPage - 1,
         size: nextSize,
@@ -205,7 +204,9 @@ export default function PostsPage() {
             }}
           />
         }
-        toolbar={<XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />}
+        toolbar={
+          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+        }
         table={
           <XnTable
             data={tableData}

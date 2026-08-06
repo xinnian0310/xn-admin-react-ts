@@ -29,7 +29,10 @@ function filterTree<T extends Record<string, unknown>>(
       const filteredChildren = walk(children)
       const label = String(node[labelKey] ?? '').toLowerCase()
       if (label.includes(kw) || filteredChildren.length) {
-        result.push({ ...node, [childrenKey]: filteredChildren.length ? filteredChildren : children })
+        result.push({
+          ...node,
+          [childrenKey]: filteredChildren.length ? filteredChildren : children,
+        })
       }
     }
     return result
@@ -71,7 +74,16 @@ export default function XnTreePanel<T extends Record<string, unknown>>({
   }, [filtered, keyField, labelKey, childrenKey])
 
   return (
-    <div style={{ width, padding: 12, height: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div
+      style={{
+        width,
+        padding: 12,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+      }}
+    >
       {title ? <div style={{ fontWeight: 600 }}>{title}</div> : null}
       <Input
         allowClear

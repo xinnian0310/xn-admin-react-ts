@@ -14,9 +14,7 @@ export default function Auth({ permission, fallback = null, children }: AuthProp
 
   if (!permission) return <>{children}</>
 
-  const ok = Array.isArray(permission)
-    ? hasAnyPermission(permission)
-    : hasPermission(permission)
+  const ok = Array.isArray(permission) ? hasAnyPermission(permission) : hasPermission(permission)
 
   return <>{ok ? children : fallback}</>
 }

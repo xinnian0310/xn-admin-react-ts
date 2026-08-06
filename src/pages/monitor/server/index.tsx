@@ -272,7 +272,9 @@ export default function MonitorServerPage() {
               {infraCards.map((item) => (
                 <Col key={item.key} xs={24} sm={12} md={8} lg={4}>
                   <Card size="small" styles={{ body: { padding: 12 } }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <div
+                      style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}
+                    >
                       <strong>{item.title}</strong>
                       <Tag color={statusTagColor(item.status)}>{item.status || '—'}</Tag>
                     </div>
@@ -400,11 +402,7 @@ export default function MonitorServerPage() {
                 dataIndex: 'usage',
                 minWidth: 200,
                 render: (v: number) => (
-                  <Progress
-                    percent={Math.round(v)}
-                    strokeColor={usageColor(v)}
-                    size="small"
-                  />
+                  <Progress percent={Math.round(v)} strokeColor={usageColor(v)} size="small" />
                 ),
               },
             ]}

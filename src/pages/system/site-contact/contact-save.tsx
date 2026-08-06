@@ -169,7 +169,11 @@ const ContactSave = forwardRef<ContactSaveHandle, Props>(function ContactSave({ 
 
         {type === 'link' ? (
           <>
-            <Form.Item name="value" label="文案" rules={[{ required: true, message: '请输入展示文案' }]}>
+            <Form.Item
+              name="value"
+              label="文案"
+              rules={[{ required: true, message: '请输入展示文案' }]}
+            >
               <Input maxLength={200} placeholder="链接展示文字" />
             </Form.Item>
             <Form.Item
@@ -180,7 +184,8 @@ const ContactSave = forwardRef<ContactSaveHandle, Props>(function ContactSave({ 
                 {
                   validator: async (_, v) => {
                     const s = String(v || '').trim()
-                    if (!/^https?:\/\//i.test(s)) throw new Error('链接需以 http:// 或 https:// 开头')
+                    if (!/^https?:\/\//i.test(s))
+                      throw new Error('链接需以 http:// 或 https:// 开头')
                   },
                 },
               ]}
@@ -218,7 +223,12 @@ const ContactSave = forwardRef<ContactSaveHandle, Props>(function ContactSave({ 
                 <Space key={idx} style={{ width: '100%' }} align="center">
                   <XnAppIcon name="ri:qq-fill" size={18} />
                   <Form.Item name={['groups', idx, 'value']} noStyle>
-                    <Input maxLength={30} placeholder="QQ 群号" disabled={readonly} style={{ width: 180 }} />
+                    <Input
+                      maxLength={30}
+                      placeholder="QQ 群号"
+                      disabled={readonly}
+                      style={{ width: 180 }}
+                    />
                   </Form.Item>
                   <Form.Item name={['groups', idx, 'full']} noStyle valuePropName="checked">
                     <Switch checkedChildren="已满" unCheckedChildren="可加" disabled={readonly} />
@@ -242,7 +252,9 @@ const ContactSave = forwardRef<ContactSaveHandle, Props>(function ContactSave({ 
               {!readonly ? (
                 <Button
                   type="link"
-                  onClick={() => form.setFieldValue('groups', [...groups, { value: '', full: false }])}
+                  onClick={() =>
+                    form.setFieldValue('groups', [...groups, { value: '', full: false }])
+                  }
                 >
                   + 添加群号
                 </Button>

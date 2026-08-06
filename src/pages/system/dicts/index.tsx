@@ -85,7 +85,9 @@ export default function DictsPage() {
   }
 
   function goDictData(row: DictType) {
-    navigate(`/system/dicts/data?dictType=${encodeURIComponent(row.type)}&dictName=${encodeURIComponent(row.name)}`)
+    navigate(
+      `/system/dicts/data?dictType=${encodeURIComponent(row.type)}&dictName=${encodeURIComponent(row.name)}`,
+    )
   }
 
   async function handleDelete(row: DictType) {
@@ -191,7 +193,9 @@ export default function DictsPage() {
             }}
           />
         }
-        toolbar={<XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />}
+        toolbar={
+          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+        }
         table={
           <XnTable
             data={tableData}

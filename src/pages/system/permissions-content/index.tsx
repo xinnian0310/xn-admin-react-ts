@@ -111,7 +111,9 @@ export default function PermissionsContentPage() {
 
   const children = useMemo(() => {
     const list = (selectedMenuPerm?.children || []).filter((c) => c.type === contentType)
-    const kw = String(queryForm.FuzzyWord ?? '').trim().toLowerCase()
+    const kw = String(queryForm.FuzzyWord ?? '')
+      .trim()
+      .toLowerCase()
     const filtered = !kw
       ? list
       : list.filter(
@@ -420,22 +422,35 @@ export default function PermissionsContentPage() {
               </Form.Item>
               <Form.Item name="buttonColor" label="颜色">
                 <Select
-                  options={['primary', 'success', 'warning', 'danger', 'info', 'default'].map((c) => ({
-                    label: c,
-                    value: c,
-                  }))}
+                  options={['primary', 'success', 'warning', 'danger', 'info', 'default'].map(
+                    (c) => ({
+                      label: c,
+                      value: c,
+                    }),
+                  )}
                 />
               </Form.Item>
             </>
           ) : (
             <>
-              <Form.Item name="method" label="方法" rules={[{ required: true, message: '请选择方法' }]}>
+              <Form.Item
+                name="method"
+                label="方法"
+                rules={[{ required: true, message: '请选择方法' }]}
+              >
                 <Select
                   disabled={Boolean(editing?.builtIn) && mode !== 'add'}
-                  options={['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].map((m) => ({ label: m, value: m }))}
+                  options={['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].map((m) => ({
+                    label: m,
+                    value: m,
+                  }))}
                 />
               </Form.Item>
-              <Form.Item name="path" label="路径" rules={[{ required: true, message: '请输入路径' }]}>
+              <Form.Item
+                name="path"
+                label="路径"
+                rules={[{ required: true, message: '请输入路径' }]}
+              >
                 <Input disabled={Boolean(editing?.builtIn) && mode !== 'add'} />
               </Form.Item>
             </>

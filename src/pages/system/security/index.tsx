@@ -160,7 +160,8 @@ export default function SecurityPage() {
       showViewSwitch={false}
       page={page}
       pageSize={size}
-      total={total}
+      total={total}
+
       onPageChange={(p, s) => {
         setPage(p)
         setSize(s)
@@ -305,7 +306,11 @@ export default function SecurityPage() {
             </p>
           </Form>
           <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
-            <XnButton listItem={buttonItems} selected={selected} onButtonClick={(a) => void buttonClick(a)} />
+            <XnButton
+              listItem={buttonItems}
+              selected={selected}
+              onButtonClick={(a) => void buttonClick(a)}
+            />
           </div>
         </div>
       }

@@ -91,7 +91,11 @@ const LoginPageSave = forwardRef<LoginPageSaveHandle, Props>(function LoginPageS
       confirmLoading={submitting}
     >
       <Form form={form} labelCol={{ span: 6 }} disabled={readonly} style={{ marginTop: 16 }}>
-        <Form.Item name="name" label="配置名称" rules={[{ required: true, message: '请输入配置名称' }]}>
+        <Form.Item
+          name="name"
+          label="配置名称"
+          rules={[{ required: true, message: '请输入配置名称' }]}
+        >
           <Input maxLength={50} placeholder="如：默认登录页" />
         </Form.Item>
         <Form.Item name="status" label="启用状态">

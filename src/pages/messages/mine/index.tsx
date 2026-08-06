@@ -147,7 +147,8 @@ export default function MessagesMinePage() {
         showViewSwitch={false}
         page={page}
         pageSize={size}
-        total={total}
+        total={total}
+
         onPageChange={(p, s) => {
           setPage(p)
           setSize(s)
@@ -169,10 +170,18 @@ export default function MessagesMinePage() {
           />
         }
         toolbar={
-          <XnButton listItem={buttonItems} selected={selected} onButtonClick={(a) => void buttonClick(a)} />
+          <XnButton
+            listItem={buttonItems}
+            selected={selected}
+            onButtonClick={(a) => void buttonClick(a)}
+          />
         }
         toolbarExtra={
-          unread > 0 ? <Tag color="error" style={{ borderRadius: 999 }}>未读 {unread}</Tag> : null
+          unread > 0 ? (
+            <Tag color="error" style={{ borderRadius: 999 }}>
+              未读 {unread}
+            </Tag>
+          ) : null
         }
         table={
           <XnTable
@@ -223,7 +232,9 @@ export default function MessagesMinePage() {
       >
         {current ? (
           <div>
-            <div style={{ display: 'flex', gap: 24, marginBottom: 16, color: '#64748b', fontSize: 13 }}>
+            <div
+              style={{ display: 'flex', gap: 24, marginBottom: 16, color: '#64748b', fontSize: 13 }}
+            >
               <span>发送人：{current.senderName || '—'}</span>
               <span>发送时间：{formatDateTime(current.sentAt)}</span>
             </div>

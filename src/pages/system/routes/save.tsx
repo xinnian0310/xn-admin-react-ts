@@ -1,15 +1,5 @@
 ﻿import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
-import {
-  Alert,
-  Form,
-  Input,
-  InputNumber,
-  Modal,
-  Radio,
-  Switch,
-  TreeSelect,
-  message,
-} from 'antd'
+import { Alert, Form, Input, InputNumber, Modal, Radio, Switch, TreeSelect, message } from 'antd'
 import { create, get, list, update } from '@/api/route'
 import IconPicker from '@/components/IconPicker'
 import { hasIndexView } from '@/utils/view-loader'
@@ -183,7 +173,12 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
           />
         </Form.Item>
         <Form.Item name="parentId" label="上级">
-          <TreeSelect allowClear treeDefaultExpandAll placeholder="无（顶级）" treeData={parentTree} />
+          <TreeSelect
+            allowClear
+            treeDefaultExpandAll
+            placeholder="无（顶级）"
+            treeData={parentTree}
+          />
         </Form.Item>
         {routeType === 'MENU' ? (
           <>

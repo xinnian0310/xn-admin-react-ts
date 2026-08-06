@@ -89,7 +89,11 @@ const JobSave = forwardRef<JobSaveHandle, { onSuccess?: () => void }>(function J
       onOk={() => void handleSubmit()}
     >
       <Form form={form} labelCol={{ span: 5 }} disabled={mode === 'view'}>
-        <Form.Item name="name" label="任务名称" rules={[{ required: true, message: '请输入任务名称' }]}>
+        <Form.Item
+          name="name"
+          label="任务名称"
+          rules={[{ required: true, message: '请输入任务名称' }]}
+        >
           <Input maxLength={100} />
         </Form.Item>
         <Form.Item
@@ -99,7 +103,11 @@ const JobSave = forwardRef<JobSaveHandle, { onSuccess?: () => void }>(function J
         >
           <Input maxLength={100} placeholder="唯一标识，如 demo-heartbeat" />
         </Form.Item>
-        <Form.Item name="cron" label="Cron" rules={[{ required: true, message: '请输入 Cron 表达式' }]}>
+        <Form.Item
+          name="cron"
+          label="Cron"
+          rules={[{ required: true, message: '请输入 Cron 表达式' }]}
+        >
           <Input placeholder="如 0 */5 * * * ?" />
         </Form.Item>
         <Form.Item

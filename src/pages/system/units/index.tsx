@@ -193,9 +193,7 @@ export default function UnitsPage() {
       dataIndex: 'builtIn',
       key: 'builtIn',
       width: 100,
-      render: (v: boolean) => (
-        <Tag color={v ? 'warning' : 'default'}>{v ? '内置' : '自定义'}</Tag>
-      ),
+      render: (v: boolean) => <Tag color={v ? 'warning' : 'default'}>{v ? '内置' : '自定义'}</Tag>,
     },
     {
       title: '操作',
@@ -240,7 +238,9 @@ export default function UnitsPage() {
             }}
           />
         }
-        toolbar={<XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />}
+        toolbar={
+          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+        }
         table={
           <Table
             rowKey="id"
@@ -277,9 +277,7 @@ export default function UnitsPage() {
                     {row.builtIn ? '内置' : '自定义'}
                   </Tag>
                 </div>
-                <div>
-                  角色：{(row.roleList || []).map((r) => r.name).join('、') || '—'}
-                </div>
+                <div>角色：{(row.roleList || []).map((r) => r.name).join('、') || '—'}</div>
                 <div>描述：{row.description || '—'}</div>
                 <div style={{ marginTop: 8 }}>
                   <Tag color={row.status === 1 ? 'success' : 'default'}>

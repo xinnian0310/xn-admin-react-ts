@@ -55,7 +55,10 @@ export default function XnSearch({
         const controlWidth = typeof width === 'number' ? width : undefined
         return (
           <Form.Item key={item.prop} name={item.prop} label={item.label}>
-            <div className="xn-search__control" style={controlWidth ? { width: controlWidth } : undefined}>
+            <div
+              className="xn-search__control"
+              style={controlWidth ? { width: controlWidth } : undefined}
+            >
               {renderField(item)}
             </div>
           </Form.Item>

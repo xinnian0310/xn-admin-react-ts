@@ -151,7 +151,9 @@ export default function PermissionAssignPanel({
 
   function renderTable(type: 'API' | 'BUTTON' | 'TABLE_BUTTON', data: Permission[]) {
     const pool = type === 'BUTTON' ? BUTTON_POOL : type === 'TABLE_BUTTON' ? TABLE_BUTTON_POOL : []
-    const existing = new Set(data.map((d) => (d.action || d.code.split(':').pop() || '').toLowerCase()))
+    const existing = new Set(
+      data.map((d) => (d.action || d.code.split(':').pop() || '').toLowerCase()),
+    )
     const canQuickAdd = pool.filter((p) => !existing.has(p.action.toLowerCase()))
 
     return (
@@ -190,12 +192,15 @@ export default function PermissionAssignPanel({
           columns={[
             ...(type === 'API'
               ? [
-                  { title: '方法', dataIndex: 'method', width: 90, render: (v: string) => <Tag>{v}</Tag> },
+                  {
+                    title: '方法',
+                    dataIndex: 'method',
+                    width: 90,
+                    render: (v: string) => <Tag>{v}</Tag>,
+                  },
                   { title: '路径', dataIndex: 'path', ellipsis: true },
                 ]
-              : [
-                  { title: '编码', dataIndex: 'code', ellipsis: true },
-                ]),
+              : [{ title: '编码', dataIndex: 'code', ellipsis: true }]),
             { title: '名称', dataIndex: 'name' },
             { title: '排序', dataIndex: 'sort', width: 70 },
             {
@@ -298,14 +303,28 @@ export default function PermissionAssignPanel({
           </Form.Item>
           {activeType === 'API' ? (
             <>
-              <Form.Item name="method" label="方法" rules={[{ required: true, message: '请选择方法' }]}>
+              <Form.Item
+                name="method"
+                label="方法"
+                rules={[{ required: true, message: '请选择方法' }]}
+              >
                 <Select
                   disabled={Boolean(editing?.builtIn) && mode !== 'add'}
-                  options={['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].map((m) => ({ label: m, value: m }))}
+                  options={['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].map((m) => ({
+                    label: m,
+                    value: m,
+                  }))}
                 />
               </Form.Item>
-              <Form.Item name="path" label="路径" rules={[{ required: true, message: '请输入路径' }]}>
-                <Input disabled={Boolean(editing?.builtIn) && mode !== 'add'} placeholder="/api/xxx" />
+              <Form.Item
+                name="path"
+                label="路径"
+                rules={[{ required: true, message: '请输入路径' }]}
+              >
+                <Input
+                  disabled={Boolean(editing?.builtIn) && mode !== 'add'}
+                  placeholder="/api/xxx"
+                />
               </Form.Item>
             </>
           ) : (
@@ -323,10 +342,12 @@ export default function PermissionAssignPanel({
               </Form.Item>
               <Form.Item name="buttonColor" label="颜色">
                 <Select
-                  options={['primary', 'success', 'warning', 'danger', 'info', 'default'].map((c) => ({
-                    label: c,
-                    value: c,
-                  }))}
+                  options={['primary', 'success', 'warning', 'danger', 'info', 'default'].map(
+                    (c) => ({
+                      label: c,
+                      value: c,
+                    }),
+                  )}
                 />
               </Form.Item>
             </>

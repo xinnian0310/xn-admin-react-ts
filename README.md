@@ -32,13 +32,13 @@ npm run dev
 
 开发地址：http://localhost:8888
 
-| 前缀          | 目标                                 |
-| ------------- | ------------------------------------ |
-| `/api`        | `http://localhost:8088`              |
-| `/uploads`    | `http://localhost:8088`              |
-| `/swagger-ui` | `http://localhost:8088`              |
-| `/v3/api-docs`| `http://localhost:8088`              |
-| `/ws`         | `http://localhost:8088`（WebSocket） |
+| 前缀           | 目标                                 |
+| -------------- | ------------------------------------ |
+| `/api`         | `http://localhost:8088`              |
+| `/uploads`     | `http://localhost:8088`              |
+| `/swagger-ui`  | `http://localhost:8088`              |
+| `/v3/api-docs` | `http://localhost:8088`              |
+| `/ws`          | `http://localhost:8088`（WebSocket） |
 
 ```bash
 npm run build        # tsc -b + vite build
@@ -50,14 +50,14 @@ npm run format
 
 ## 技术栈
 
-| 类别        | 技术                                      |
-| ----------- | ----------------------------------------- |
-| 框架        | React 19、TypeScript、Vite 8              |
-| UI          | Ant Design 6、@ant-design/icons、Iconify  |
-| 状态 / 路由 | Zustand 5、React Router 7                 |
-| 请求        | Axios                                     |
-| 图表 / 编辑 | ECharts、wangEditor                       |
-| Excel       | ExcelJS、xlsx                             |
+| 类别        | 技术                                     |
+| ----------- | ---------------------------------------- |
+| 框架        | React 19、TypeScript、Vite 8             |
+| UI          | Ant Design 6、@ant-design/icons、Iconify |
+| 状态 / 路由 | Zustand 5、React Router 7                |
+| 请求        | Axios                                    |
+| 图表 / 编辑 | ECharts、wangEditor                      |
+| Excel       | ExcelJS、xlsx                            |
 
 ## 工程约定
 

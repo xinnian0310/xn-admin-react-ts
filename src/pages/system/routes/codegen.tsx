@@ -38,7 +38,8 @@ const RouteCodegen = forwardRef<RouteCodegenHandle, object>(function RouteCodege
       setRoute(row)
       setResult(null)
       setActiveTab('sql')
-      const prefix = (row.path || '').replace(/^\//, '').split('/').filter(Boolean).pop() || 'module'
+      const prefix =
+        (row.path || '').replace(/^\//, '').split('/').filter(Boolean).pop() || 'module'
       const modulePrefix = prefix.toLowerCase()
       form.setFieldsValue({
         modulePrefix,
@@ -87,9 +88,7 @@ const RouteCodegen = forwardRef<RouteCodegenHandle, object>(function RouteCodege
             <Button onClick={() => void copyCurrent()}>复制当前</Button>
             <Button
               type="primary"
-              onClick={() =>
-                downloadZip(result.zipBase64, `codegen-${result.modulePrefix}.zip`)
-              }
+              onClick={() => downloadZip(result.zipBase64, `codegen-${result.modulePrefix}.zip`)}
             >
               下载 ZIP
             </Button>

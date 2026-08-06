@@ -222,7 +222,8 @@ export default function SystemFilesPage() {
   return (
     <>
       <XnPageLayout
-        showViewSwitch={false}
+        showViewSwitch={false}
+
         aside={
           <XnTreePanel
             title={`存储路径（${storageLabel}）`}

@@ -118,8 +118,11 @@ export default function SystemApiDocsPage() {
 
   return (
     <XnPageLayout
-      showViewSwitch={false}
-      toolbar={<span style={{ fontSize: 13, color: 'var(--app-text-muted, #909399)' }}>{modeHint}</span>}
+      showViewSwitch={false}
+
+      toolbar={
+        <span style={{ fontSize: 13, color: 'var(--app-text-muted, #909399)' }}>{modeHint}</span>
+      }
       toolbarExtra={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Radio.Group
@@ -180,7 +183,15 @@ export default function SystemApiDocsPage() {
       }
     >
       {mode === 'ui' ? (
-        <div style={{ flex: 1, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           <iframe
             title="Swagger UI"
             src={swaggerSrc}

@@ -303,7 +303,9 @@ export default function NoticesPage() {
             }}
           />
         }
-        toolbar={<XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />}
+        toolbar={
+          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+        }
         table={
           <XnTable
             data={tableData}
@@ -353,13 +355,23 @@ export default function NoticesPage() {
           >
             {tableData.map((row) => (
               <Card key={row.id} size="small">
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 12 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    marginBottom: 12,
+                  }}
+                >
                   <div style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {row.title}
                   </div>
                   <Tag color={statusColor(row.status)}>{statusLabel(row.status)}</Tag>
                 </div>
-                <div>已读：{row.status === 'DRAFT' ? '—' : `${row.readCount ?? 0} / ${row.totalCount ?? 0}`}</div>
+                <div>
+                  已读：
+                  {row.status === 'DRAFT' ? '—' : `${row.readCount ?? 0} / ${row.totalCount ?? 0}`}
+                </div>
                 <div>发布人：{row.publisherName || '—'}</div>
                 <div style={{ marginBottom: 12 }}>
                   下发时间：{formatDateTime(row.publishedAt) || '—'}

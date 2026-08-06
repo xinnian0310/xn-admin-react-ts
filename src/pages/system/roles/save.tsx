@@ -49,8 +49,7 @@ const RoleSave = forwardRef<RoleSaveHandle, { onSuccess?: () => void }>(function
           name: res.data.name,
           code: res.data.code,
           dataScope:
-            res.data.dataScope ||
-            (res.data.code === 'SUPER_ADMIN' ? 'ALL' : 'UNIT_AND_CHILDREN'),
+            res.data.dataScope || (res.data.code === 'SUPER_ADMIN' ? 'ALL' : 'UNIT_AND_CHILDREN'),
           description: res.data.description || '',
         })
       }

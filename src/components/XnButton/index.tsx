@@ -28,7 +28,8 @@ export default function XnButton({ listItem = [], selected = [], onButtonClick }
   function isDisabled(item: ButtonListItem) {
     if (item.disabled) return true
     if (item.index === 0 && selected.length !== 1) return true
-    if (typeof item.index === 'number' && item.index > 0 && selected.length < item.index) return true
+    if (typeof item.index === 'number' && item.index > 0 && selected.length < item.index)
+      return true
     return false
   }
 
@@ -94,12 +95,7 @@ interface XnTableActionsProps {
   onActionClick?: (payload: { action: string; row: Record<string, unknown> }) => void
 }
 
-export function XnTableActions({
-  items = [],
-  row,
-  disabled,
-  onActionClick,
-}: XnTableActionsProps) {
+export function XnTableActions({ items = [], row, disabled, onActionClick }: XnTableActionsProps) {
   const { hasPermission } = usePermission()
   const visible = items.filter((item) => !item.permission || hasPermission(item.permission))
 

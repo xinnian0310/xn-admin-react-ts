@@ -33,7 +33,8 @@ export default function XnAppIcon({ name, size = 16, className, style }: XnAppIc
     return <Comp className={className} style={merged} />
   }
 
-  const iconify = resolveIconifyName(name ?? undefined) || (parsed.type === 'iconify' ? parsed.name : null)
+  const iconify =
+    resolveIconifyName(name ?? undefined) || (parsed.type === 'iconify' ? parsed.name : null)
   if (iconify) {
     return <Icon icon={iconify} className={className} style={merged} width={dim} height={dim} />
   }
@@ -41,5 +42,7 @@ export default function XnAppIcon({ name, size = 16, className, style }: XnAppIc
   const Comp = resolveAntdIcon(parsed.name)
   if (Comp) return <Comp className={className} style={merged} />
 
-  return <Icon icon="mdi:circle-medium" className={className} style={merged} width={dim} height={dim} />
+  return (
+    <Icon icon="mdi:circle-medium" className={className} style={merged} width={dim} height={dim} />
+  )
 }
