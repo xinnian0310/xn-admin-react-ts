@@ -2,31 +2,39 @@
 
 心念后台管理系统前端：React 19 + TypeScript + Vite + Ant Design。
 
-对接微服务后端 [`xn-admin-cloud`](../xn-admin-cloud/)（经网关 `8088`），提供 JWT 登录、RBAC、动态路由/菜单、page-ui 驱动 CRUD、主题、通知与系统监控等能力。
+本仓库**独立开源**。对接微服务后端独立仓库 **xn-admin-cloud**（经网关 `8088`），提供 JWT 登录、RBAC、动态路由/菜单、page-ui 驱动 CRUD、主题、通知与系统监控等能力。
 
-本工程是基准前端 [`xn-admin-vue3-ts`](../xn-admin-vue3-ts/) 的 React 技术栈移植，功能目标见 [`../docs/PRD-xn-admin-frontend-sync.md`](../docs/PRD-xn-admin-frontend-sync.md)。同步进度见 [`SYNC.md`](./SYNC.md)。
+本工程是基准前端 **xn-admin-vue3-ts** 的 React 技术栈移植。同步进度见 [`SYNC.md`](./SYNC.md)。
 
 **视觉刻意与 Element Plus 端区分**：使用 Ant Design 原生主色（`#1677ff`）、浅色侧栏与白顶栏（主题可切换），不做「壳层仿 Element」。业务能力以基准为准。
 
-版本：`1.0.0` · Copyright 2026 心念
+版本：`1.0.0` · 许可证：[Apache-2.0](./LICENSE) · Copyright 2026 心念
+
+## 相关仓库
+
+| 仓库 | 说明 |
+|------|------|
+| `xn-admin-cloud` | 微服务后端（必需） |
+| `xn-admin-vue3-ts` | 功能基准（Vue 3 + TypeScript） |
+| `xn-admin-vue3-js` / `xn-admin-vue2-js` | 其它 Vue 管理端 |
 
 ## 前提
 
-1. Node.js 20+（建议与其它前端一致使用 20 LTS）
-2. 后端已启动，网关可访问：http://127.0.0.1:8088  
-   （同级目录一般为 [`../xn-admin-cloud`](../xn-admin-cloud/)，按其 README 启动 system / file / log / job / gateway）
-3. MySQL / Redis / Nacos 等中间件已就绪
+1. Node.js 20+（建议 20 LTS）
+2. 后端 **xn-admin-cloud** 已启动，网关可访问：http://127.0.0.1:8088  
+   （按其仓库 README 启动 system / file / log / job / gateway）
+3. MySQL / Redis / Nacos / MinIO 等中间件已就绪（随后端）
 
 ## 默认账号
 
-与后端种子账号一致（首次初始化）：
+与后端种子账号一致（首次初始化，**仅用于本地开发**）：
 
 | 用户名       | 初始密码     | 说明       |
 | ------------ | ------------ | ---------- |
 | `SuperAdmin` | `SuperAdmin` | 超级管理员 |
 | `admin`      | `admin`      | 管理员     |
 
-登录后请尽快修改密码。
+登录后请尽快修改密码。详见 [SECURITY.md](./SECURITY.md)。
 
 ## 快速启动
 
@@ -81,7 +89,7 @@ npm run build         # 类型检查 + 生产构建
 
 ## 与基准差异
 
-| 项               | 基准 Vue（vue3-ts）   | 本工程 React                              |
+| 项               | 基准 Vue（xn-admin-vue3-ts） | 本工程 React                              |
 | ---------------- | --------------------- | ----------------------------------------- |
 | UI               | Element Plus          | **Ant Design 原生视觉**                   |
 | 默认主色 / 侧栏  | `#409eff` 同色顶栏侧栏 | `#1677ff` + 浅色侧栏 + 白顶栏（可切换）   |
@@ -145,7 +153,7 @@ XnPageLayout
 
 ## 界面预览
 
-截图目录 [`docs/images/`](./docs/images/)，命名与基准 [`xn-admin-vue3-ts`](../xn-admin-vue3-ts/) 对齐（如 `login.png`、`users.png`），均为本工程 Ant Design 界面实拍。
+截图目录 [`docs/images/`](./docs/images/)，命名与基准仓库 **xn-admin-vue3-ts** 对齐（如 `login.png`、`users.png`），均为本工程 Ant Design 界面实拍。
 
 ### 登录与首页
 
@@ -242,3 +250,13 @@ XnPageLayout
 - 列表页模式：`XnPageLayout` → `XnSearch` → `XnButton` → `XnTable`（+ 可选 `XnTreePanel`）
 - 动态菜单页面对应 `src/pages/**/index.tsx`（由 view-loader 懒加载）
 - 详细同步与缺口说明见 [`SYNC.md`](./SYNC.md)
+
+## 生产部署（摘要）
+
+- `npm run build` 产出静态资源，由 Nginx 等托管
+- 将 `/api`、`/uploads`、`/ws` 反向代理到后端网关（默认 `127.0.0.1:8088`）
+- 安全见 [SECURITY.md](./SECURITY.md)；贡献见 [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+## 许可证
+
+[Apache License 2.0](./LICENSE)

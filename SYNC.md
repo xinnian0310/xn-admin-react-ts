@@ -1,6 +1,6 @@
 # xn-admin-react-ts 同步说明
 
-对照基准：`xn-admin-vue3-ts` · PRD：`docs/PRD-xn-admin-frontend-sync.md`
+对照基准：独立仓库 **xn-admin-vue3-ts**（功能范围以其仓库为准）
 
 ## 已实现
 
