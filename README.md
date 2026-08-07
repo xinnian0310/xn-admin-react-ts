@@ -257,6 +257,14 @@ XnPageLayout
 - 将 `/api`、`/uploads`、`/ws` 反向代理到后端网关（默认 `127.0.0.1:8088`）
 - 安全见 [SECURITY.md](./SECURITY.md)；贡献见 [CONTRIBUTING.md](./CONTRIBUTING.md)
 
+## 支持捐赠
+
+如果这个项目对你有帮助，欢迎请作者喝杯咖啡 ☕
+
+| 微信支付 | 支付宝 |
+| -------- | ------ |
+| ![微信支付](./docs/donation/wechat.jpg) | ![支付宝](./docs/donation/alipay.jpg) |
+
 ## 许可证
 
 [Apache License 2.0](./LICENSE)

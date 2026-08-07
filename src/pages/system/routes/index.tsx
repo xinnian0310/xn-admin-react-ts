@@ -144,6 +144,18 @@ export default function RoutesPage() {
     else if (action === 'generate') codegenRef.current?.open(row)
   }
 
+  function routeTypeLabel(type: SysRoute['type']) {
+    if (type === 'MENU') return '菜单'
+    if (type === 'LINK') return '外部链接'
+    return '目录'
+  }
+
+  function routeTypeColor(type: SysRoute['type']) {
+    if (type === 'MENU') return 'success'
+    if (type === 'LINK') return 'warning'
+    return 'processing'
+  }
+
   const columns = [
     {
       title: '标题',
@@ -160,9 +172,9 @@ export default function RoutesPage() {
     {
       title: '类型',
       dataIndex: 'type',
-      width: 90,
-      render: (v: string) => (
-        <Tag color={v === 'DIR' ? 'processing' : 'success'}>{v === 'DIR' ? '目录' : '菜单'}</Tag>
+      width: 100,
+      render: (v: SysRoute['type']) => (
+        <Tag color={routeTypeColor(v)}>{routeTypeLabel(v)}</Tag>
       ),
     },
     { title: '路径', dataIndex: 'path', ellipsis: true, minWidth: 140 },
@@ -172,6 +184,13 @@ export default function RoutesPage() {
       ellipsis: true,
       minWidth: 160,
       render: (v?: string) => (v ? `pages/${v}/` : '—'),
+    },
+    {
+      title: '外部链接',
+      dataIndex: 'linkUrl',
+      ellipsis: true,
+      minWidth: 180,
+      render: (v?: string) => v || '—',
     },
     { title: '排序', dataIndex: 'sort', width: 70 },
     {
@@ -280,14 +299,13 @@ export default function RoutesPage() {
                 }
               >
                 <div>
-                  <Tag color={row.type === 'DIR' ? 'processing' : 'success'}>
-                    {row.type === 'DIR' ? '目录' : '菜单'}
-                  </Tag>
+                  <Tag color={routeTypeColor(row.type)}>{routeTypeLabel(row.type)}</Tag>
                   <Tag color={row.status === 1 ? 'success' : 'default'}>
                     {row.status === 1 ? '启用' : '禁用'}
                   </Tag>
                 </div>
                 <div>路径：{row.path || '—'}</div>
+                {row.type === 'LINK' ? <div>外部链接：{row.linkUrl || '—'}</div> : null}
                 <div>权限控制：{row.permissionControl ? '开启' : '关闭'}</div>
                 <div style={{ marginTop: 8 }}>
                   <XnTableActions

@@ -30,4 +30,6 @@ export interface AppRouteMeta {
   noCache?: boolean
   permission?: string
   routePath?: string
+  /** LINK 类型外链地址 */
+  linkUrl?: string
 }

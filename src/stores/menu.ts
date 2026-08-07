@@ -9,7 +9,7 @@ function routeToMenu(route: SysRoute): MenuItem {
     title: route.title,
     icon: route.icon,
     iconAntd: route.iconAntd,
-    path: route.type === 'MENU' ? route.path : undefined,
+    path: route.type === 'MENU' || route.type === 'LINK' ? route.path : undefined,
     permission: route.permission,
     affix: route.affix,
     hidden: route.hidden,
@@ -20,7 +20,7 @@ function routeToMenu(route: SysRoute): MenuItem {
 export function collectMenuPaths(routes: SysRoute[]): SysRoute[] {
   const result: SysRoute[] = []
   for (const route of routes) {
-    if (route.type === 'MENU' && route.path) {
+    if ((route.type === 'MENU' || route.type === 'LINK') && route.path) {
       result.push(route)
     }
     if (route.children?.length) {

@@ -58,7 +58,16 @@
   overflow: hidden;
 }
 
-.admin-layout__page > *:not(.xn-page-layout):not(.profile-page):not(.system-config-page) {
+/* 外部链接 iframe：撑满主内容区 */
+.admin-layout__page > .iframe-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.admin-layout__page
+  > *:not(.xn-page-layout):not(.profile-page):not(.system-config-page):not(.iframe-page) {
   flex: 0 0 auto;
   min-height: 100%;
   box-sizing: border-box;

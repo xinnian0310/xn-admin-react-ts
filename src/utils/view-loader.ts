@@ -51,6 +51,8 @@ export interface DynamicRouteMeta {
   public?: boolean
   noCache?: boolean
   routePath?: string
+  /** LINK 类型外链地址 */
+  linkUrl?: string
 }
 
 export interface DynamicRouteObject {

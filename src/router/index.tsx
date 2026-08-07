@@ -120,6 +120,7 @@ export default function AppRouter() {
               <Route
                 key={r.name}
                 path={r.path}
+                handle={r.meta}
                 element={
                   <AuthGuard meta={r.meta}>
                     <r.Component />

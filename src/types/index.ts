@@ -434,12 +434,14 @@ export interface SysRoute {
   title: string
   path?: string
   viewPath?: string
+  /** 外链地址（LINK 类型），主内容区 iframe 加载 */
+  linkUrl?: string
   icon?: string
   /** React 端菜单图标；优先于 icon */
   iconAntd?: string
   permission?: string
   parentId?: number | null
-  type: 'DIR' | 'MENU'
+  type: 'DIR' | 'MENU' | 'LINK'
   sort: number
   status: number
   hidden: boolean
@@ -454,11 +456,12 @@ export interface SysRouteForm {
   title: string
   path?: string
   viewPath?: string
+  linkUrl?: string
   icon?: string
   iconAntd?: string
   permission?: string
   parentId?: number | null
-  type: 'DIR' | 'MENU'
+  type: 'DIR' | 'MENU' | 'LINK'
   sort?: number
   status?: number
   hidden?: boolean
