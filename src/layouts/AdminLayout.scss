@@ -32,13 +32,36 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-.admin-layout__page > * {
+/* XnPageLayout 占满视口并由内部滚动；其余页面（个人信息/服务监控等）可自然增高由本层滚动 */
+.admin-layout__page > .xn-page-layout {
   flex: 1 1 auto;
   min-height: 0;
   height: 100%;
+}
+
+/* 个人信息：整页占满，左侧头像固定、右侧内部滚动 */
+.admin-layout__page > .profile-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+/* 系统配置：整页占满，仅标签页内容区滚动 */
+.admin-layout__page > .system-config-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.admin-layout__page > *:not(.xn-page-layout):not(.profile-page):not(.system-config-page) {
+  flex: 0 0 auto;
+  min-height: 100%;
+  box-sizing: border-box;
 }
 
 .admin-layout.is-fullscreen .admin-layout__content {
@@ -128,7 +151,8 @@
   color: var(--app-header-text, rgba(0, 0, 0, 0.88)) !important;
   border-bottom: 1px solid var(--app-header-border, #f0f0f0);
   height: 56px;
-  line-height: 56px;
+  /* 避免继承大行高导致头像/文字垂直错位 */
+  line-height: 1.5;
   box-shadow: none;
   transition:
     background 0.2s ease,
@@ -140,6 +164,7 @@
   align-items: center;
   gap: 16px;
   color: inherit;
+  line-height: 1;
 }
 
 .layout-header-tools .anticon,
@@ -147,6 +172,30 @@
   color: inherit;
   font-size: 16px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.layout-header-tools__user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.layout-header-tools__user .ant-avatar {
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.layout-header-tools__username {
+  line-height: 1;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .layout-brand {

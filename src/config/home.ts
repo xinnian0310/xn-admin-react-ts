@@ -97,7 +97,7 @@ export const homeConfig = {
     { name: 'Zustand', version: '5.x', desc: '轻量状态管理' },
     { name: 'React Router', version: '7.x', desc: '客户端路由 · 动态菜单' },
     { name: 'Axios', version: '1.x', desc: 'HTTP 请求与拦截封装' },
-    { name: 'ECharts', version: '6.x', desc: '数据可视化（echarts-for-react）' },
+    { name: '@ant-design/plots', version: '2.x', desc: 'Ant Design Charts 数据可视化' },
     { name: 'wangEditor', version: '5.x', desc: '富文本编辑器' },
     { name: 'Iconify', version: '6.x', desc: '图标集' },
     { name: 'dayjs', version: '1.x', desc: '轻量日期时间处理' },

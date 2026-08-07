@@ -6,7 +6,7 @@
 
 ### M0–M2 基础
 
-- Vite / TS / Ant Design / Zustand / React Router（端口 **8888**，`APP_CLIENT_ID=xn-admin-react-ts`）
+- Vite / TS / Ant Design / Zustand / React Router（端口 **1800**，`APP_CLIENT_ID=xn-admin-react-ts`）
 - 请求层、会话守卫、公告 WS、动态路由、四布局、核心 Xn* 组件
 - Login / Dashboard（统计卡片 + 注册趋势/角色分布图）/ Profile / 错误页 / Redirect
 - Vite 代理含 `/api` `/uploads` `/ws` `/swagger-ui` `/v3/api-docs` → `localhost:8088`
@@ -74,6 +74,6 @@
 ## 验收建议
 
 1. 启动 `xn-admin-cloud` 网关 `8088`
-2. `npm run dev` → http://localhost:1803
+2. `npm run dev` → http://localhost:1800
 3. SuperAdmin 登录 → 动态菜单 → 用户管理 / 系统配置 / api-docs UI·API / 监控 / 日志导出
 4. `npm run typecheck` / `npm run build`

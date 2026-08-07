@@ -79,13 +79,15 @@ export const useUserStore = create<UserState>((set, get) => ({
       captchaCode: captcha?.captchaCode,
     })
     const { token, user } = res.data
-    set({ token, user })
+    // 先写 localStorage / 权限，完成 registry 与 UI 偏好后再发布 token。
+    // 否则 LoginGuard 会在 bootstrap 未完成时立刻 Navigate，触发 AuthGuard 竞态。
     localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(user))
     usePermissionStore.getState().setAuthData(user.roles || [], user.permissions || [])
     await get().loadRegistry()
     startSessionGuard()
     await useUiPreferenceStore.getState().load()
+    set({ token, user })
     return res.data
   },
 

@@ -127,7 +127,7 @@ export default function LoginView() {
         captchaId: captchaEnabled ? captchaId : undefined,
         captchaCode: captchaEnabled && captchaType === 'IMAGE' ? values.captcha : undefined,
       })
-      if (data.user.mustChangePassword) {
+      if (data.user?.mustChangePassword) {
         message.warning('按安全策略要求，请先修改密码')
         navigate('/profile?forcePwd=1', { replace: true })
       } else {

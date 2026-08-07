@@ -199,6 +199,7 @@ export default function UnitsPage() {
       title: '操作',
       key: 'actions',
       fixed: 'right' as const,
+      align: 'center' as const,
       width: 220,
       render: (_: unknown, row: SysUnit) => (
         <XnTableActions

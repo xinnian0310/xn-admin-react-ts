@@ -198,6 +198,7 @@ export default function RoutesPage() {
       title: '操作',
       key: 'actions',
       fixed: 'right' as const,
+      align: 'center' as const,
       width: 240,
       render: (_: unknown, row: SysRoute) => (
         <XnTableActions

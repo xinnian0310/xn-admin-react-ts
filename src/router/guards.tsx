@@ -57,13 +57,15 @@ export function TagsViewSync({
 export function AuthGuard({ meta, children }: { meta?: AppRouteMeta; children?: ReactNode }) {
   const location = useLocation()
   const token = useUserStore((s) => s.token)
-  const user = useUserStore((s) => s.user)
+  const mustChangePassword = useUserStore((s) => !!s.user?.mustChangePassword)
+  const userRolesLength = useUserStore((s) => s.user?.roles?.length ?? 0)
+  const userPermissionsLength = useUserStore((s) => s.user?.permissions?.length ?? 0)
   const fetchProfile = useUserStore((s) => s.fetchProfile)
   const logout = useUserStore((s) => s.logout)
   const routesRegistered = useMenuStore((s) => s.routesRegistered)
   const hasPermission = usePermissionStore((s) => s.hasPermission)
   const isSuperAdmin = usePermissionStore((s) => s.isSuperAdmin)
-  const permissions = usePermissionStore((s) => s.permissions)
+  const permissionsLength = usePermissionStore((s) => s.permissions.length)
   const [ready, setReady] = useState(false)
   const [forbidden, setForbidden] = useState(false)
   const [toLogin, setToLogin] = useState(false)
@@ -73,25 +75,32 @@ export function AuthGuard({ meta, children }: { meta?: AppRouteMeta; children?: 
     let cancelled = false
 
     async function run() {
-      setReady(false)
       setForbidden(false)
       setToLogin(false)
       setForcePwd(false)
 
       if (!meta?.public && !token) {
-        if (!cancelled) setToLogin(true)
+        if (!cancelled) {
+          setReady(false)
+          setToLogin(true)
+        }
         return
       }
 
-      if (token && user?.mustChangePassword) {
+      if (token && mustChangePassword) {
         const path = location.pathname
         if (path !== '/profile' && path !== '/login' && !ERROR_PATHS.has(path)) {
-          if (!cancelled) setForcePwd(true)
+          if (!cancelled) {
+            setReady(false)
+            setForcePwd(true)
+          }
           return
         }
       }
 
-      if (!meta?.public && token && !routesRegistered) {
+      // 读最新值，避免 await 期间 routesRegistered 已翻转却仍走取消分支卡住 ready
+      if (!meta?.public && token && !useMenuStore.getState().routesRegistered) {
+        if (!cancelled) setReady(false)
         await registerDynamicRoutes()
         if (cancelled) return
       }
@@ -103,18 +112,30 @@ export function AuthGuard({ meta, children }: { meta?: AppRouteMeta; children?: 
 
       if (meta?.permission) {
         try {
+          // 超管以角色兜底，空 permissions 不应反复拉 /auth/me
           const needsRefresh =
-            !permissions.length || !user?.roles?.length || !user?.permissions?.length
+            !isSuperAdmin() &&
+            (!usePermissionStore.getState().permissions.length ||
+              !userRolesLength ||
+              !userPermissionsLength)
           if (needsRefresh && token) {
+            if (!cancelled) setReady(false)
             await fetchProfile()
+            if (cancelled) return
           }
         } catch {
           await logout(false)
-          if (!cancelled) setToLogin(true)
+          if (!cancelled) {
+            setReady(false)
+            setToLogin(true)
+          }
           return
         }
         if (!isSuperAdmin() && !hasPermission(meta.permission)) {
-          if (!cancelled) setForbidden(true)
+          if (!cancelled) {
+            setReady(false)
+            setForbidden(true)
+          }
           return
         }
       }
@@ -131,9 +152,11 @@ export function AuthGuard({ meta, children }: { meta?: AppRouteMeta; children?: 
     meta?.public,
     meta?.permission,
     token,
-    user,
+    mustChangePassword,
+    userRolesLength,
+    userPermissionsLength,
     routesRegistered,
-    permissions.length,
+    permissionsLength,
     fetchProfile,
     logout,
     hasPermission,
@@ -152,7 +175,7 @@ export function AuthGuard({ meta, children }: { meta?: AppRouteMeta; children?: 
   if (!ready) {
     return (
       <div style={{ display: 'grid', placeItems: 'center', height: '40vh' }}>
-        <Spin tip="加载中..." />
+        <Spin description="加载中..." />
       </div>
     )
   }

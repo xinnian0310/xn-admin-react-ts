@@ -48,3 +48,14 @@
   border-top: 1px solid var(--app-border-color, #f0f0f0);
   background: var(--app-card-bg, #fff);
 }
+
+/* 操作列：单行展示、居中，宽度由按钮估算 */
+.xn-table__body .xn-table-col-actions {
+  white-space: nowrap;
+  text-align: center;
+}
+
+.xn-table__body .xn-table-col-actions .ant-space {
+  flex-wrap: nowrap !important;
+  justify-content: center;
+}

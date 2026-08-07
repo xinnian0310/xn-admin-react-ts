@@ -4,6 +4,7 @@ import type { ButtonListItem } from '@/types/button'
 import { resolveButtonAction } from '@/utils/page-ui'
 import { usePermission } from '@/hooks/usePermission'
 import XnAppIcon from '@/components/XnAppIcon'
+import './xnButton.scss'
 
 const COLOR_MAP: Record<string, 'primary' | 'default' | 'dashed' | 'link' | 'text'> = {
   primary: 'primary',
@@ -42,7 +43,7 @@ export default function XnButton({ listItem = [], selected = [], onButtonClick }
   }
 
   return (
-    <Space wrap>
+    <Space wrap className="xn-button">
       {visible.map((item) => {
         if (item.type === 'down' && item.searchItem?.length) {
           const items: MenuProps['items'] = item.searchItem
@@ -61,7 +62,12 @@ export default function XnButton({ listItem = [], selected = [], onButtonClick }
           return (
             <Dropdown key={item.name} menu={{ items }} disabled={isDisabled(item)}>
               <Button
-                type={COLOR_MAP[item.typeColor || 'default'] || 'default'}
+                className={
+                  !item.typeColor || item.typeColor === 'primary' || item.typeColor === 'success'
+                    ? 'xn-button__primary-tone'
+                    : undefined
+                }
+                type={COLOR_MAP[item.typeColor || 'primary'] || 'primary'}
                 danger={item.typeColor === 'danger'}
                 icon={item.icon ? <XnAppIcon name={item.icon} size={14} /> : undefined}
               >
@@ -71,11 +77,14 @@ export default function XnButton({ listItem = [], selected = [], onButtonClick }
           )
         }
 
+        const tone = item.typeColor || 'default'
+        const usePrimaryTone = tone === 'primary' || tone === 'success'
         return (
           <Button
             key={item.name + (item.action || '')}
-            type={COLOR_MAP[item.typeColor || 'default'] || 'default'}
-            danger={item.typeColor === 'danger'}
+            className={usePrimaryTone ? 'xn-button__primary-tone' : undefined}
+            type={COLOR_MAP[tone] || 'default'}
+            danger={tone === 'danger'}
             disabled={isDisabled(item)}
             icon={item.icon ? <XnAppIcon name={item.icon} size={14} /> : undefined}
             onClick={() => handleClick(item)}
@@ -100,7 +109,7 @@ export function XnTableActions({ items = [], row, disabled, onActionClick }: XnT
   const visible = items.filter((item) => !item.permission || hasPermission(item.permission))
 
   return (
-    <Space size={4} wrap>
+    <Space size={4} wrap={false} className="xn-table-actions" style={{ flexWrap: 'nowrap' }}>
       {visible.map((item) => {
         const action = resolveButtonAction(item)
         const reason = disabled?.(action, row)
@@ -110,6 +119,7 @@ export function XnTableActions({ items = [], row, disabled, onActionClick }: XnT
             key={action}
             type="link"
             size="small"
+            className={item.typeColor === 'danger' ? undefined : 'xn-button__link-tone'}
             danger={item.typeColor === 'danger'}
             disabled={isDisabled}
             title={typeof reason === 'string' ? reason : undefined}

@@ -28,7 +28,7 @@ export default function UiPreferenceFab() {
           openDrawer()
         }}
       />
-      <Drawer title="界面偏好" open={drawerVisible} onClose={closeDrawer} width={360}>
+      <Drawer title="界面偏好" open={drawerVisible} onClose={closeDrawer} size={360}>
         <Form
           form={form}
           layout="vertical"

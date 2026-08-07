@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type Key } from 'react'
 import { Input, Tree } from 'antd'
 import type { DataNode } from 'antd/es/tree'
 
@@ -40,6 +40,18 @@ function filterTree<T extends Record<string, unknown>>(
   return walk(nodes)
 }
 
+function collectKeys(nodes: DataNode[]): Key[] {
+  const keys: Key[] = []
+  const walk = (list: DataNode[]) => {
+    for (const n of list) {
+      keys.push(n.key)
+      if (n.children?.length) walk(n.children)
+    }
+  }
+  walk(nodes)
+  return keys
+}
+
 export default function XnTreePanel<T extends Record<string, unknown>>({
   title,
   width = 240,
@@ -73,6 +85,15 @@ export default function XnTreePanel<T extends Record<string, unknown>>({
     return mapNodes(filtered)
   }, [filtered, keyField, labelKey, childrenKey])
 
+  const allKeys = useMemo(() => collectKeys(treeData), [treeData])
+  const allKeysSig = allKeys.join('|')
+  const [expandedKeys, setExpandedKeys] = useState<Key[]>([])
+
+  // 异步数据到达后仍默认全部展开（antd defaultExpandAll 仅首挂载生效）
+  useEffect(() => {
+    setExpandedKeys(allKeysSig ? allKeysSig.split('|') : [])
+  }, [allKeysSig])
+
   return (
     <div
       style={{
@@ -82,6 +103,7 @@ export default function XnTreePanel<T extends Record<string, unknown>>({
         display: 'flex',
         flexDirection: 'column',
         gap: 8,
+        boxSizing: 'border-box',
       }}
     >
       {title ? <div style={{ fontWeight: 600 }}>{title}</div> : null}
@@ -99,7 +121,8 @@ export default function XnTreePanel<T extends Record<string, unknown>>({
         <Tree
           treeData={treeData}
           selectedKeys={currentKey != null ? [String(currentKey)] : []}
-          defaultExpandAll
+          expandedKeys={expandedKeys}
+          onExpand={(keys) => setExpandedKeys(keys)}
           onSelect={(_keys, info) => {
             const raw = (info.node as DataNode & { raw?: T }).raw
             if (raw) onNodeClick?.(raw)

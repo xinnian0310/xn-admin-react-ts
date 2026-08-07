@@ -1,4 +1,4 @@
-import { Avatar, Dropdown, Space, Tooltip } from 'antd'
+import { Avatar, Dropdown, Tooltip } from 'antd'
 import type { MenuProps } from 'antd'
 import {
   BgColorsOutlined,
@@ -83,10 +83,14 @@ export default function LayoutHeaderTools() {
         <BgColorsOutlined style={{ cursor: 'pointer' }} onClick={openDialog} />
       </Tooltip>
       <Dropdown menu={{ items: menuItems }}>
-        <Space style={{ cursor: 'pointer' }}>
-          <Avatar size={28}>{avatarText}</Avatar>
-          <span>{user?.nickname || user?.username}</span>
-        </Space>
+        <span className="layout-header-tools__user">
+          <Avatar size={28} src={user?.avatar}>
+            {avatarText}
+          </Avatar>
+          <span className="layout-header-tools__username">
+            {user?.nickname || user?.username}
+          </span>
+        </span>
       </Dropdown>
     </div>
   )

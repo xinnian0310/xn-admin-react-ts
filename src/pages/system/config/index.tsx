@@ -37,6 +37,7 @@ import {
 } from '@/api/system-config'
 import { useUiPreferenceStore } from '@/stores/uiPreference'
 import { parsePxInt, toPx } from '@/utils/px'
+import './systemConfig.scss'
 
 function createForm(): SystemConfigPayload {
   const d = JSON.parse(JSON.stringify(defaultAppConfig)) as AppConfig
@@ -239,13 +240,6 @@ export default function SystemConfigPage() {
         label: '应用信息',
         children: (
           <Form labelCol={{ span: 4 }} style={{ maxWidth: 720 }}>
-            <Form.Item label="当前前端工程">
-              <Input value={clientId} disabled />
-              <div style={{ marginTop: 6, color: '#94a3b8', fontSize: 12, lineHeight: 1.5 }}>
-                项目名称 / 应用介绍按此 clientId
-                写入数据库（app.clients），各技术栈互不影响；页脚与品牌图标仍共享。
-              </div>
-            </Form.Item>
             <Form.Item label="项目名称" required>
               <Input
                 maxLength={50}
@@ -820,28 +814,12 @@ export default function SystemConfigPage() {
   )
 
   return (
-    <div className="page-card" style={{ padding: 16 }}>
-      <Spin spinning={loading}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            gap: 16,
-            marginBottom: 16,
-            alignItems: 'flex-start',
-          }}
-        >
-          <div>
-            <h2 style={{ margin: 0, fontSize: 18 }}>系统配置</h2>
-            <p
-              style={{
-                margin: '6px 0 0',
-                color: '#64748b',
-                fontSize: 13,
-                lineHeight: 1.5,
-                maxWidth: 760,
-              }}
-            >
+    <div className="page-card system-config-page" style={{ padding: 16 }}>
+      <Spin spinning={loading} wrapperClassName="system-config-page__spin">
+        <div className="system-config-page__header">
+          <div className="system-config-page__heading">
+            <h2>系统配置</h2>
+            <p className="system-config-page__hint">
               与前端 app.ts
               对齐：保存后即时生效。登录页背景/验证码请在「登录页设置」中配置；主题色请在右上角主题面板调整。
               「项目名称 / 应用介绍」按当前前端工程（{clientId}）单独存储，不影响其他前端项目。
@@ -861,7 +839,13 @@ export default function SystemConfigPage() {
           </Space>
         </div>
 
-        <Tabs tabPosition="left" activeKey={activeTab} onChange={setActiveTab} items={tabItems} />
+        <Tabs
+          className="system-config-page__tabs"
+          tabPosition="left"
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          items={tabItems}
+        />
       </Spin>
 
       <Image

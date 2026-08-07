@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState, type Key } from 'react'
 import {
   Alert,
   Form,
@@ -61,6 +61,18 @@ function remapTableAction(action: string) {
   return action
 }
 
+function collectTreeKeys(nodes: DataNode[]): Key[] {
+  const keys: Key[] = []
+  const walk = (list: DataNode[]) => {
+    for (const n of list) {
+      keys.push(n.key)
+      if (n.children?.length) walk(n.children)
+    }
+  }
+  walk(nodes)
+  return keys
+}
+
 export default function PermissionsContentPage() {
   const { searchItems, buttonItems, tableButtonItems } = usePageUi('/system/permissions-content')
   const [routes, setRoutes] = useState<SysRoute[]>([])
@@ -108,6 +120,13 @@ export default function PermissionsContentPage() {
       }))
     return map(routes)
   }, [routes])
+
+  const treeKeys = useMemo(() => collectTreeKeys(treeData), [treeData])
+  const treeKeysSig = treeKeys.join('|')
+  const [expandedKeys, setExpandedKeys] = useState<Key[]>([])
+  useEffect(() => {
+    setExpandedKeys(treeKeysSig ? treeKeysSig.split('|') : [])
+  }, [treeKeysSig])
 
   const children = useMemo(() => {
     const list = (selectedMenuPerm?.children || []).filter((c) => c.type === contentType)
@@ -284,6 +303,7 @@ export default function PermissionsContentPage() {
     {
       title: '操作',
       key: 'actions',
+      align: 'center' as const,
       width: 160,
       render: (_: unknown, row: Permission) => (
         <XnTableActions
@@ -318,7 +338,8 @@ export default function PermissionsContentPage() {
         <div style={{ fontWeight: 600, marginBottom: 8 }}>菜单</div>
         <Tree
           treeData={treeData}
-          defaultExpandAll
+          expandedKeys={expandedKeys}
+          onExpand={(keys) => setExpandedKeys(keys)}
           onSelect={(_keys, info) => {
             const raw = (info.node as DataNode & { raw?: SysRoute; disabled?: boolean }).raw
             if (!raw || info.node.disabled) return

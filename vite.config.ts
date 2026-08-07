@@ -18,12 +18,12 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['exceljs'],
+    include: ['exceljs', '@ant-design/plots', 'tslib'],
   },
   server: {
     host: '0.0.0.0',
-    // Dedicated port so it won't collide with Vue frontends (1800–1802)
-    port: 8888,
+    // Dedicated port so it won't collide with Vue frontends / xn-home
+    port: 1800,
     open: true,
     proxy: {
       '/api': {

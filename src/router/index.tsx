@@ -17,7 +17,7 @@ const RedirectPage = lazy(() => import('@/pages/redirect/index'))
 function PageFallback() {
   return (
     <div style={{ display: 'grid', placeItems: 'center', height: '40vh' }}>
-      <Spin tip="页面加载中..." />
+      <Spin description="页面加载中..." />
     </div>
   )
 }
@@ -28,7 +28,7 @@ function CatchAll() {
   if (!routesRegistered || !isCatchAllReady()) {
     return (
       <div style={{ display: 'grid', placeItems: 'center', height: '40vh' }}>
-        <Spin tip="注册路由中..." />
+        <Spin description="注册路由中..." />
       </div>
     )
   }

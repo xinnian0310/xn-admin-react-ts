@@ -19,10 +19,12 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  width: 260px;
+  /* 宽度由 aside 内容（如 XnTreePanel / 安全策略表单）决定，避免固定 260 导致横向滚动 */
+  max-width: 42%;
   background: var(--app-card-bg, #fff);
   border-right: 1px solid var(--app-border-color, #f0f0f0);
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .xn-page-layout__main {

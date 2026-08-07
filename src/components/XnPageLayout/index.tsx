@@ -88,7 +88,6 @@ export default function XnPageLayout({
             {toolbarExtra}
             {showViewSwitch && card ? (
               <Segmented
-                size="small"
                 value={viewMode}
                 options={[
                   { label: '表格', value: 'table' },

@@ -66,18 +66,19 @@ export default function XnSearch({
       })}
       <Form.Item className="xn-search__actions">
         <Space>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" className="xn-search__btn-primary">
             查询
           </Button>
           <Button onClick={handleReset}>重置</Button>
           {searchItem.length > collapseCount ? (
             <Button
-              type="link"
+              type="primary"
+              className="xn-search__btn-primary"
+              aria-label={expanded ? '收起' : '展开'}
+              title={expanded ? '收起' : '展开'}
               onClick={() => setExpanded((v) => !v)}
               icon={expanded ? <UpOutlined /> : <DownOutlined />}
-            >
-              {expanded ? '收起' : '展开'}
-            </Button>
+            />
           ) : null}
         </Space>
       </Form.Item>

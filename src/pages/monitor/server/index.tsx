@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -14,10 +14,15 @@ import {
   Modal,
   Spin,
 } from 'antd'
-import ReactECharts from 'echarts-for-react'
+import * as echarts from 'echarts/core'
+import { GaugeChart } from 'echarts/charts'
+import { CanvasRenderer } from 'echarts/renderers'
+import type { EChartsType } from 'echarts/core'
 import Auth from '@/components/Auth'
 import { getInfraStatus, getServerMonitor, restartInfra } from '@/api/monitor'
 import type { InfraComponent, InfraStatus, ServerMonitor } from '@/types'
+
+echarts.use([GaugeChart, CanvasRenderer])
 
 const emptyData: ServerMonitor = {
   cpu: { cores: 0, sysUsage: 0, processUsage: 0 },
@@ -95,45 +100,71 @@ function statusTagColor(status?: string) {
   return 'warning'
 }
 
-function gaugeOption(value: number) {
+function UsageGauge({ value }: { value: number }) {
   const color = usageColor(value)
-  return {
-    animation: false,
-    series: [
+  const hostRef = useRef<HTMLDivElement | null>(null)
+  const chartRef = useRef<EChartsType | null>(null)
+
+  useEffect(() => {
+    const el = hostRef.current
+    if (!el) return
+    const chart = echarts.init(el)
+    chartRef.current = chart
+    const onResize = () => chart.resize()
+    window.addEventListener('resize', onResize)
+    return () => {
+      window.removeEventListener('resize', onResize)
+      chart.dispose()
+      chartRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    const chart = chartRef.current
+    if (!chart) return
+    chart.setOption(
       {
-        type: 'gauge',
-        radius: '88%',
-        center: ['50%', '58%'],
-        startAngle: 210,
-        endAngle: -30,
-        min: 0,
-        max: 100,
-        splitNumber: 5,
-        progress: { show: true, width: 10, roundCap: true, itemStyle: { color } },
-        axisLine: { roundCap: true, lineStyle: { width: 10, color: [[1, '#ebeef5']] } },
-        axisTick: { show: false },
-        splitLine: {
-          show: true,
-          length: 8,
-          distance: 2,
-          lineStyle: { color: '#c0c4cc', width: 1 },
-        },
-        axisLabel: { distance: 14, color: '#909399', fontSize: 11 },
-        pointer: { show: true, length: '46%', width: 3, itemStyle: { color } },
-        anchor: { show: true, showAbove: true, size: 6, itemStyle: { color } },
-        title: { show: false },
-        detail: {
-          valueAnimation: false,
-          offsetCenter: [0, '28%'],
-          fontSize: 20,
-          fontWeight: 600,
-          formatter: (v: number) => `${Number(v).toFixed(1)}%`,
-          color,
-        },
-        data: [{ value: Number(value.toFixed(1)) }],
+        animation: false,
+        series: [
+          {
+            type: 'gauge',
+            radius: '88%',
+            center: ['50%', '58%'],
+            startAngle: 210,
+            endAngle: -30,
+            min: 0,
+            max: 100,
+            splitNumber: 5,
+            progress: { show: true, width: 10, roundCap: true, itemStyle: { color } },
+            axisLine: { roundCap: true, lineStyle: { width: 10, color: [[1, '#ebeef5']] } },
+            axisTick: { show: false },
+            splitLine: {
+              show: true,
+              length: 8,
+              distance: 2,
+              lineStyle: { color: '#c0c4cc', width: 1 },
+            },
+            axisLabel: { distance: 14, color: '#909399', fontSize: 11 },
+            pointer: { show: true, length: '46%', width: 3, itemStyle: { color } },
+            anchor: { show: true, showAbove: true, size: 6, itemStyle: { color } },
+            title: { show: false },
+            detail: {
+              valueAnimation: false,
+              offsetCenter: [0, '28%'],
+              fontSize: 20,
+              fontWeight: 600,
+              formatter: (v: number) => `${Number(v).toFixed(1)}%`,
+              color,
+            },
+            data: [{ value: Number(value.toFixed(1)) }],
+          },
+        ],
       },
-    ],
-  }
+      true,
+    )
+  }, [value, color])
+
+  return <div ref={hostRef} style={{ height: 180, width: '100%' }} />
 }
 
 export default function MonitorServerPage() {
@@ -327,7 +358,7 @@ export default function MonitorServerPage() {
             {gauges.map((g) => (
               <Col key={g.key} xs={24} sm={8}>
                 <Card size="small">
-                  <ReactECharts option={gaugeOption(g.value)} style={{ height: 180 }} />
+                  <UsageGauge value={g.value} />
                   <div style={{ textAlign: 'center', fontWeight: 600 }}>{g.title}</div>
                   <div style={{ textAlign: 'center', color: 'rgba(0,0,0,0.45)', fontSize: 12 }}>
                     {g.foot}

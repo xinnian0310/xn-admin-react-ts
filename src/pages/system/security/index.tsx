@@ -153,7 +153,7 @@ export default function SecurityPage() {
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
-  const hint = { marginLeft: 8, color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' as const }
+  const hint = { marginLeft: 8, color: '#94a3b8', fontSize: 12 }
 
   return (
     <XnPageLayout
@@ -171,16 +171,20 @@ export default function SecurityPage() {
         <div
           style={{
             width: 380,
+            minWidth: 380,
+            maxWidth: '100%',
             padding: 12,
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
-            overflow: 'auto',
+            overflowX: 'hidden',
+            overflowY: 'auto',
+            boxSizing: 'border-box',
           }}
         >
           <div style={{ fontWeight: 600 }}>安全策略</div>
-          <Form layout="horizontal" labelCol={{ span: 10 }} style={{ flex: 1 }}>
+          <Form layout="horizontal" labelCol={{ flex: '140px' }} wrapperCol={{ flex: 1 }} style={{ flex: 1 }}>
             <div style={{ fontWeight: 600, margin: '4px 0 12px', fontSize: 13 }}>登录防护</div>
             <Form.Item label="失败锁定阈值">
               <InputNumber
@@ -188,6 +192,7 @@ export default function SecurityPage() {
                 max={50}
                 value={form.maxFailures}
                 onChange={(v) => patch('maxFailures', Number(v) || 1)}
+                style={{ width: 120 }}
               />
               <span style={hint}>次</span>
             </Form.Item>
@@ -197,6 +202,7 @@ export default function SecurityPage() {
                 max={1440}
                 value={form.lockMinutes}
                 onChange={(v) => patch('lockMinutes', Number(v) || 1)}
+                style={{ width: 120 }}
               />
               <span style={hint}>分钟</span>
             </Form.Item>
@@ -206,6 +212,7 @@ export default function SecurityPage() {
                 max={1000}
                 value={form.rateLimitPerMinute}
                 onChange={(v) => patch('rateLimitPerMinute', Number(v) || 1)}
+                style={{ width: 120 }}
               />
               <span style={hint}>次</span>
             </Form.Item>
@@ -215,6 +222,7 @@ export default function SecurityPage() {
                 max={600}
                 value={form.captchaTtlSeconds}
                 onChange={(v) => patch('captchaTtlSeconds', Number(v) || 30)}
+                style={{ width: 120 }}
               />
               <span style={hint}>秒</span>
             </Form.Item>
@@ -236,6 +244,7 @@ export default function SecurityPage() {
                 max={50}
                 value={form.pwdMinLength}
                 onChange={(v) => patch('pwdMinLength', Number(v) || 6)}
+                style={{ width: 120 }}
               />
               <span style={hint}>位</span>
             </Form.Item>
@@ -245,6 +254,7 @@ export default function SecurityPage() {
                 max={50}
                 value={form.pwdMaxLength}
                 onChange={(v) => patch('pwdMaxLength', Number(v) || 6)}
+                style={{ width: 120 }}
               />
               <span style={hint}>位</span>
             </Form.Item>
@@ -278,6 +288,7 @@ export default function SecurityPage() {
                 max={3650}
                 value={form.pwdExpireDays}
                 onChange={(v) => patch('pwdExpireDays', Number(v) || 0)}
+                style={{ width: 120 }}
               />
               <span style={hint}>天（0=不过期）</span>
             </Form.Item>
@@ -287,6 +298,7 @@ export default function SecurityPage() {
                 max={20}
                 value={form.pwdHistoryCount}
                 onChange={(v) => patch('pwdHistoryCount', Number(v) || 0)}
+                style={{ width: 120 }}
               />
               <span style={hint}>次（0=不限制）</span>
             </Form.Item>

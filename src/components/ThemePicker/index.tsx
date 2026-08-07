@@ -15,10 +15,13 @@ export default function ThemePicker() {
   const setCustomParts = useThemeStore((s) => s.setCustomParts)
 
   return (
-    <Modal title="主题设置" open={visible} onCancel={closeDialog} footer={null} width={560}>
+    <Modal title="主题设置" open={visible} onCancel={closeDialog} footer={null} width={640}>
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <div>
           <div style={{ marginBottom: 8, fontWeight: 600 }}>预设主题</div>
+          <div style={{ marginBottom: 6, fontSize: 12, color: 'rgba(0,0,0,0.45)' }}>
+            一键切换主色、侧栏与顶栏配色
+          </div>
           <Space wrap>
             {themes.map((t) => (
               <Button

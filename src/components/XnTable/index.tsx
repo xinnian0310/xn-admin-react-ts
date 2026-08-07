@@ -222,6 +222,20 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
     })
   }, [columns, columnPrefs])
 
+  const visibleActionItems = useMemo(
+    () => (actionItems || []).filter((item) => !item.permission || hasPermission(item.permission)),
+    [actionItems, hasPermission],
+  )
+
+  const actionsColumnWidth = useMemo(
+    () => (visibleActionItems.length ? estimateTableActionsWidth(visibleActionItems) : undefined),
+    [visibleActionItems],
+  )
+
+  function isActionsColumn(col: TableColumnItem, slotName?: string) {
+    return slotName === 'actions' || col.slot === 'actions' || col.label === '操作'
+  }
+
   const antdColumns: ColumnsType<Record<string, unknown>> = useMemo(() => {
     const cols: ColumnsType<Record<string, unknown>> = []
 
@@ -241,13 +255,22 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
 
       const slotName = col.slot || col.prop
       if (col.type === 'slot' && slotName && slots?.[slotName]) {
+        const actions = isActionsColumn(col, slotName)
         cols.push({
           title: col.label,
           dataIndex: col.prop,
-          width: col.width,
-          minWidth: typeof col.minWidth === 'number' ? col.minWidth : undefined,
-          fixed: col.fixed === true ? 'left' : col.fixed || undefined,
-          align: col.align,
+          // 操作列：始终按可见按钮估算宽度（覆盖页面过窄 width），保证不换行
+          width: actions && actionsColumnWidth != null ? actionsColumnWidth : col.width,
+          minWidth:
+            actions && actionsColumnWidth != null
+              ? actionsColumnWidth
+              : typeof col.minWidth === 'number'
+                ? col.minWidth
+                : undefined,
+          fixed: actions ? 'right' : col.fixed === true ? 'left' : col.fixed || undefined,
+          align: col.align || (actions ? 'center' : undefined),
+          className: actions ? 'xn-table-col-actions' : undefined,
+          onCell: actions ? () => ({ style: { whiteSpace: 'nowrap' } }) : undefined,
           render: (_v, row, index) => slots[slotName]!({ row, index }),
         })
         continue
@@ -327,17 +350,18 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
         continue
       }
 
-      if (col.type === 'slot' && slotName === 'actions' && actionItems?.length) {
+      if (col.type === 'slot' && slotName === 'actions' && visibleActionItems.length) {
         cols.push({
           title: col.label || '操作',
           key: 'actions',
           fixed: 'right',
-          width: col.width || estimateTableActionsWidth(actionItems),
+          align: 'center',
+          width: actionsColumnWidth || estimateTableActionsWidth(visibleActionItems),
+          className: 'xn-table-col-actions',
+          onCell: () => ({ style: { whiteSpace: 'nowrap' } }),
           render: (_v, row) => (
-            <Space size={0}>
-              {actionItems
-                .filter((item) => !item.permission || hasPermission(item.permission))
-                .map((item) => {
+            <Space size={0} wrap={false}>
+              {visibleActionItems.map((item) => {
                   const action = item.action || item.name
                   return (
                     <Button
@@ -375,6 +399,8 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
     visibleColumns,
     slots,
     actionItems,
+    visibleActionItems,
+    actionsColumnWidth,
     currentPage,
     currentPageSize,
     hasPermission,

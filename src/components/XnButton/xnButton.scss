@@ -1,0 +1,26 @@
+/* 主色按钮跟随主题 CSS 变量（与 ConfigProvider token 互补） */
+.xn-button__primary-tone.ant-btn-primary:not(.ant-btn-dangerous):not(:disabled) {
+  background: var(--app-color-primary, #1677ff);
+  border-color: var(--app-color-primary, #1677ff);
+  color: #fff;
+}
+
+.xn-button__primary-tone.ant-btn-primary:not(.ant-btn-dangerous):not(:disabled):hover {
+  background: var(--app-color-primary-light-3, #4096ff);
+  border-color: var(--app-color-primary-light-3, #4096ff);
+  color: #fff;
+}
+
+.xn-button__primary-tone.ant-btn-primary:not(.ant-btn-dangerous):not(:disabled):active {
+  background: var(--app-color-primary-dark-2, #0958d9);
+  border-color: var(--app-color-primary-dark-2, #0958d9);
+  color: #fff;
+}
+
+.xn-button__link-tone.ant-btn-link:not(.ant-btn-dangerous):not(:disabled) {
+  color: var(--app-color-primary, #1677ff);
+}
+
+.xn-button__link-tone.ant-btn-link:not(.ant-btn-dangerous):not(:disabled):hover {
+  color: var(--app-color-primary-light-3, #4096ff);
+}

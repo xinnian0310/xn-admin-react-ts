@@ -5,7 +5,10 @@ import {
   DEFAULT_THEME_ID,
   DEFAULT_THEME_SOURCE,
   builtinThemes,
+  findAppearanceTheme,
+  findTheme,
   resolveActiveTheme,
+  themeToCustomParts,
   type AppearanceMode,
   type CustomThemeParts,
   type ThemeSource,
@@ -140,17 +143,21 @@ export const useThemeStore = create<ThemeState>((set, get) => {
 
     setTheme(id) {
       localStorage.setItem(STORAGE_THEME_ID, id)
-      const nextDerived = computeDerived('preset', id, get().appearance, get().customParts)
+      const parts = themeToCustomParts(findTheme(id))
+      localStorage.setItem(STORAGE_CUSTOM, JSON.stringify(parts))
+      const nextDerived = computeDerived('preset', id, get().appearance, parts)
       localStorage.setItem(STORAGE_SOURCE, 'preset')
-      set({ themeId: id, source: 'preset', ...nextDerived })
+      set({ themeId: id, source: 'preset', customParts: parts, ...nextDerived })
       get().applyCurrent()
     },
 
     setAppearance(mode) {
       localStorage.setItem(STORAGE_APPEARANCE, mode)
-      const nextDerived = computeDerived('appearance', get().themeId, mode, get().customParts)
+      const parts = themeToCustomParts(findAppearanceTheme(mode))
+      localStorage.setItem(STORAGE_CUSTOM, JSON.stringify(parts))
+      const nextDerived = computeDerived('appearance', get().themeId, mode, parts)
       localStorage.setItem(STORAGE_SOURCE, 'appearance')
-      set({ appearance: mode, source: 'appearance', ...nextDerived })
+      set({ appearance: mode, source: 'appearance', customParts: parts, ...nextDerived })
       get().applyCurrent()
     },
 

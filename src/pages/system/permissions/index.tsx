@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState, type ReactNode } from 'react'
+﻿import { useEffect, useMemo, useState, type Key, type ReactNode } from 'react'
 import {
   Alert,
   Badge,
@@ -53,6 +53,18 @@ function countChecked(ids: Set<number>, items: Permission[]) {
   let n = 0
   for (const item of items) if (ids.has(item.id)) n++
   return n
+}
+
+function collectTreeKeys(nodes: DataNode[]): Key[] {
+  const keys: Key[] = []
+  const walk = (list: DataNode[]) => {
+    for (const n of list) {
+      keys.push(n.key)
+      if (n.children?.length) walk(n.children)
+    }
+  }
+  walk(nodes)
+  return keys
 }
 
 export default function RolePermissionsPage() {
@@ -210,7 +222,7 @@ export default function RolePermissionsPage() {
     ].filter((g) => g.items.length)
   }, [assignableOfSelected])
 
-  function buildTreeData(nodes: MenuNode[]): DataNode[] {
+  const menuTreeData = useMemo(() => {
     const kw = menuFilter.trim().toLowerCase()
     const filterNode = (list: MenuNode[]): MenuNode[] => {
       const result: MenuNode[] = []
@@ -225,7 +237,7 @@ export default function RolePermissionsPage() {
       }
       return result
     }
-    const mapped = filterNode(nodes)
+    const mapped = filterNode(routes)
     const toData = (list: MenuNode[]): DataNode[] =>
       list.map((n) => {
         const disabled = !(n.type === 'MENU' && n.permissionControl)
@@ -270,7 +282,14 @@ export default function RolePermissionsPage() {
         }
       })
     return toData(mapped)
-  }
+  }, [routes, menuFilter, permByCode, checkedIds, currentRole])
+
+  const menuTreeKeys = useMemo(() => collectTreeKeys(menuTreeData), [menuTreeData])
+  const menuTreeKeysSig = menuTreeKeys.join('|')
+  const [menuExpandedKeys, setMenuExpandedKeys] = useState<Key[]>([])
+  useEffect(() => {
+    setMenuExpandedKeys(menuTreeKeysSig ? menuTreeKeysSig.split('|') : [])
+  }, [menuTreeKeysSig])
 
   function toggleGroup(items: Permission[], checked: boolean) {
     const next = new Set(checkedIds)
@@ -368,9 +387,10 @@ export default function RolePermissionsPage() {
                 style={{ marginBottom: 8 }}
               />
               <Tree
-                treeData={buildTreeData(routes)}
+                treeData={menuTreeData}
                 selectedKeys={selectedRouteKey ? [selectedRouteKey] : []}
-                defaultExpandAll
+                expandedKeys={menuExpandedKeys}
+                onExpand={(keys) => setMenuExpandedKeys(keys)}
                 onSelect={(keys, info) => {
                   const raw = (info.node as DataNode & { raw?: MenuNode; disabled?: boolean }).raw
                   if (!raw || info.node.disabled) return

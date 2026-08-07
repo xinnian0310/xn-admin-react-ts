@@ -212,6 +212,7 @@ export default function PermissionAssignPanel({
             {
               title: '操作',
               width: 140,
+              align: 'center' as const,
               render: (_: unknown, row: Permission) => (
                 <Space>
                   <Auth permission="permission-content:table-edit">

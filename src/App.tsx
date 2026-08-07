@@ -108,7 +108,7 @@ export default function App() {
   if (booting) {
     return (
       <div style={{ height: '100vh', display: 'grid', placeItems: 'center' }}>
-        <Spin size="large" tip="初始化配置..." />
+        <Spin size="large" description="初始化配置..." />
       </div>
     )
   }

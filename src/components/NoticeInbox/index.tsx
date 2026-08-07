@@ -18,7 +18,7 @@ export default function NoticeInbox() {
       <Badge count={unreadCount} size="small">
         <BellOutlined style={{ fontSize: 18, cursor: 'pointer' }} onClick={openDrawer} />
       </Badge>
-      <Drawer title="我的公告" open={drawerVisible} onClose={closeDrawer} width={420}>
+      <Drawer title="我的公告" open={drawerVisible} onClose={closeDrawer} size={420}>
         <List
           loading={loading}
           dataSource={notices}
@@ -44,7 +44,7 @@ export default function NoticeInbox() {
         title={activeNotice?.title || '公告详情'}
         open={Boolean(activeNotice)}
         onClose={closeDetail}
-        width={520}
+        size={520}
       >
         <Typography.Paragraph>{activeNotice?.content}</Typography.Paragraph>
       </Drawer>

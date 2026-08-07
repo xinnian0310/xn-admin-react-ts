@@ -1,4 +1,4 @@
-/** 内置主题：侧栏 / 顶栏 / 主色（Ant Design 气质；各预设侧栏/顶栏可区分） */
+/** 内置主题：侧栏 / 顶栏 / 主色（各预设侧栏色明显区分，避免清一色 #001529） */
 
 import { hexToRgbCss, isLightColor, mixHex } from '@/utils/color'
 
@@ -47,10 +47,19 @@ export const ANTD_SIDER_BG = '#001529'
 export const DEFAULT_CUSTOM_PARTS: CustomThemeParts = {
   primary: ANTD_PRIMARY,
   sidebarBg: ANTD_SIDER_BG,
-  headerBg: '#ffffff',
+  headerBg: mixHex(ANTD_SIDER_BG, '#ffffff', 0.14),
 }
 
-/** Pro 深色侧栏：底色可定制，选中项用主色 */
+/** 从完整主题提取个性化三项，便于预设切换后同步取色器 */
+export function themeToCustomParts(theme: AppTheme): CustomThemeParts {
+  return {
+    primary: theme.colors.primary,
+    sidebarBg: theme.colors.sidebar.bg,
+    headerBg: theme.colors.header.bg,
+  }
+}
+
+/** Pro 深色侧栏：底色可定制，选中项用主色块 */
 function darkSider(primary: string, siderBg: string): ThemeColors['sidebar'] {
   return {
     bg: siderBg,
@@ -65,19 +74,44 @@ function darkSider(primary: string, siderBg: string): ThemeColors['sidebar'] {
   }
 }
 
-function lightHeader(borderColor = '#f0f0f0'): ThemeColors['header'] {
+/** 品牌色侧栏：侧栏即主色系，选中用半透明白 */
+function brandSider(bg: string): ThemeColors['sidebar'] {
   return {
-    bg: '#ffffff',
-    text: 'rgba(0, 0, 0, 0.88)',
-    border: borderColor,
+    bg,
+    bgElevated: mixHex(bg, '#000000', 0.1),
+    text: 'rgba(255, 255, 255, 0.85)',
+    textActive: '#ffffff',
+    active: '#ffffff',
+    activeBg: 'rgba(255, 255, 255, 0.22)',
+    hoverBg: 'rgba(255, 255, 255, 0.12)',
+    border: 'rgba(255, 255, 255, 0.14)',
+    railBg: mixHex(bg, '#000000', 0.22),
   }
 }
 
-function tintedHeader(primary: string): ThemeColors['header'] {
+/** 浅色侧栏：浅底 + 主色高亮 */
+function softSider(primary: string, siderBg: string): ThemeColors['sidebar'] {
   return {
-    bg: primary,
-    text: '#ffffff',
-    border: 'transparent',
+    bg: siderBg,
+    bgElevated: mixHex(siderBg, '#ffffff', 0.45),
+    text: 'rgba(0, 0, 0, 0.65)',
+    textActive: 'rgba(0, 0, 0, 0.88)',
+    active: primary,
+    activeBg: `rgba(${hexToRgbCss(primary)}, 0.12)`,
+    hoverBg: 'rgba(0, 0, 0, 0.04)',
+    border: mixHex(siderBg, '#000000', 0.08),
+    railBg: mixHex(siderBg, '#000000', 0.04),
+  }
+}
+
+/** 顶栏：相对侧栏只略提亮，色差保持很小 */
+function liftHeader(siderBg: string, whiteMix = 0.14): ThemeColors['header'] {
+  const bg = mixHex(siderBg, '#ffffff', whiteMix)
+  const light = isLightColor(bg)
+  return {
+    bg,
+    text: light ? 'rgba(0, 0, 0, 0.88)' : 'rgba(255, 255, 255, 0.92)',
+    border: light ? mixHex(bg, '#000000', 0.06) : 'rgba(255, 255, 255, 0.1)',
   }
 }
 
@@ -85,27 +119,17 @@ export const appearanceThemes: Record<AppearanceMode, AppTheme> = {
   light: {
     id: 'appearance-light',
     name: '亮色',
-    swatches: ['#ffffff', ANTD_PRIMARY],
+    swatches: ['#d6e4ff', '#e6f4ff'],
     colors: {
       primary: ANTD_PRIMARY,
-      sidebar: {
-        bg: '#ffffff',
-        bgElevated: '#fafafa',
-        text: 'rgba(0, 0, 0, 0.65)',
-        textActive: 'rgba(0, 0, 0, 0.88)',
-        active: ANTD_PRIMARY,
-        activeBg: '#e6f4ff',
-        hoverBg: 'rgba(0, 0, 0, 0.04)',
-        border: '#f0f0f0',
-        railBg: '#fafafa',
-      },
-      header: lightHeader(),
+      sidebar: softSider(ANTD_PRIMARY, '#d6e4ff'),
+      header: liftHeader('#d6e4ff', 0.12),
     },
   },
   dark: {
     id: 'appearance-dark',
     name: '暗色',
-    swatches: ['#141414', ANTD_PRIMARY],
+    swatches: ['#141414', '#1f1f1f'],
     colors: {
       primary: ANTD_PRIMARY,
       sidebar: {
@@ -119,11 +143,7 @@ export const appearanceThemes: Record<AppearanceMode, AppTheme> = {
         border: '#303030',
         railBg: '#000000',
       },
-      header: {
-        bg: '#141414',
-        text: 'rgba(255, 255, 255, 0.85)',
-        border: '#303030',
-      },
+      header: liftHeader('#141414', 0.12),
     },
   },
 }
@@ -158,71 +178,91 @@ export const builtinThemes: AppTheme[] = [
   {
     id: 'blue',
     name: 'Ant Design',
-    swatches: [ANTD_SIDER_BG, ANTD_PRIMARY],
+    swatches: [ANTD_SIDER_BG, mixHex(ANTD_SIDER_BG, '#ffffff', 0.14)],
     colors: {
       primary: ANTD_PRIMARY,
       sidebar: darkSider(ANTD_PRIMARY, ANTD_SIDER_BG),
-      header: lightHeader(),
+      header: liftHeader(ANTD_SIDER_BG),
     },
   },
   {
     id: 'tech-blue',
     name: '极客蓝',
-    swatches: ['#000c17', '#1668dc'],
+    swatches: ['#0958d9', mixHex('#0958d9', '#ffffff', 0.14)],
     colors: {
-      primary: '#1668dc',
-      sidebar: darkSider('#1668dc', '#000c17'),
-      header: tintedHeader('#1668dc'),
+      primary: '#1677ff',
+      sidebar: brandSider('#0958d9'),
+      header: liftHeader('#0958d9'),
     },
   },
   {
     id: 'cyan',
     name: '明青',
-    swatches: ['#002329', '#13c2c2'],
+    swatches: ['#006d75', mixHex('#006d75', '#ffffff', 0.14)],
     colors: {
       primary: '#13c2c2',
-      sidebar: darkSider('#13c2c2', '#002329'),
-      header: tintedHeader('#13c2c2'),
+      sidebar: brandSider('#006d75'),
+      header: liftHeader('#006d75'),
     },
   },
   {
     id: 'green',
     name: '极光绿',
-    swatches: ['#092b00', '#52c41a'],
+    swatches: ['#237804', mixHex('#237804', '#ffffff', 0.14)],
     colors: {
       primary: '#52c41a',
-      sidebar: darkSider('#52c41a', '#092b00'),
-      header: tintedHeader('#52c41a'),
+      sidebar: brandSider('#237804'),
+      header: liftHeader('#237804'),
     },
   },
   {
     id: 'purple',
     name: '酱紫',
-    swatches: ['#120338', '#722ed1'],
+    swatches: ['#391085', mixHex('#391085', '#ffffff', 0.14)],
     colors: {
       primary: '#722ed1',
-      sidebar: darkSider('#722ed1', '#120338'),
-      header: tintedHeader('#722ed1'),
+      sidebar: brandSider('#391085'),
+      header: liftHeader('#391085'),
+    },
+  },
+  {
+    id: 'orange',
+    name: '日落橙',
+    swatches: ['#ad4e00', mixHex('#ad4e00', '#ffffff', 0.14)],
+    colors: {
+      primary: '#fa8c16',
+      sidebar: brandSider('#ad4e00'),
+      header: liftHeader('#ad4e00'),
+    },
+  },
+  {
+    id: 'magenta',
+    name: '薄暮',
+    swatches: ['#9e1068', mixHex('#9e1068', '#ffffff', 0.14)],
+    colors: {
+      primary: '#eb2f96',
+      sidebar: brandSider('#9e1068'),
+      header: liftHeader('#9e1068'),
+    },
+  },
+  {
+    id: 'sky',
+    name: '晴空',
+    swatches: ['#91caff', mixHex('#91caff', '#ffffff', 0.14)],
+    colors: {
+      primary: '#1677ff',
+      sidebar: softSider('#1677ff', '#91caff'),
+      header: liftHeader('#91caff'),
     },
   },
   {
     id: 'daybreak',
     name: '拂晓灰',
-    swatches: ['#fafafa', ANTD_PRIMARY],
+    swatches: ['#d9d9d9', mixHex('#d9d9d9', '#ffffff', 0.14)],
     colors: {
       primary: ANTD_PRIMARY,
-      sidebar: {
-        bg: '#fafafa',
-        bgElevated: '#ffffff',
-        text: 'rgba(0, 0, 0, 0.65)',
-        textActive: 'rgba(0, 0, 0, 0.88)',
-        active: ANTD_PRIMARY,
-        activeBg: '#e6f4ff',
-        hoverBg: 'rgba(0, 0, 0, 0.04)',
-        border: '#f0f0f0',
-        railBg: '#f5f5f5',
-      },
-      header: lightHeader(),
+      sidebar: softSider(ANTD_PRIMARY, '#d9d9d9'),
+      header: liftHeader('#d9d9d9'),
     },
   },
 ]
