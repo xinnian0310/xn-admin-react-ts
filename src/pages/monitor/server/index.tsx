@@ -180,7 +180,7 @@ export default function MonitorServerPage() {
       { key: 'minio', title: 'MinIO', ...infra.minio },
       { key: 'nacos', title: 'Nacos', ...infra.nacos },
       { key: 'kkfileview', title: 'kkFileView', ...infra.kkfileview },
-      { key: 'backend', title: 'Backend', ...infra.backend },
+      { key: 'backend', title: '后端', ...infra.backend },
     ],
     [infra],
   )

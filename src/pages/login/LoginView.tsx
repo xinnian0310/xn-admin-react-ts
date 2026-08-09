@@ -186,7 +186,7 @@ export default function LoginView() {
             <Form
               form={form}
               size="large"
-              initialValues={{ username: 'SuperAdmin', password: '' }}
+              initialValues={{ username: 'admin', password: 'admin' }}
               onFinish={() => void handleLogin()}
             >
               <Form.Item name="username" rules={[{ required: true, message: '请输入用户名' }]}>
