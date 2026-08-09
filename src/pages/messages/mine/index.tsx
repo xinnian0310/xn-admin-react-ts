@@ -1,3 +1,4 @@
+import XnModal from '@/components/XnModal'
 ﻿import { useEffect, useState } from 'react'
 import { Modal, Tag, message } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
@@ -201,6 +202,7 @@ export default function MessagesMinePage() {
               setSize(s)
               applyLocalPage(p, s)
             }}
+            onRefresh={() => void loadData()}
             slots={{
               sentAt: ({ row }) => formatDateTime((row as unknown as MyMessage).sentAt) || '—',
               read: ({ row }) => {
@@ -222,7 +224,7 @@ export default function MessagesMinePage() {
           />
         }
       />
-      <Modal
+      <XnModal
         title={current?.title || '消息详情'}
         open={detailVisible}
         width={720}
@@ -244,7 +246,8 @@ export default function MessagesMinePage() {
             />
           </div>
         ) : null}
-      </Modal>
+      </XnModal>
     </>
   )
 }
+

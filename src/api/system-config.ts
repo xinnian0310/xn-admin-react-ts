@@ -17,7 +17,7 @@ export type SystemConfigPayload = {
     layout: { mode: AppConfig['ui']['layout']['mode'] }
     fontSize: AppConfig['ui']['fontSize']
     tagsView: AppConfig['ui']['tagsView']
-    elementPlus: AppConfig['ui']['elementPlus']
+    antd: AppConfig['ui']['antd']
   }
   storage: AppConfig['storage']
   logRetention: AppConfig['logRetention']

@@ -1,4 +1,4 @@
-/** 内置主题：侧栏 / 顶栏 / 主色（各预设侧栏色明显区分，避免清一色 #001529） */
+/** 内置主题：侧栏 / 顶栏 / 主色（与 xn-admin-vue3-ts 共享预设；默认 blue 保留 Ant Design 原生色） */
 
 import { hexToRgbCss, isLightColor, mixHex } from '@/utils/color'
 
@@ -41,6 +41,7 @@ export const CUSTOM_THEME_ID = 'custom'
 export type ThemeSource = 'preset' | 'appearance' | 'custom'
 export const DEFAULT_THEME_SOURCE: ThemeSource = 'preset'
 
+/** Ant Design 默认主色 / Pro 深色侧栏 */
 export const ANTD_PRIMARY = '#1677ff'
 export const ANTD_SIDER_BG = '#001529'
 
@@ -48,6 +49,18 @@ export const DEFAULT_CUSTOM_PARTS: CustomThemeParts = {
   primary: ANTD_PRIMARY,
   sidebarBg: ANTD_SIDER_BG,
   headerBg: mixHex(ANTD_SIDER_BG, '#ffffff', 0.14),
+}
+
+/** 旧主题 id → 新共享 id（两栈统一后兼容 localStorage） */
+const THEME_ID_ALIASES: Record<string, string> = {
+  'tech-blue': 'indigo',
+  cyan: 'teal',
+  green: 'emerald',
+  purple: 'violet',
+  orange: 'amber',
+  magenta: 'rose',
+  daybreak: 'sky',
+  dawn: 'sky',
 }
 
 /** 从完整主题提取个性化三项，便于预设切换后同步取色器 */
@@ -94,11 +107,11 @@ function softSider(primary: string, siderBg: string): ThemeColors['sidebar'] {
   return {
     bg: siderBg,
     bgElevated: mixHex(siderBg, '#ffffff', 0.45),
-    text: 'rgba(0, 0, 0, 0.65)',
-    textActive: 'rgba(0, 0, 0, 0.88)',
+    text: 'rgba(15, 23, 42, 0.65)',
+    textActive: 'rgba(15, 23, 42, 0.92)',
     active: primary,
     activeBg: `rgba(${hexToRgbCss(primary)}, 0.12)`,
-    hoverBg: 'rgba(0, 0, 0, 0.04)',
+    hoverBg: 'rgba(15, 23, 42, 0.05)',
     border: mixHex(siderBg, '#000000', 0.08),
     railBg: mixHex(siderBg, '#000000', 0.04),
   }
@@ -110,7 +123,7 @@ function liftHeader(siderBg: string, whiteMix = 0.14): ThemeColors['header'] {
   const light = isLightColor(bg)
   return {
     bg,
-    text: light ? 'rgba(0, 0, 0, 0.88)' : 'rgba(255, 255, 255, 0.92)',
+    text: light ? 'rgba(15, 23, 42, 0.88)' : 'rgba(255, 255, 255, 0.92)',
     border: light ? mixHex(bg, '#000000', 0.06) : 'rgba(255, 255, 255, 0.1)',
   }
 }
@@ -158,22 +171,23 @@ export function buildThemeColorsFromParts(parts: CustomThemeParts): ThemeColors 
     sidebar: {
       bg: sidebarBg,
       bgElevated: mixHex(sidebarBg, sidebarLight ? '#000000' : '#ffffff', 0.08),
-      text: sidebarLight ? 'rgba(0, 0, 0, 0.65)' : 'rgba(255, 255, 255, 0.65)',
-      textActive: sidebarLight ? 'rgba(0, 0, 0, 0.88)' : '#ffffff',
+      text: sidebarLight ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.65)',
+      textActive: sidebarLight ? 'rgba(15, 23, 42, 0.92)' : '#ffffff',
       active: sidebarLight ? primary : '#ffffff',
-      activeBg: sidebarLight ? `rgba(${hexToRgbCss(primary)}, 0.1)` : primary,
-      hoverBg: sidebarLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.08)',
-      border: sidebarLight ? '#f0f0f0' : 'transparent',
+      activeBg: sidebarLight ? `rgba(${hexToRgbCss(primary)}, 0.12)` : primary,
+      hoverBg: sidebarLight ? 'rgba(15, 23, 42, 0.05)' : 'rgba(255, 255, 255, 0.08)',
+      border: sidebarLight ? mixHex(sidebarBg, '#000000', 0.08) : 'transparent',
       railBg: mixHex(sidebarBg, sidebarLight ? '#000000' : '#ffffff', 0.1),
     },
     header: {
       bg: headerBg,
-      text: headerLight ? 'rgba(0, 0, 0, 0.88)' : 'rgba(255, 255, 255, 0.85)',
-      border: headerLight ? '#f0f0f0' : 'rgba(255, 255, 255, 0.12)',
+      text: headerLight ? 'rgba(15, 23, 42, 0.88)' : 'rgba(255, 255, 255, 0.92)',
+      border: headerLight ? mixHex(headerBg, '#000000', 0.06) : 'rgba(255, 255, 255, 0.1)',
     },
   }
 }
 
+/** 共享预设（与 Vue 端 id / 色值一致；blue 为各自框架默认） */
 export const builtinThemes: AppTheme[] = [
   {
     id: 'blue',
@@ -186,83 +200,83 @@ export const builtinThemes: AppTheme[] = [
     },
   },
   {
-    id: 'tech-blue',
-    name: '极客蓝',
-    swatches: ['#0958d9', mixHex('#0958d9', '#ffffff', 0.14)],
+    id: 'indigo',
+    name: '靛蓝',
+    swatches: ['#312e81', mixHex('#312e81', '#ffffff', 0.14)],
     colors: {
-      primary: '#1677ff',
-      sidebar: brandSider('#0958d9'),
-      header: liftHeader('#0958d9'),
+      primary: '#6366f1',
+      sidebar: darkSider('#6366f1', '#312e81'),
+      header: liftHeader('#312e81'),
     },
   },
   {
-    id: 'cyan',
-    name: '明青',
-    swatches: ['#006d75', mixHex('#006d75', '#ffffff', 0.14)],
+    id: 'teal',
+    name: '青碧',
+    swatches: ['#0f766e', mixHex('#0f766e', '#ffffff', 0.14)],
     colors: {
-      primary: '#13c2c2',
-      sidebar: brandSider('#006d75'),
-      header: liftHeader('#006d75'),
+      primary: '#14b8a6',
+      sidebar: brandSider('#0f766e'),
+      header: liftHeader('#0f766e'),
     },
   },
   {
-    id: 'green',
-    name: '极光绿',
-    swatches: ['#237804', mixHex('#237804', '#ffffff', 0.14)],
+    id: 'emerald',
+    name: '翠绿',
+    swatches: ['#065f46', mixHex('#065f46', '#ffffff', 0.14)],
     colors: {
-      primary: '#52c41a',
-      sidebar: brandSider('#237804'),
-      header: liftHeader('#237804'),
+      primary: '#10b981',
+      sidebar: brandSider('#065f46'),
+      header: liftHeader('#065f46'),
     },
   },
   {
-    id: 'purple',
-    name: '酱紫',
-    swatches: ['#391085', mixHex('#391085', '#ffffff', 0.14)],
+    id: 'violet',
+    name: '紫罗兰',
+    swatches: ['#5b21b6', mixHex('#5b21b6', '#ffffff', 0.14)],
     colors: {
-      primary: '#722ed1',
-      sidebar: brandSider('#391085'),
-      header: liftHeader('#391085'),
+      primary: '#8b5cf6',
+      sidebar: brandSider('#5b21b6'),
+      header: liftHeader('#5b21b6'),
     },
   },
   {
-    id: 'orange',
-    name: '日落橙',
-    swatches: ['#ad4e00', mixHex('#ad4e00', '#ffffff', 0.14)],
+    id: 'amber',
+    name: '琥珀',
+    swatches: ['#92400e', mixHex('#92400e', '#ffffff', 0.14)],
     colors: {
-      primary: '#fa8c16',
-      sidebar: brandSider('#ad4e00'),
-      header: liftHeader('#ad4e00'),
+      primary: '#f59e0b',
+      sidebar: brandSider('#92400e'),
+      header: liftHeader('#92400e'),
     },
   },
   {
-    id: 'magenta',
-    name: '薄暮',
-    swatches: ['#9e1068', mixHex('#9e1068', '#ffffff', 0.14)],
+    id: 'rose',
+    name: '玫红',
+    swatches: ['#9f1239', mixHex('#9f1239', '#ffffff', 0.14)],
     colors: {
-      primary: '#eb2f96',
-      sidebar: brandSider('#9e1068'),
-      header: liftHeader('#9e1068'),
+      primary: '#e11d48',
+      sidebar: brandSider('#9f1239'),
+      header: liftHeader('#9f1239'),
+    },
+  },
+  {
+    id: 'slate',
+    name: '深空灰',
+    swatches: ['#1e293b', mixHex('#1e293b', '#ffffff', 0.14)],
+    colors: {
+      primary: '#64748b',
+      sidebar: darkSider('#64748b', '#1e293b'),
+      header: liftHeader('#1e293b'),
     },
   },
   {
     id: 'sky',
     name: '晴空',
-    swatches: ['#91caff', mixHex('#91caff', '#ffffff', 0.14)],
+    swatches: ['#bae6fd', mixHex('#bae6fd', '#ffffff', 0.14)],
     colors: {
-      primary: '#1677ff',
-      sidebar: softSider('#1677ff', '#91caff'),
-      header: liftHeader('#91caff'),
-    },
-  },
-  {
-    id: 'daybreak',
-    name: '拂晓灰',
-    swatches: ['#d9d9d9', mixHex('#d9d9d9', '#ffffff', 0.14)],
-    colors: {
-      primary: ANTD_PRIMARY,
-      sidebar: softSider(ANTD_PRIMARY, '#d9d9d9'),
-      header: liftHeader('#d9d9d9'),
+      primary: '#0ea5e9',
+      sidebar: softSider('#0ea5e9', '#bae6fd'),
+      header: liftHeader('#bae6fd'),
     },
   },
 ]
@@ -270,7 +284,8 @@ export const builtinThemes: AppTheme[] = [
 export const DEFAULT_THEME_ID = 'blue'
 
 export function findTheme(id: string): AppTheme {
-  return builtinThemes.find((t) => t.id === id) ?? builtinThemes[0]
+  const resolved = THEME_ID_ALIASES[id] ?? id
+  return builtinThemes.find((t) => t.id === resolved) ?? builtinThemes[0]
 }
 
 export function findAppearanceTheme(mode: AppearanceMode): AppTheme {

@@ -18,6 +18,7 @@ import {
 } from '@/types/site-contact'
 import ContactSave, { type ContactSaveHandle } from './contact-save'
 import QrcodeSave, { type QrcodeSaveHandle } from './qrcode-save'
+import './siteContact.scss'
 
 type ContactRow = SiteContactItem & { __index?: number }
 type QrRow = SiteDonationQrcode & { __index?: number }
@@ -278,17 +279,18 @@ export default function SiteContactPage() {
   const qrRows = qrcodes.map((q, i) => ({ ...q, __index: i, id: i }))
 
   return (
-    <div className="page-card" style={{ padding: 16 }}>
-      <Spin spinning={loading}>
-        <div style={{ marginBottom: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 18 }}>联系与捐赠</h2>
-          <p style={{ margin: '6px 0 0', color: '#64748b', fontSize: 13, lineHeight: 1.5 }}>
+    <div className="page-card site-contact-page" style={{ padding: 16 }}>
+      <Spin spinning={loading} classNames={{ root: 'site-contact-page__spin' }}>
+        <div className="site-contact-page__heading">
+          <h2>联系与捐赠</h2>
+          <p className="site-contact-page__hint">
             图标与标签固定；每项可选择分类（文本 / 链接 / 邮箱 /
             QQ群），内容表单随分类变化。QQ群支持多群号与已满状态。修改后立即同步。
           </p>
         </div>
 
         <Tabs
+          className="site-contact-page__tabs"
           activeKey={activeTab}
           onChange={setActiveTab}
           items={[
@@ -296,112 +298,107 @@ export default function SiteContactPage() {
               key: 'contacts',
               label: '联系我们',
               children: (
-                <XnPageLayout
-                  showViewSwitch={false}
-                  showPagination={false}
-                  toolbar={
-                    <XnButton
-                      listItem={crudButtons}
-                      selected={contactSelected}
-                      onButtonClick={onContactToolbar}
-                    />
-                  }
-                  table={
-                    <XnTable
-                      data={contactRows as unknown as Record<string, unknown>[]}
-                      total={contacts.length}
-                      loading={false}
-                      tableKey="system:site-contact:contacts"
-                      entityName="联系项"
-                      nameField="label"
-                      columns={contactColumns}
-                      actionItems={tableActions}
-                      showPagination={false}
-                      onSelectionChange={(rows) => setContactSelected(rows as ContactRow[])}
-                      slots={{
-                        icon: ({ row }) => (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                            {row.icon ? <XnAppIcon name={String(row.icon)} /> : null}
-                            <span>{String(row.icon || '—')}</span>
-                          </span>
-                        ),
-                        type: ({ row }) =>
-                          contactTypeLabel(resolveContactType(row as unknown as SiteContactItem)),
-                        value: ({ row }) => {
-                          const item = row as unknown as SiteContactItem
-                          if (isQqContact(item) && item.groups?.length) {
-                            return (
-                              <span style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                                {item.groups.map((g, gi) => (
-                                  <span
-                                    key={gi}
-                                    style={{
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: 4,
-                                      textDecoration: g.full ? 'line-through' : undefined,
-                                      opacity: g.full ? 0.7 : 1,
-                                    }}
-                                  >
-                                    <XnAppIcon name="ri:qq-fill" size={14} />
-                                    {g.value}
-                                    {g.full ? <em style={{ fontStyle: 'normal' }}>已满</em> : null}
-                                  </span>
-                                ))}
-                              </span>
-                            )
-                          }
-                          return <span>{item.value || '—'}</span>
-                        },
-                        link: ({ row }) => {
-                          const item = row as unknown as SiteContactItem
-                          if (resolveContactType(item) === 'qq') {
+                <div className="site-contact-page__pane">
+                  <XnPageLayout
+                    showViewSwitch={false}
+                    showPagination={false}
+                    toolbar={
+                      <XnButton
+                        listItem={crudButtons}
+                        selected={contactSelected}
+                        onButtonClick={onContactToolbar}
+                      />
+                    }
+                    table={
+                      <XnTable
+                        data={contactRows as unknown as Record<string, unknown>[]}
+                        total={contacts.length}
+                        loading={false}
+                        tableKey="system:site-contact:contacts"
+                        entityName="联系项"
+                        nameField="label"
+                        columns={contactColumns}
+                        actionItems={tableActions}
+                        showPagination={false}
+                        onSelectionChange={(rows) => setContactSelected(rows as ContactRow[])}
+                        slots={{
+                          icon: ({ row }) => (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                              {row.icon ? <XnAppIcon name={String(row.icon)} /> : null}
+                              <span>{String(row.icon || '—')}</span>
+                            </span>
+                          ),
+                          type: ({ row }) =>
+                            contactTypeLabel(resolveContactType(row as unknown as SiteContactItem)),
+                          value: ({ row }) => {
+                            const item = row as unknown as SiteContactItem
+                            if (isQqContact(item) && item.groups?.length) {
+                              return (
+                                <span style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                                  {item.groups.map((g, gi) => (
+                                    <span
+                                      key={gi}
+                                      style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: 4,
+                                        textDecoration: g.full ? 'line-through' : undefined,
+                                        opacity: g.full ? 0.7 : 1,
+                                      }}
+                                    >
+                                      <XnAppIcon name="ri:qq-fill" size={14} />
+                                      {g.value}
+                                      {g.full ? <em style={{ fontStyle: 'normal' }}>已满</em> : null}
+                                    </span>
+                                  ))}
+                                </span>
+                              )
+                            }
+                            return <span>{item.value || '—'}</span>
+                          },
+                          link: ({ row }) => {
+                            const item = row as unknown as SiteContactItem
+                            if (resolveContactType(item) === 'qq') {
+                              return <span style={{ color: '#94a3b8' }}>—</span>
+                            }
+                            if (item.link) {
+                              return (
+                                <a href={item.link} target="_blank" rel="noopener noreferrer">
+                                  {item.link}
+                                </a>
+                              )
+                            }
                             return <span style={{ color: '#94a3b8' }}>—</span>
-                          }
-                          if (item.link) {
-                            return (
-                              <a href={item.link} target="_blank" rel="noopener noreferrer">
-                                {item.link}
-                              </a>
-                            )
-                          }
-                          return <span style={{ color: '#94a3b8' }}>—</span>
-                        },
-                        actions: ({ row }) => (
-                          <XnTableActions
-                            items={tableActions}
-                            row={row}
-                            onActionClick={({ action, row: r }) => {
-                              const index = resolveRowIndex(r, contacts.length)
-                              if (index < 0) return
-                              if (action === 'edit') {
-                                contactSaveRef.current?.open('edit', contacts[index], index)
-                              }
-                              if (action === 'view') {
-                                contactSaveRef.current?.open('view', contacts[index], index)
-                              }
-                            }}
-                          />
-                        ),
-                      }}
-                    />
-                  }
-                />
+                          },
+                          actions: ({ row }) => (
+                            <XnTableActions
+                              items={tableActions}
+                              row={row}
+                              onActionClick={({ action, row: r }) => {
+                                const index = resolveRowIndex(r, contacts.length)
+                                if (index < 0) return
+                                if (action === 'edit') {
+                                  contactSaveRef.current?.open('edit', contacts[index], index)
+                                }
+                                if (action === 'view') {
+                                  contactSaveRef.current?.open('view', contacts[index], index)
+                                }
+                              }}
+                            />
+                          ),
+                        }}
+                      />
+                    }
+                  />
+                </div>
               ),
             },
             {
               key: 'donation',
               label: '捐赠二维码',
               children: (
-                <>
-                  <div
-                    style={{
-                      marginBottom: 16,
-                      padding: 12,
-                      border: '1px solid #ebeef5',
-                      borderRadius: 8,
-                    }}
-                  >
+                <div className="site-contact-page__pane">
+                  <div className="site-contact-page__donation-tip">
                     <div style={{ marginBottom: 8 }}>
                       <div style={{ fontWeight: 600 }}>捐赠说明</div>
                       <div style={{ fontSize: 12, color: '#94a3b8' }}>
@@ -475,7 +472,7 @@ export default function SiteContactPage() {
                       />
                     }
                   />
-                </>
+                </div>
               ),
             },
           ]}

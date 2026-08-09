@@ -1,10 +1,11 @@
 import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Form, Input, Modal, Upload, Image, message } from 'antd'
+import { Form, Input, Upload, Image, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import type { UploadFile } from 'antd/es/upload/interface'
 import { uploadDonationQrcode } from '@/api/site-contact'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
 import type { SiteDonationQrcode } from '@/types/site-contact'
+import XnModal from '@/components/XnModal'
 
 export interface QrcodeSaveHandle {
   open: (mode: SaveMode, row?: SiteDonationQrcode, index?: number) => void
@@ -57,7 +58,7 @@ const QrcodeSave = forwardRef<QrcodeSaveHandle, Props>(function QrcodeSave({ onS
 
   return (
     <>
-      <Modal
+      <XnModal
         title={saveDialogTitle(mode, '捐赠二维码')}
         open={visible}
         width={480}
@@ -129,7 +130,7 @@ const QrcodeSave = forwardRef<QrcodeSaveHandle, Props>(function QrcodeSave({ onS
             </div>
           </div>
         </Form>
-      </Modal>
+      </XnModal>
       <Image
         style={{ display: 'none' }}
         preview={{
@@ -143,3 +144,4 @@ const QrcodeSave = forwardRef<QrcodeSaveHandle, Props>(function QrcodeSave({ onS
 })
 
 export default QrcodeSave
+

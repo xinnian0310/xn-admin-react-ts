@@ -1,0 +1,82 @@
+.ui-pref-fab {
+  position: fixed;
+  right: 0;
+  z-index: 2800;
+  width: 36px;
+  height: 48px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 24px 0 0 24px;
+  background: var(--app-color-primary, #1677ff);
+  color: #fff;
+  cursor: grab;
+  box-shadow: -2px 2px 10px color-mix(in srgb, var(--app-color-primary, #1677ff) 40%, transparent);
+  /* 平时缩进右侧一半，靠近/悬停/拖拽/打开时完全露出 */
+  transform: translateX(50%);
+  transition:
+    transform 0.2s ease,
+    filter 0.15s ease;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 扩大可点/可靠近热区（半隐时仍易触达） */
+.ui-pref-fab::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  bottom: -12px;
+  left: -20px;
+  right: 0;
+}
+
+.ui-pref-fab.is-peek,
+.ui-pref-fab.is-open,
+.ui-pref-fab.is-dragging,
+.ui-pref-fab:hover {
+  transform: translateX(0);
+  filter: brightness(1.05);
+}
+
+.ui-pref-fab.is-dragging {
+  cursor: grabbing;
+  transition: none;
+  filter: brightness(1.08);
+}
+
+.ui-pref-hint {
+  margin: 0 0 16px;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ui-pref-form .ant-radio-group {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.ui-pref-form .ant-input-number {
+  width: 140px;
+}
+
+.ui-pref-px-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ui-pref-px-field__unit {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+}
+
+.ui-pref-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

@@ -1,5 +1,6 @@
+import XnModal from '@/components/XnModal'
 ﻿import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Form, Input, Modal, Radio, Select, Switch, message } from 'antd'
+import { Form, Input, Radio, Select, Switch, message } from 'antd'
 import { createJob, getJob, updateJob } from '@/api/file-job'
 import type { JobForm } from '@/types'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
@@ -76,7 +77,7 @@ const JobSave = forwardRef<JobSaveHandle, { onSuccess?: () => void }>(function J
   }
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '定时任务')}
       open={visible}
       onCancel={() => setVisible(false)}
@@ -141,8 +142,9 @@ const JobSave = forwardRef<JobSaveHandle, { onSuccess?: () => void }>(function J
           <Input.TextArea rows={2} maxLength={500} />
         </Form.Item>
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 
 export default JobSave
+

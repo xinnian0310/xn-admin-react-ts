@@ -12,7 +12,7 @@ import { Modal, message } from 'antd'
 import { useUserStore } from '@/stores/user'
 import { useThemeStore } from '@/stores/theme'
 import { useTagsViewStore } from '@/stores/tagsView'
-import NoticeInbox from '@/components/NoticeInbox'
+import XnNoticeInbox from '@/components/XnNoticeInbox'
 import {
   isBrowserFullscreen,
   isFullscreenEnabled,
@@ -66,7 +66,7 @@ export default function LayoutHeaderTools() {
 
   return (
     <div className="layout-header-tools">
-      <NoticeInbox />
+      <XnNoticeInbox />
       <Tooltip title={isFullscreen ? '退出内容全屏' : '内容全屏'}>
         <span style={{ cursor: 'pointer' }} onClick={() => toggleFullscreen()}>
           {isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}

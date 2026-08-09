@@ -6,7 +6,7 @@ import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnTable from '@/components/XnTable'
 import XnImport, { type XnImportHandle } from '@/components/XnImport'
-import Auth from '@/components/Auth'
+import XnAuth from '@/components/XnAuth'
 import UserSave, { type UserSaveHandle } from './save'
 import { usePageUi } from '@/hooks/usePageUi'
 import { list, batchRemove, remove, updateStatus, importUsers, exportUsers } from '@/api/user'
@@ -374,12 +374,12 @@ export default function UsersPage() {
               status: ({ row }) => {
                 const u = row as unknown as User
                 return (
-                  <Auth permission="user:update">
+                  <XnAuth permission="user:update">
                     <Switch
                       checked={u.status === 1}
                       onChange={(val) => void handleStatusChange(u, val)}
                     />
-                  </Auth>
+                  </XnAuth>
                 )
               },
               actions: ({ row }) => (
@@ -422,12 +422,12 @@ export default function UsersPage() {
                 </div>
                 <div>邮箱：{row.email || '—'}</div>
                 <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between' }}>
-                  <Auth permission="user:update">
+                  <XnAuth permission="user:update">
                     <Switch
                       checked={row.status === 1}
                       onChange={(val) => void handleStatusChange(row, val)}
                     />
-                  </Auth>
+                  </XnAuth>
                   <XnTableActions
                     items={tableButtonItems}
                     row={row as unknown as Record<string, unknown>}

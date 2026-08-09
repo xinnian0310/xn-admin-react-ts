@@ -18,12 +18,13 @@ import {
 } from 'antd'
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons'
 import type { UploadFile } from 'antd/es/upload/interface'
-import Auth from '@/components/Auth'
+import XnAuth from '@/components/XnAuth'
 import {
   appConfig,
   applyRemoteAppConfig,
   applyUserUiPreference,
   captureGlobalUiBaseline,
+  cloneAntdUi,
   defaultAppConfig,
   type AppConfig,
   type LayoutMode,
@@ -42,19 +43,14 @@ import './systemConfig.scss'
 function createForm(): SystemConfigPayload {
   const d = JSON.parse(JSON.stringify(defaultAppConfig)) as AppConfig
   return {
-    app: { ...d.app, clients: { ...(d.app.clients || {}) } },
+    app: { ...d.app, clients: {} },
     session: { ...d.session },
     ui: {
       dialog: { ...d.ui.dialog },
       layout: { mode: d.ui.layout.mode },
       fontSize: { ...d.ui.fontSize },
       tagsView: { ...d.ui.tagsView },
-      elementPlus: {
-        ...d.ui.elementPlus,
-        button: { ...d.ui.elementPlus.button },
-        message: { ...d.ui.elementPlus.message },
-        dialog: { ...d.ui.elementPlus.dialog },
-      },
+      antd: cloneAntdUi(d.ui.antd),
     },
     storage: { minio: { ...d.storage.minio } },
     logRetention: { ...d.logRetention },
@@ -122,12 +118,7 @@ export default function SystemConfigPage() {
     next.ui.layout.mode = (data.ui.layout?.mode || 'side') as LayoutMode
     Object.assign(next.ui.fontSize, data.ui.fontSize)
     Object.assign(next.ui.tagsView, data.ui.tagsView)
-    Object.assign(next.ui.elementPlus, {
-      ...data.ui.elementPlus,
-      button: { ...data.ui.elementPlus.button },
-      message: { ...data.ui.elementPlus.message },
-      dialog: { ...data.ui.elementPlus.dialog },
-    })
+    Object.assign(next.ui.antd, cloneAntdUi(data.ui.antd || defaultAppConfig.ui.antd))
     Object.assign(next.storage.minio, data.storage?.minio || {})
     Object.assign(next.logRetention, data.logRetention || defaultAppConfig.logRetention)
     const sd = data.sensitiveData || defaultAppConfig.sensitiveData
@@ -159,12 +150,7 @@ export default function SystemConfigPage() {
         layout: { mode: appConfig.ui.layout.mode },
         fontSize: { ...appConfig.ui.fontSize },
         tagsView: { ...appConfig.ui.tagsView },
-        elementPlus: {
-          ...appConfig.ui.elementPlus,
-          button: { ...appConfig.ui.elementPlus.button },
-          message: { ...appConfig.ui.elementPlus.message },
-          dialog: { ...appConfig.ui.elementPlus.dialog },
-        },
+        antd: cloneAntdUi(appConfig.ui.antd),
       },
       storage: { minio: { ...appConfig.storage.minio } },
       logRetention: { ...appConfig.logRetention },
@@ -267,7 +253,7 @@ export default function SystemConfigPage() {
               />
             </Form.Item>
             <Form.Item label="品牌图标">
-              <Auth permission="system-config:update">
+              <XnAuth permission="system-config:update">
                 <Upload
                   listType="picture-card"
                   accept="image/png,image/jpeg,image/webp,image/svg+xml,image/x-icon"
@@ -303,7 +289,7 @@ export default function SystemConfigPage() {
                     </div>
                   )}
                 </Upload>
-              </Auth>
+              </XnAuth>
               <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>
                 一张图同时用于浏览器标签图标与侧栏 / 登录页 Logo
               </div>
@@ -470,33 +456,38 @@ export default function SystemConfigPage() {
                       : form.ui.fontSize[key as keyof typeof form.ui.fontSize]
                   return (
                     <Form.Item key={`${group}-${key}`} label={label}>
-                      <InputNumber
-                        min={1}
-                        max={max}
-                        value={parsePxInt(raw, fallback)}
-                        onChange={(v) => {
-                          const px = toPx(Number(v), fallback)
-                          setForm((prev) => {
-                            if (group === 'tagsView') {
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                        <InputNumber
+                          min={1}
+                          max={max}
+                          step={1}
+                          precision={0}
+                          style={{ width: 140 }}
+                          value={parsePxInt(raw, fallback)}
+                          onChange={(v) => {
+                            const px = toPx(Number(v), fallback)
+                            setForm((prev) => {
+                              if (group === 'tagsView') {
+                                return {
+                                  ...prev,
+                                  ui: {
+                                    ...prev.ui,
+                                    tagsView: { ...prev.ui.tagsView, height: px },
+                                  },
+                                }
+                              }
                               return {
                                 ...prev,
                                 ui: {
                                   ...prev.ui,
-                                  tagsView: { ...prev.ui.tagsView, height: px },
+                                  fontSize: { ...prev.ui.fontSize, [key]: px },
                                 },
                               }
-                            }
-                            return {
-                              ...prev,
-                              ui: {
-                                ...prev.ui,
-                                fontSize: { ...prev.ui.fontSize, [key]: px },
-                              },
-                            }
-                          })
-                        }}
-                      />
-                      <span style={hintStyle}>px</span>
+                            })
+                          }}
+                        />
+                        <span style={{ color: '#94a3b8', fontSize: 13 }}>px</span>
+                      </div>
                     </Form.Item>
                   )
                 })}
@@ -505,13 +496,12 @@ export default function SystemConfigPage() {
             <div>
               <h3 style={{ marginTop: 0 }}>组件全局</h3>
               <p style={{ color: '#64748b', fontSize: 13 }}>
-                对应后端 ui.elementPlus 契约字段；Ant Design 由 ConfigProvider
-                映射。主题色请用右上角主题面板。
+                对应本工程 ui.antd。未提交的云端字段由后端深合并保留。主题色请用右上角主题面板。
               </p>
               <Form labelCol={{ span: 8 }}>
-                <Form.Item label="语言">
+                <Form.Item label="locale">
                   <Select
-                    value={form.ui.elementPlus.locale}
+                    value={form.ui.antd.locale}
                     options={[
                       { label: '简体中文', value: 'zh-cn' },
                       { label: 'English', value: 'en' },
@@ -521,146 +511,112 @@ export default function SystemConfigPage() {
                         ...prev,
                         ui: {
                           ...prev.ui,
-                          elementPlus: { ...prev.ui.elementPlus, locale: v },
+                          antd: { ...prev.ui.antd, locale: v },
                         },
                       }))
                     }
                   />
                 </Form.Item>
-                <Form.Item label="组件尺寸">
+                <Form.Item label="componentSize">
                   <Radio.Group
-                    value={form.ui.elementPlus.size}
+                    value={form.ui.antd.componentSize}
                     optionType="button"
                     options={[
-                      { label: '大', value: 'large' },
-                      { label: '默认', value: 'default' },
-                      { label: '小', value: 'small' },
+                      { label: 'large', value: 'large' },
+                      { label: 'middle', value: 'middle' },
+                      { label: 'small', value: 'small' },
                     ]}
                     onChange={(e) =>
                       setForm((prev) => ({
                         ...prev,
                         ui: {
                           ...prev.ui,
-                          elementPlus: { ...prev.ui.elementPlus, size: e.target.value },
+                          antd: { ...prev.ui.antd, componentSize: e.target.value },
                         },
                       }))
                     }
                   />
                 </Form.Item>
-                <Form.Item label="弹层 z-index">
-                  <InputNumber
-                    min={1000}
-                    max={9999}
-                    style={{ width: '100%' }}
-                    value={form.ui.elementPlus.zIndex}
-                    onChange={(v) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        ui: {
-                          ...prev.ui,
-                          elementPlus: { ...prev.ui.elementPlus, zIndex: Number(v) || 2000 },
-                        },
-                      }))
-                    }
-                  />
-                </Form.Item>
-                <Form.Item label="类名前缀">
+                <Form.Item label="prefixCls">
                   <Input
-                    value={form.ui.elementPlus.namespace}
-                    placeholder="默认 el"
+                    value={form.ui.antd.prefixCls}
+                    placeholder="默认 ant"
                     onChange={(e) =>
                       setForm((prev) => ({
                         ...prev,
                         ui: {
                           ...prev.ui,
-                          elementPlus: { ...prev.ui.elementPlus, namespace: e.target.value },
+                          antd: { ...prev.ui.antd, prefixCls: e.target.value },
                         },
                       }))
                     }
                   />
                 </Form.Item>
-                <Form.Item label="按钮自动空格">
+                <Form.Item label="button.autoInsertSpace">
                   <Switch
-                    checked={form.ui.elementPlus.button.autoInsertSpace}
+                    checked={form.ui.antd.button.autoInsertSpace}
                     onChange={(v) =>
                       setForm((prev) => ({
                         ...prev,
                         ui: {
                           ...prev.ui,
-                          elementPlus: {
-                            ...prev.ui.elementPlus,
-                            button: { ...prev.ui.elementPlus.button, autoInsertSpace: v },
+                          antd: {
+                            ...prev.ui.antd,
+                            button: { ...prev.ui.antd.button, autoInsertSpace: v },
                           },
                         },
                       }))
                     }
                   />
                 </Form.Item>
-                <Form.Item label="消息最大数量">
+                <Form.Item label="message.maxCount">
                   <InputNumber
                     min={1}
                     max={20}
                     style={{ width: '100%' }}
-                    value={form.ui.elementPlus.message.max}
+                    value={form.ui.antd.message.maxCount}
                     onChange={(v) =>
                       setForm((prev) => ({
                         ...prev,
                         ui: {
                           ...prev.ui,
-                          elementPlus: {
-                            ...prev.ui.elementPlus,
-                            message: { ...prev.ui.elementPlus.message, max: Number(v) || 3 },
+                          antd: {
+                            ...prev.ui.antd,
+                            message: { ...prev.ui.antd.message, maxCount: Number(v) || 3 },
                           },
                         },
                       }))
                     }
                   />
                 </Form.Item>
-                <Form.Item label="对话框居中">
+                <Form.Item label="modal.centered">
                   <Switch
-                    checked={form.ui.elementPlus.dialog.alignCenter}
+                    checked={form.ui.antd.modal.centered}
                     onChange={(v) =>
                       setForm((prev) => ({
                         ...prev,
                         ui: {
                           ...prev.ui,
-                          elementPlus: {
-                            ...prev.ui.elementPlus,
-                            dialog: { ...prev.ui.elementPlus.dialog, alignCenter: v },
+                          antd: {
+                            ...prev.ui.antd,
+                            modal: { ...prev.ui.antd.modal, centered: v },
                           },
                         },
                       }))
                     }
                   />
                 </Form.Item>
-                <Form.Item label="对话框可拖拽">
+                <Form.Item label="modal.draggable">
                   <Switch
-                    checked={form.ui.elementPlus.dialog.draggable}
+                    checked={form.ui.antd.modal.draggable}
                     onChange={(v) =>
                       setForm((prev) => ({
                         ...prev,
                         ui: {
                           ...prev.ui,
-                          elementPlus: {
-                            ...prev.ui.elementPlus,
-                            dialog: { ...prev.ui.elementPlus.dialog, draggable: v },
-                          },
-                        },
-                      }))
-                    }
-                  />
-                </Form.Item>
-                <Form.Item label="拖拽限制可视区">
-                  <Switch
-                    checked={form.ui.elementPlus.dialog.overflow}
-                    onChange={(v) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        ui: {
-                          ...prev.ui,
-                          elementPlus: {
-                            ...prev.ui.elementPlus,
-                            dialog: { ...prev.ui.elementPlus.dialog, overflow: v },
+                          antd: {
+                            ...prev.ui.antd,
+                            modal: { ...prev.ui.antd.modal, draggable: v },
                           },
                         },
                       }))
@@ -815,7 +771,7 @@ export default function SystemConfigPage() {
 
   return (
     <div className="page-card system-config-page" style={{ padding: 16 }}>
-      <Spin spinning={loading} wrapperClassName="system-config-page__spin">
+      <Spin spinning={loading} classNames={{ root: 'system-config-page__spin' }}>
         <div className="system-config-page__header">
           <div className="system-config-page__heading">
             <h2>系统配置</h2>
@@ -826,16 +782,16 @@ export default function SystemConfigPage() {
             </p>
           </div>
           <Space>
-            <Auth permission="system-config:view">
+            <XnAuth permission="system-config:view">
               <Button icon={<ReloadOutlined />} onClick={() => void loadConfig()}>
                 刷新
               </Button>
-            </Auth>
-            <Auth permission="system-config:update">
+            </XnAuth>
+            <XnAuth permission="system-config:update">
               <Button type="primary" loading={saving} onClick={() => void handleSave()}>
                 保存
               </Button>
-            </Auth>
+            </XnAuth>
           </Space>
         </div>
 

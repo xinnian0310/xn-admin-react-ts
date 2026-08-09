@@ -173,9 +173,7 @@ export default function RoutesPage() {
       title: '类型',
       dataIndex: 'type',
       width: 100,
-      render: (v: SysRoute['type']) => (
-        <Tag color={routeTypeColor(v)}>{routeTypeLabel(v)}</Tag>
-      ),
+      render: (v: SysRoute['type']) => <Tag color={routeTypeColor(v)}>{routeTypeLabel(v)}</Tag>,
     },
     { title: '路径', dataIndex: 'path', ellipsis: true, minWidth: 140 },
     {

@@ -1,5 +1,6 @@
+import XnModal from '@/components/XnModal'
 ﻿import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Form, Input, Modal, message } from 'antd'
+import { Form, Input, message } from 'antd'
 import XnRichEditor from '@/components/XnRichEditor'
 import { create, get, update } from '@/api/message'
 import type { MessageForm } from '@/types'
@@ -56,7 +57,7 @@ const MessageSave = forwardRef<MessageSaveHandle, Props>(function MessageSave({ 
   const readonly = mode === 'view'
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '站内信')}
       open={visible}
       width={820}
@@ -76,8 +77,9 @@ const MessageSave = forwardRef<MessageSaveHandle, Props>(function MessageSave({ 
           <XnRichEditor disabled={readonly} height="360px" placeholder="请输入消息内容" />
         </Form.Item>
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 
 export default MessageSave
+

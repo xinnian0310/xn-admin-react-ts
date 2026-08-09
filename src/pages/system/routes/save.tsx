@@ -1,4 +1,4 @@
-﻿import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
+﻿import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import {
   Alert,
   Cascader,
@@ -6,7 +6,6 @@ import {
   Form,
   Input,
   InputNumber,
-  Modal,
   Radio,
   Row,
   Switch,
@@ -14,7 +13,8 @@ import {
   message,
 } from 'antd'
 import { create, get, list, update } from '@/api/route'
-import IconPicker from '@/components/IconPicker'
+import XnIconPicker from '@/components/XnIconPicker'
+import XnModal from '@/components/XnModal'
 import { hasIndexView } from '@/utils/view-loader'
 import { autoViewPath, normalizeRoutePath } from '@/utils/route-path'
 import type { SysRoute, SysRouteForm } from '@/types'
@@ -89,6 +89,8 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
   const [routeTree, setRouteTree] = useState<SysRoute[]>([])
   const [form] = Form.useForm<SysRouteForm>()
   const routeType = Form.useWatch('type', form) || 'MENU'
+  /** 编辑时保留已有 Element 图标，避免 React 表单提交清空 Vue 端 icon */
+  const existingIconRef = useRef('')
 
   const parentTree = useMemo(
     () => toTree(excludeSelf(routeTree, editingId)),
@@ -106,6 +108,7 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
       setMode(openMode)
       setEditingId(id ?? null)
       setBuiltIn(false)
+      existingIconRef.current = ''
       form.resetFields()
       form.setFieldsValue({
         title: '',
@@ -114,7 +117,6 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
         path: '',
         viewPath: '',
         linkUrl: '',
-        icon: '',
         iconAntd: '',
         sort: 0,
         status: 1,
@@ -128,6 +130,7 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
       if (openMode !== 'add' && id) {
         const detail = await get(id)
         setBuiltIn(Boolean(detail.data.builtIn))
+        existingIconRef.current = detail.data.icon || ''
         form.setFieldsValue({
           title: detail.data.title,
           type: detail.data.type,
@@ -135,7 +138,6 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
           path: detail.data.path || '',
           viewPath: detail.data.viewPath || '',
           linkUrl: detail.data.linkUrl || '',
-          icon: detail.data.icon || '',
           iconAntd: detail.data.iconAntd || '',
           sort: detail.data.sort,
           status: detail.data.status,
@@ -208,7 +210,7 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
         title: values.title,
         type: values.type,
         parentId: values.parentId ?? null,
-        icon: values.icon,
+        icon: existingIconRef.current || undefined,
         iconAntd: values.iconAntd,
         sort: values.sort ?? 0,
         status: values.status ?? 1,
@@ -236,7 +238,7 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
   }
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '路由')}
       open={visible}
       onCancel={() => setVisible(false)}
@@ -315,18 +317,11 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
           </>
         ) : null}
         <Form.Item
-          name="icon"
-          label="图标(Element)"
-          extra="Vue 端使用；填写 Element 图标名如 Setting"
-        >
-          <IconPicker placeholder="Setting / mdi:cog" />
-        </Form.Item>
-        <Form.Item
           name="iconAntd"
-          label="图标(Ant)"
-          extra="React 端优先使用；建议 Iconify，如 mdi:cog"
+          label="图标"
+          extra="可从 Ant / Iconify / SVG 中选择"
         >
-          <IconPicker placeholder="mdi:home / antd:SettingOutlined" />
+          <XnIconPicker placeholder="选择 Ant / Iconify / SVG 图标" />
         </Form.Item>
         <Row gutter={16}>
           <Col span={12}>
@@ -381,7 +376,7 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
           ) : null}
         </Row>
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 

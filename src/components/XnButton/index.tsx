@@ -28,15 +28,28 @@ export default function XnButton({ listItem = [], selected = [], onButtonClick }
 
   function isDisabled(item: ButtonListItem) {
     if (item.disabled) return true
-    if (item.index === 0 && selected.length !== 1) return true
-    if (typeof item.index === 'number' && item.index > 0 && selected.length < item.index)
-      return true
+    // index 表示「需要选中的行数 - 1」；后端未配置时可能下发 null，不能当成 0
+    if (item.index != null) {
+      return selected.length !== item.index + 1
+    }
+    // 删除 / 下发 / 撤回：至少选中 1 条（与 Vue XnButton 对齐）
+    const action = resolveButtonAction(item)
+    if (action === 'delete' || action === 'publish' || action === 'revoke') {
+      return selected.length < 1
+    }
     return false
   }
 
   function handleClick(item: ButtonListItem) {
     if (isDisabled(item)) {
-      if (item.index === 0) message.warning('请选择一项操作')
+      const action = resolveButtonAction(item)
+      if (item.index != null) {
+        message.warning(
+          item.index === 0 ? '请选择一项操作' : `请选择 ${item.index + 1} 项操作`,
+        )
+      } else if (action === 'delete' || action === 'publish' || action === 'revoke') {
+        message.warning('请至少选择一项')
+      }
       return
     }
     onButtonClick?.(resolveButtonAction(item), item)

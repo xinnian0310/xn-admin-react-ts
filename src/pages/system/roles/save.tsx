@@ -1,5 +1,6 @@
+import XnModal from '@/components/XnModal'
 ﻿import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Form, Input, Modal, Select, message } from 'antd'
+import { Form, Input, Select, message } from 'antd'
 import { create, get, update } from '@/api/role'
 import type { RoleForm } from '@/types'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
@@ -81,7 +82,7 @@ const RoleSave = forwardRef<RoleSaveHandle, { onSuccess?: () => void }>(function
   const lockCore = mode === 'view' || editingBuiltIn
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '角色')}
       open={visible}
       onCancel={() => setVisible(false)}
@@ -119,8 +120,9 @@ const RoleSave = forwardRef<RoleSaveHandle, { onSuccess?: () => void }>(function
           <Input.TextArea rows={3} />
         </Form.Item>
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 
 export default RoleSave
+

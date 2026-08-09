@@ -1,9 +1,16 @@
-import { useMemo } from 'react'
-import { Menu } from 'antd'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Button, Input, Menu, Space } from 'antd'
 import type { MenuProps } from 'antd'
+import { SearchOutlined } from '@ant-design/icons'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { MenuItem } from '@/types/menu'
-import { filterHiddenMenus, collectOpenMenuIds } from '@/utils/menu'
+import {
+  collectOpenMenuIds,
+  collectSearchOpenKeys,
+  filterHiddenMenus,
+  menuNodeKey,
+  searchMenus,
+} from '@/utils/menu'
 import XnAppIcon from '@/components/XnAppIcon'
 
 type AntdItem = Required<MenuProps>['items'][number]
@@ -16,17 +23,21 @@ interface XnSidebarMenuProps {
   className?: string
   style?: React.CSSProperties
   onSelectPath?: (path: string) => void
+  /** 左侧竖向菜单是否显示搜索框，默认 true */
+  showSearch?: boolean
 }
 
-function toAntdItems(items: MenuItem[]): AntdItem[] {
+function toAntdItems(items: MenuItem[], highlightIds: Set<string>): AntdItem[] {
   return items.map((item) => {
-    const children = item.children?.length ? toAntdItems(item.children) : undefined
+    const children = item.children?.length ? toAntdItems(item.children, highlightIds) : undefined
     const iconName = item.iconAntd || item.icon
+    const hit = highlightIds.has(item.id)
     return {
-      key: item.path || `menu-${item.id}`,
+      key: menuNodeKey(item),
       label: item.title,
       icon: iconName ? <XnAppIcon name={iconName} size={16} className="xn-app-icon" /> : undefined,
       children,
+      className: hit ? 'is-search-hit' : undefined,
     }
   })
 }
@@ -35,7 +46,7 @@ function findSelectedKey(pathname: string, menus: MenuItem[]): string {
   const clean = pathname.replace(/\/save(\/.*)?$/, '')
   const walk = (items: MenuItem[]): string | null => {
     for (const item of items) {
-      if (item.path === clean || item.path === pathname) return item.path
+      if (item.path === clean || item.path === pathname) return menuNodeKey(item)
       if (item.children) {
         const found = walk(item.children)
         if (found) return found
@@ -54,26 +65,65 @@ export default function XnSidebarMenu({
   className,
   style,
   onSelectPath,
+  showSearch = true,
 }: XnSidebarMenuProps) {
   const navigate = useNavigate()
   const location = useLocation()
+  const wrapRef = useRef<HTMLDivElement>(null)
   const visible = useMemo(() => filterHiddenMenus(menus), [menus])
-  const items = useMemo(() => toAntdItems(visible), [visible])
+  const activePath = location.pathname.replace(/\/save(\/.*)?$/, '') || location.pathname
   const selectedKey = findSelectedKey(location.pathname, visible)
-  const openKeys = useMemo(() => {
-    if (mode === 'horizontal') return undefined
-    return collectOpenMenuIds(visible, selectedKey) || []
-  }, [visible, selectedKey, mode])
+  const routeOpenKeys = useMemo(() => {
+    if (mode === 'horizontal') return [] as string[]
+    return collectOpenMenuIds(visible, activePath) || []
+  }, [visible, activePath, mode])
 
-  return (
+  const [openKeys, setOpenKeys] = useState<string[]>(routeOpenKeys)
+  const [searchDraft, setSearchDraft] = useState('')
+  const [highlightIds, setHighlightIds] = useState<Set<string>>(() => new Set())
+
+  const items = useMemo(() => toAntdItems(visible, highlightIds), [visible, highlightIds])
+  const enableSearch = showSearch && mode === 'inline' && !collapsed
+
+  useEffect(() => {
+    if (mode === 'horizontal') return
+    setOpenKeys((prev) => Array.from(new Set([...prev, ...routeOpenKeys])))
+  }, [routeOpenKeys, mode])
+
+  function clearSearch() {
+    setSearchDraft('')
+    setHighlightIds(new Set())
+  }
+
+  function runSearch() {
+    const keyword = searchDraft.trim()
+    if (!keyword) {
+      setHighlightIds(new Set())
+      return
+    }
+    const hits = searchMenus(visible, keyword)
+    setHighlightIds(new Set(hits.map((h) => h.id)))
+    const keys = collectSearchOpenKeys(hits)
+    setOpenKeys((prev) => Array.from(new Set([...prev, ...keys])))
+
+    const firstId = hits[0]?.id
+    if (!firstId) return
+    window.setTimeout(() => {
+      const el = wrapRef.current?.querySelector('.is-search-hit') as HTMLElement | null
+      el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    }, 120)
+  }
+
+  const menuNode = (
     <Menu
       className={className}
-      style={style}
+      style={enableSearch ? { ...style, flex: 1, overflow: 'auto', borderInlineEnd: 'none' } : style}
       theme={theme}
       mode={mode}
       inlineCollapsed={collapsed}
       selectedKeys={[selectedKey]}
-      defaultOpenKeys={openKeys}
+      openKeys={mode === 'horizontal' ? undefined : openKeys}
+      onOpenChange={(keys) => setOpenKeys(keys as string[])}
       items={items}
       onClick={({ key }) => {
         const path = String(key)
@@ -82,5 +132,33 @@ export default function XnSidebarMenu({
         navigate(path)
       }}
     />
+  )
+
+  if (!enableSearch) {
+    return menuNode
+  }
+
+  return (
+    <div ref={wrapRef} className="xn-sidebar-menu-wrap">
+      <div className="xn-sidebar-menu-search">
+        <Space.Compact style={{ width: '100%' }}>
+          <Input
+            allowClear
+            value={searchDraft}
+            placeholder="搜索菜单"
+            onChange={(e) => setSearchDraft(e.target.value)}
+            onPressEnter={runSearch}
+            onClear={clearSearch}
+          />
+          <Button
+            type="default"
+            icon={<SearchOutlined />}
+            aria-label="搜索菜单"
+            onClick={runSearch}
+          />
+        </Space.Compact>
+      </div>
+      {menuNode}
+    </div>
   )
 }

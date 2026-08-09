@@ -58,6 +58,22 @@
   overflow: hidden;
 }
 
+/* 联系与捐赠：整页占满，表格吃满剩余高度 */
+.admin-layout__page > .site-contact-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 组件演示：整页占满，左侧分类固定，右侧内容区滚动 */
+.admin-layout__page > .demo-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
 /* 外部链接 iframe：撑满主内容区 */
 .admin-layout__page > .iframe-page {
   flex: 1 1 auto;
@@ -67,7 +83,9 @@
 }
 
 .admin-layout__page
-  > *:not(.xn-page-layout):not(.profile-page):not(.system-config-page):not(.iframe-page) {
+  > *:not(.xn-page-layout):not(.profile-page):not(.system-config-page):not(.site-contact-page):not(
+    .iframe-page
+  ):not(.demo-page) {
   flex: 0 0 auto;
   min-height: 100%;
   box-sizing: border-box;
@@ -115,6 +133,40 @@
   background: inherit;
 }
 
+.layout-aside .xn-sidebar-menu-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.layout-aside .xn-sidebar-menu-search {
+  flex-shrink: 0;
+  padding: 8px 10px 4px;
+}
+
+.layout-aside .xn-sidebar-menu-search .ant-input-affix-wrapper,
+.layout-aside .xn-sidebar-menu-search .ant-input {
+  background: color-mix(in srgb, var(--app-sidebar-text) 8%, transparent);
+  border-color: color-mix(in srgb, var(--app-sidebar-text) 22%, transparent);
+  color: var(--app-sidebar-text-active);
+}
+
+.layout-aside .xn-sidebar-menu-search .ant-input::placeholder {
+  color: color-mix(in srgb, var(--app-sidebar-text) 70%, transparent);
+}
+
+.layout-aside .xn-sidebar-menu-search .ant-btn {
+  background: color-mix(in srgb, var(--app-sidebar-text) 12%, transparent);
+  border-color: color-mix(in srgb, var(--app-sidebar-text) 22%, transparent);
+  color: var(--app-sidebar-text-active);
+}
+
+.layout-aside .xn-sidebar-menu-search .ant-btn:hover {
+  color: var(--app-sidebar-active) !important;
+  border-color: color-mix(in srgb, var(--app-sidebar-text-active) 55%, transparent) !important;
+}
+
 .layout-aside .ant-menu {
   background: transparent !important;
   border-inline-end: none !important;
@@ -142,6 +194,14 @@
 
 .layout-aside .ant-menu-submenu-selected > .ant-menu-submenu-title {
   color: var(--app-sidebar-text-active) !important;
+}
+
+.layout-aside .ant-menu-item.is-search-hit,
+.layout-aside .ant-menu-submenu.is-search-hit > .ant-menu-submenu-title {
+  color: var(--app-sidebar-text-active) !important;
+  background: color-mix(in srgb, var(--app-sidebar-active) 28%, transparent) !important;
+  box-shadow: inset 3px 0 0 var(--app-sidebar-active);
+  font-weight: 600;
 }
 
 .layout-aside .ant-menu-item .anticon,

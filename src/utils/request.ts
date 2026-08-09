@@ -12,6 +12,26 @@ const request = axios.create({
 
 const warnedApis = new Set<string>()
 
+/** 相同错误文案在窗口内只提示一次，避免并发失败刷屏 */
+const ERROR_TOAST_DEDUP_MS = 3000
+const recentErrorToasts = new Map<string, number>()
+
+function showRequestError(content: string) {
+  const now = Date.now()
+  const lastAt = recentErrorToasts.get(content)
+  if (lastAt != null && now - lastAt < ERROR_TOAST_DEDUP_MS) {
+    return
+  }
+  recentErrorToasts.set(content, now)
+  // 顺带清理过期项，避免 Map 无限增长
+  if (recentErrorToasts.size > 40) {
+    for (const [key, at] of recentErrorToasts) {
+      if (now - at >= ERROR_TOAST_DEDUP_MS) recentErrorToasts.delete(key)
+    }
+  }
+  message.error(content)
+}
+
 const HTTP_STATUS_MESSAGES: Record<number, string> = {
   400: '请求参数错误',
   401: '登录已过期，请重新登录',
@@ -112,7 +132,7 @@ request.interceptors.request.use((config) => {
     const key = `${method} ${fullPath}`
     if (!warnedApis.has(key)) {
       warnedApis.add(key)
-      message.error(`接口未在权限内容中登记，无法访问：${key}`)
+      showRequestError(`接口未在权限内容中登记，无法访问：${key}`)
     }
     return Promise.reject(new Error(`接口未登记，已拦截：${key}`))
   }
@@ -124,7 +144,7 @@ request.interceptors.response.use(
   (response) => {
     const res = response.data as ApiResponse<unknown>
     if (res.code !== 200) {
-      message.error(res.message || '请求失败')
+      showRequestError(res.message || '请求失败')
       return Promise.reject(new Error(res.message || '请求失败'))
     }
     if (res.data !== undefined) {
@@ -146,7 +166,7 @@ request.interceptors.response.use(
       navigateTo('/login', { replace: true })
     }
 
-    message.error(errMessage)
+    showRequestError(errMessage)
     return Promise.reject(error)
   },
 )

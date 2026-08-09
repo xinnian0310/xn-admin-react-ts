@@ -2,7 +2,7 @@ import { Badge, Drawer, List, Typography } from 'antd'
 import { BellOutlined } from '@ant-design/icons'
 import { useNoticeStore } from '@/stores/notice'
 
-export default function NoticeInbox() {
+export default function XnNoticeInbox() {
   const unreadCount = useNoticeStore((s) => s.unreadCount)
   const drawerVisible = useNoticeStore((s) => s.drawerVisible)
   const notices = useNoticeStore((s) => s.notices)

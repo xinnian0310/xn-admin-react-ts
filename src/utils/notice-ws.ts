@@ -40,6 +40,30 @@ function scheduleReconnect() {
   }, 3000)
 }
 
+function detachSocket(s: WebSocket) {
+  s.onopen = null
+  s.onmessage = null
+  s.onerror = null
+  s.onclose = null
+}
+
+/** 避免在 CONNECTING 时 close，否则浏览器会打 “closed before the connection is established” */
+function safeClose(s: WebSocket) {
+  if (s.readyState === WebSocket.OPEN) {
+    s.close()
+    return
+  }
+  if (s.readyState === WebSocket.CONNECTING) {
+    s.addEventListener('open', () => {
+      try {
+        s.close()
+      } catch {
+        /* ignore */
+      }
+    })
+  }
+}
+
 export function onNoticeWsMessage(handler: NoticeWsHandler) {
   handlers.add(handler)
   return () => handlers.delete(handler)
@@ -58,13 +82,16 @@ export function connectNoticeWs() {
     return
   }
 
-  socket = new WebSocket(buildWsUrl(token))
+  const next = new WebSocket(buildWsUrl(token))
+  socket = next
 
-  socket.onopen = () => {
+  next.onopen = () => {
+    if (socket !== next) return
     startHeartbeat()
   }
 
-  socket.onmessage = (event) => {
+  next.onmessage = (event) => {
+    if (socket !== next) return
     try {
       const data = JSON.parse(String(event.data)) as Record<string, unknown>
       handlers.forEach((handler) => handler(data))
@@ -73,22 +100,26 @@ export function connectNoticeWs() {
     }
   }
 
-  socket.onclose = () => {
-    clearTimers()
-    socket = null
-    scheduleReconnect()
+  next.onclose = () => {
+    if (socket === next) {
+      socket = null
+      clearTimers()
+      scheduleReconnect()
+    }
   }
 
-  socket.onerror = () => {
-    socket?.close()
+  // 失败会走 onclose；CONNECTING 时再 close 会触发控制台警告
+  next.onerror = () => {
+    /* no-op */
   }
 }
 
 export function disconnectNoticeWs() {
   manualClose = true
   clearTimers()
-  if (socket) {
-    socket.close()
-    socket = null
-  }
+  if (!socket) return
+  const s = socket
+  socket = null
+  detachSocket(s)
+  safeClose(s)
 }

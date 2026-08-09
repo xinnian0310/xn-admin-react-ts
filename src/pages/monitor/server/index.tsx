@@ -18,7 +18,7 @@ import * as echarts from 'echarts/core'
 import { GaugeChart } from 'echarts/charts'
 import { CanvasRenderer } from 'echarts/renderers'
 import type { EChartsType } from 'echarts/core'
-import Auth from '@/components/Auth'
+import XnAuth from '@/components/XnAuth'
 import { getInfraStatus, getServerMonitor, restartInfra } from '@/api/monitor'
 import type { InfraComponent, InfraStatus, ServerMonitor } from '@/types'
 
@@ -284,25 +284,37 @@ export default function MonitorServerPage() {
             <Space>
               <span>自动刷新</span>
               <Switch checked={autoRefresh} onChange={setAutoRefresh} />
-              <Auth permission="server:refresh">
+              <XnAuth permission="server:refresh">
                 <Button onClick={() => void load()}>刷新</Button>
-              </Auth>
+              </XnAuth>
             </Space>
           }
         >
           <div style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ marginBottom: 12 }}>
               <strong>配套组件</strong>
-              {infra.projectRoot ? (
-                <span style={{ color: 'rgba(0,0,0,0.45)', fontSize: 12 }}>
-                  根目录 {infra.projectRoot}
-                </span>
-              ) : null}
             </div>
-            <Row gutter={[12, 12]}>
+            <div
+              style={{
+                display: 'flex',
+                gap: 12,
+                alignItems: 'stretch',
+              }}
+            >
               {infraCards.map((item) => (
-                <Col key={item.key} xs={24} sm={12} md={8} lg={4}>
-                  <Card size="small" styles={{ body: { padding: 12 } }}>
+                <div
+                  key={item.key}
+                  style={{
+                    flex: '1 1 0',
+                    minWidth: 0,
+                    display: 'flex',
+                  }}
+                >
+                  <Card
+                    size="small"
+                    style={{ width: '100%', height: '100%' }}
+                    styles={{ body: { padding: 12, height: '100%' } }}
+                  >
                     <div
                       style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}
                     >
@@ -333,7 +345,7 @@ export default function MonitorServerPage() {
                       {item.message || '—'}
                     </div>
                     {item.restartable && item.status !== 'UP' && item.status !== 'DISABLED' ? (
-                      <Auth permission="server:restart">
+                      <XnAuth permission="server:restart">
                         <Button
                           type="primary"
                           size="small"
@@ -342,16 +354,16 @@ export default function MonitorServerPage() {
                         >
                           重启
                         </Button>
-                      </Auth>
+                      </XnAuth>
                     ) : (
                       <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)' }}>
                         {item.key === 'backend' ? '本服务' : item.status === 'UP' ? '运行中' : ''}
                       </span>
                     )}
                   </Card>
-                </Col>
+                </div>
               ))}
-            </Row>
+            </div>
           </div>
 
           <Row gutter={16}>
@@ -379,7 +391,6 @@ export default function MonitorServerPage() {
                 <Descriptions.Item label="主机名称">{data.system.hostName}</Descriptions.Item>
                 <Descriptions.Item label="服务器 IP">{data.system.ip}</Descriptions.Item>
                 <Descriptions.Item label="CPU 核心数">{data.cpu.cores} 核</Descriptions.Item>
-                <Descriptions.Item label="项目路径">{data.system.userDir}</Descriptions.Item>
               </Descriptions>
             </Card>
           </Col>

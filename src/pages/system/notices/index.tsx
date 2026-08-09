@@ -1,5 +1,5 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react'
-import { Card, Modal, Table, Tag, message } from 'antd'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Card, Table, Tag, message } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
@@ -22,6 +22,7 @@ import type { SaveMode } from '@/types/save'
 import type { TableColumnItem } from '@/types/table'
 import { formatDateTime } from '@/utils/datetime'
 import NoticeSave, { type NoticeSaveHandle } from './save'
+import XnModal from '@/components/XnModal'
 
 function statusLabel(status: NoticeStatus) {
   if (status === 'PUBLISHED') return '已下发'
@@ -113,7 +114,7 @@ export default function NoticesPage() {
       message.warning('仅草稿可删除')
       return
     }
-    Modal.confirm({
+    XnModal.confirm({
       title: '删除确认',
       content: `确定删除公告「${row.title}」吗？`,
       okType: 'danger',
@@ -135,7 +136,7 @@ export default function NoticesPage() {
       message.warning('仅草稿可删除，请取消勾选非草稿项')
       return
     }
-    Modal.confirm({
+    XnModal.confirm({
       title: '删除确认',
       content: `确定删除选中的 ${selected.length} 条公告吗？`,
       okType: 'danger',
@@ -150,7 +151,7 @@ export default function NoticesPage() {
   }
 
   async function handlePublish(row: Notice) {
-    Modal.confirm({
+    XnModal.confirm({
       title: '下发确认',
       content: `确定下发公告「${row.title}」给全体启用用户吗？`,
       onOk: async () => {
@@ -170,7 +171,7 @@ export default function NoticesPage() {
       message.warning('仅草稿或已撤回可下发，请取消勾选其他状态项')
       return
     }
-    Modal.confirm({
+    XnModal.confirm({
       title: '下发确认',
       content: `确定下发选中的 ${selected.length} 条公告给全体启用用户吗？`,
       onOk: async () => {
@@ -183,7 +184,7 @@ export default function NoticesPage() {
   }
 
   async function handleRevoke(row: Notice) {
-    Modal.confirm({
+    XnModal.confirm({
       title: '撤回确认',
       content: `确定撤回公告「${row.title}」吗？`,
       onOk: async () => {
@@ -203,7 +204,7 @@ export default function NoticesPage() {
       message.warning('仅已下发可撤回，请取消勾选其他状态项')
       return
     }
-    Modal.confirm({
+    XnModal.confirm({
       title: '撤回确认',
       content: `确定撤回选中的 ${selected.length} 条公告吗？`,
       onOk: async () => {
@@ -324,6 +325,7 @@ export default function NoticesPage() {
               setSize(s)
               void loadData(p, s)
             }}
+            onRefresh={() => void loadData()}
             slots={{
               readCount: ({ row }) => {
                 const n = row as unknown as Notice
@@ -387,7 +389,7 @@ export default function NoticesPage() {
         }
       />
       <NoticeSave ref={saveRef} onSuccess={() => void loadData()} />
-      <Modal
+      <XnModal
         title="已读明细"
         open={readersVisible}
         width={640}
@@ -404,7 +406,8 @@ export default function NoticesPage() {
           scroll={{ y: 420 }}
           size="small"
         />
-      </Modal>
+      </XnModal>
     </>
   )
 }
+

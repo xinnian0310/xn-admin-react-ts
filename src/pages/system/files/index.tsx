@@ -1,5 +1,6 @@
+import XnModal from '@/components/XnModal'
 ﻿import { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Input, Modal, message } from 'antd'
+import { Button, Input, message } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnTreePanel from '@/components/XnTreePanel'
 import XnSearch from '@/components/XnSearch'
@@ -138,7 +139,7 @@ export default function SystemFilesPage() {
       message.warning('文件地址不存在，无法下载')
       return
     }
-    Modal.confirm({
+    XnModal.confirm({
       title: '提示',
       content: '该文件类型暂不支持在线预览，是否下载？',
       okText: '下载',
@@ -151,7 +152,7 @@ export default function SystemFilesPage() {
       message.warning('不支持删除目录')
       return
     }
-    Modal.confirm({
+    XnModal.confirm({
       title: '删除确认',
       content: `确定删除文件「${row.path}」吗？`,
       okType: 'danger',
@@ -169,7 +170,7 @@ export default function SystemFilesPage() {
       message.warning('请至少选择一个文件')
       return
     }
-    Modal.confirm({
+    XnModal.confirm({
       title: '删除确认',
       content: `确定删除选中的 ${targets.length} 个文件吗？`,
       okType: 'danger',
@@ -313,7 +314,7 @@ export default function SystemFilesPage() {
           />
         }
       />
-      <Modal
+      <XnModal
         title="新建目录"
         open={mkdirOpen}
         onCancel={() => setMkdirOpen(false)}
@@ -327,7 +328,8 @@ export default function SystemFilesPage() {
           onChange={(e) => setMkdirName(e.target.value)}
           onPressEnter={() => void submitMkdir()}
         />
-      </Modal>
+      </XnModal>
     </>
   )
 }
+

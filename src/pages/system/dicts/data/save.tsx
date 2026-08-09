@@ -1,5 +1,6 @@
+import XnModal from '@/components/XnModal'
 ﻿import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Form, Input, InputNumber, Modal, Radio, Select, Switch, Tag, message } from 'antd'
+import { Form, Input, InputNumber, Radio, Select, Switch, Tag, message } from 'antd'
 import { create, get, update } from '@/api/dict-data'
 import { DICT_LIST_CLASS_OPTIONS, type DictDataForm } from '@/types'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
@@ -89,7 +90,7 @@ const DictDataSave = forwardRef<DictDataSaveHandle, Props>(function DictDataSave
   const previewColor = TAG_COLORS[listClass || ''] || undefined
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '字典数据')}
       open={visible}
       width={560}
@@ -147,8 +148,9 @@ const DictDataSave = forwardRef<DictDataSaveHandle, Props>(function DictDataSave
           <Input.TextArea rows={3} />
         </Form.Item>
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 
 export default DictDataSave
+

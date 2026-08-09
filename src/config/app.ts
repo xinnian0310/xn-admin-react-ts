@@ -4,7 +4,7 @@
  * - 本地默认值在此定义；后端「系统配置」启动时 merge 覆盖
  * - 应用介绍只保留 intro：本地留空，公开接口按 clientId 投影后写入
  * - 多前端隔离存于云端 app.clients，前端配置与运行时不挂 clients
- * - UI 行为、布局字号集中管理；Ant Design 由 App ConfigProvider 处理
+ * - UI 行为、布局字号集中管理；本工程仅 ui.antd（Ant Design）
  * - 主题色由 theme store 管理
  */
 import type { AppearanceMode, ThemeColors, ThemeSource } from '@/config/themes'
@@ -17,10 +17,9 @@ import {
 } from '@/config/themes'
 import { buildPrimaryScale, mixHex } from '@/utils/color'
 
-/** 与后端 AppConfigVO.ui.elementPlus 字段对齐（API 契约），前端实际用 Ant Design */
-export type ElementPlusLocale = 'zh-cn' | 'en'
-export type ElementPlusSize = 'large' | 'default' | 'small'
-export type AntdSize = 'large' | 'middle' | 'small'
+/** 与后端 AppConfigVO.ui.antd 对齐（Ant Design 原生命名） */
+export type AntdLocale = 'zh-cn' | 'en'
+export type AntdComponentSize = 'large' | 'middle' | 'small'
 /** 后台整体布局：side 左侧 | top 顶部 | mix 顶+侧 | columns 双列侧栏 */
 export type LayoutMode = 'side' | 'top' | 'mix' | 'columns'
 
@@ -45,7 +44,7 @@ export const defaultAppConfig = {
   },
   ui: {
     dialog: {
-      maxHeight: '95vh',
+      maxHeight: '85vh',
     },
     layout: {
       mode: 'side' as LayoutMode,
@@ -76,22 +75,21 @@ export const defaultAppConfig = {
     tagsView: {
       height: '40px',
     },
-    /** 后端契约字段名；Ant Design ConfigProvider 在 App 中单独配置 */
-    elementPlus: {
-      locale: 'zh-cn' as ElementPlusLocale,
-      size: 'default' as ElementPlusSize,
-      zIndex: 2000,
-      namespace: 'el',
+    /** React Ant Design ConfigProvider / App；字段名与 antd API 对齐 */
+    antd: {
+      locale: 'zh-cn' as AntdLocale,
+      componentSize: 'middle' as AntdComponentSize,
+      prefixCls: 'ant',
       button: {
         autoInsertSpace: false,
       },
       message: {
-        max: 3,
+        maxCount: 3,
       },
-      dialog: {
-        alignCenter: true,
+      modal: {
+        centered: true,
+        /** 声明式弹窗可拖拽（XnModal）；Modal.confirm 等命令式不受影响 */
         draggable: true,
-        overflow: false,
       },
     },
   },
@@ -159,18 +157,13 @@ export type AppConfig = {
       main: string
     }
     tagsView: { height: string }
-    elementPlus: {
-      locale: ElementPlusLocale
-      size: ElementPlusSize
-      zIndex: number
-      namespace: string
+    antd: {
+      locale: AntdLocale
+      componentSize: AntdComponentSize
+      prefixCls: string
       button: { autoInsertSpace: boolean }
-      message: { max: number }
-      dialog: {
-        alignCenter: boolean
-        draggable: boolean
-        overflow: boolean
-      }
+      message: { maxCount: number }
+      modal: { centered: boolean; draggable: boolean }
     }
   }
   storage: {
@@ -198,6 +191,26 @@ function cloneDefault(): AppConfig {
 
 /** 运行时配置（可变普通对象，可被后端下发覆盖） */
 export const appConfig: AppConfig = cloneDefault()
+
+const appConfigListeners = new Set<() => void>()
+
+/** 订阅运行时 appConfig 变更（ConfigProvider 等需据此重渲染） */
+export function subscribeAppConfig(listener: () => void) {
+  appConfigListeners.add(listener)
+  return () => {
+    appConfigListeners.delete(listener)
+  }
+}
+
+function notifyAppConfigListeners() {
+  appConfigListeners.forEach((fn) => {
+    try {
+      fn()
+    } catch {
+      /* ignore */
+    }
+  })
+}
 
 /** 深合并：仅用 remote 中非 undefined 的字段覆盖 target */
 export function deepMergeAppConfig<T extends Record<string, unknown>>(
@@ -244,6 +257,8 @@ export function applyRemoteAppConfig(
   }
   // 运行时只用投影后的 name/intro，不保留云端 clients 映射
   delete (appConfig.app as Record<string, unknown>).clients
+  // 公开配置可能带他栈字段，不进本工程运行时
+  delete (appConfig.ui as Record<string, unknown>).elementPlus
   applyAppConfig(appConfig)
 }
 
@@ -291,11 +306,18 @@ export function applyUserUiPreference(pref: UserUiPreference | null | undefined)
   applyAppConfig(appConfig)
 }
 
-/** 将后端 elementPlus.size 映射为 Ant Design componentSize */
-export function mapAntdComponentSize(size?: ElementPlusSize): AntdSize {
-  if (size === 'large') return 'large'
-  if (size === 'small') return 'small'
-  return 'middle'
+/** 深拷贝 antd 子树，供表单与 API payload 使用 */
+export function cloneAntdUi(
+  src: AppConfig['ui']['antd'] = defaultAppConfig.ui.antd,
+): AppConfig['ui']['antd'] {
+  const base = defaultAppConfig.ui.antd
+  return {
+    ...base,
+    ...src,
+    button: { ...base.button, ...src.button },
+    message: { ...base.message, ...src.message },
+    modal: { ...base.modal, ...src.modal },
+  }
 }
 
 function applyFavicon(href: string) {
@@ -462,4 +484,6 @@ export function applyLayoutTheme(colors: ThemeColors, options: ApplyLayoutThemeO
   } else {
     root.style.setProperty('--app-main-bg-image', 'none')
   }
+
+  notifyAppConfigListeners()
 }

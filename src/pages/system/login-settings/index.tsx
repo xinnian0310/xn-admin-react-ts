@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Card, Tag, message, Modal } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
@@ -208,6 +208,7 @@ export default function LoginSettingsPage() {
               setSize(s)
               void loadData(p, s)
             }}
+            onRefresh={() => void loadData()}
             slots={{
               captcha: ({ row }) => {
                 const r = row as unknown as LoginPageConfig

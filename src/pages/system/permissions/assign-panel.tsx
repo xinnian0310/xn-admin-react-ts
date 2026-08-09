@@ -4,7 +4,6 @@ import {
   Form,
   Input,
   InputNumber,
-  Modal,
   Select,
   Space,
   Table,
@@ -12,8 +11,9 @@ import {
   Tag,
   message,
 } from 'antd'
-import Auth from '@/components/Auth'
-import IconPicker from '@/components/IconPicker'
+import XnAuth from '@/components/XnAuth'
+import XnIconPicker from '@/components/XnIconPicker'
+import XnModal from '@/components/XnModal'
 import { create, getMenuGroups, remove, update } from '@/api/permission'
 import type { MenuPermissionGroup, Permission, PermissionForm } from '@/types'
 import type { SaveMode } from '@/types/save'
@@ -159,13 +159,13 @@ export default function PermissionAssignPanel({
     return (
       <>
         <Space style={{ marginBottom: 8 }}>
-          <Auth permission="permission-content:create">
+          <XnAuth permission="permission-content:create">
             <Button type="primary" size="small" onClick={() => openCreate(type)}>
               新增
             </Button>
-          </Auth>
+          </XnAuth>
           {canQuickAdd.map((p) => (
-            <Auth key={p.action} permission="permission-content:create">
+            <XnAuth key={p.action} permission="permission-content:create">
               <Button
                 size="small"
                 onClick={() => {
@@ -180,7 +180,7 @@ export default function PermissionAssignPanel({
               >
                 +{p.name}
               </Button>
-            </Auth>
+            </XnAuth>
           ))}
         </Space>
         <Table
@@ -215,19 +215,19 @@ export default function PermissionAssignPanel({
               align: 'center' as const,
               render: (_: unknown, row: Permission) => (
                 <Space>
-                  <Auth permission="permission-content:table-edit">
+                  <XnAuth permission="permission-content:table-edit">
                     <Button type="link" size="small" onClick={() => openEdit(row)}>
                       编辑
                     </Button>
-                  </Auth>
-                  <Auth permission="permission-content:table-delete">
+                  </XnAuth>
+                  <XnAuth permission="permission-content:table-delete">
                     <Button
                       type="link"
                       size="small"
                       danger
                       disabled={row.builtIn}
                       onClick={() => {
-                        Modal.confirm({
+                        XnModal.confirm({
                           title: '确认删除',
                           content: `确定删除「${row.name}」吗？`,
                           okType: 'danger',
@@ -242,7 +242,7 @@ export default function PermissionAssignPanel({
                     >
                       删除
                     </Button>
-                  </Auth>
+                  </XnAuth>
                 </Space>
               ),
             },
@@ -254,7 +254,7 @@ export default function PermissionAssignPanel({
 
   return (
     <>
-      <Modal
+      <XnModal
         title={`分配权限 - ${menuName}`}
         open={open}
         onCancel={onClose}
@@ -281,9 +281,9 @@ export default function PermissionAssignPanel({
             },
           ]}
         />
-      </Modal>
+      </XnModal>
 
-      <Modal
+      <XnModal
         title={mode === 'add' ? '新增权限' : mode === 'view' ? '查看权限' : '编辑权限'}
         open={editOpen}
         onCancel={() => setEditOpen(false)}
@@ -339,7 +339,7 @@ export default function PermissionAssignPanel({
                 <Input />
               </Form.Item>
               <Form.Item name="icon" label="图标">
-                <IconPicker />
+                <XnIconPicker />
               </Form.Item>
               <Form.Item name="buttonColor" label="颜色">
                 <Select
@@ -357,7 +357,7 @@ export default function PermissionAssignPanel({
             <InputNumber min={0} max={9999} style={{ width: '100%' }} />
           </Form.Item>
         </Form>
-      </Modal>
+      </XnModal>
     </>
   )
 }

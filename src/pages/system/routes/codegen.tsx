@@ -1,7 +1,8 @@
 import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Alert, Button, Form, Input, Modal, Space, Switch, Tabs, Tag, message } from 'antd'
+import { Alert, Button, Form, Input, Space, Switch, Tabs, Tag, message } from 'antd'
 import { generate, type RouteCodegenResult } from '@/api/route'
 import type { SysRoute } from '@/types'
+import XnModal from '@/components/XnModal'
 
 export interface RouteCodegenHandle {
   open: (row: SysRoute) => void
@@ -75,7 +76,7 @@ const RouteCodegen = forwardRef<RouteCodegenHandle, object>(function RouteCodege
   }
 
   return (
-    <Modal
+    <XnModal
       title={`代码生成 - ${route?.title || ''}`}
       open={visible}
       onCancel={() => setVisible(false)}
@@ -170,7 +171,7 @@ const RouteCodegen = forwardRef<RouteCodegenHandle, object>(function RouteCodege
           />
         </>
       )}
-    </Modal>
+    </XnModal>
   )
 })
 
@@ -206,3 +207,4 @@ function PreBlock({ text }: { text: string }) {
 }
 
 export default RouteCodegen
+

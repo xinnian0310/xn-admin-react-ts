@@ -4,7 +4,6 @@ import {
   Form,
   Input,
   InputNumber,
-  Modal,
   Radio,
   Select,
   Table,
@@ -15,7 +14,8 @@ import {
 import type { DataNode } from 'antd/es/tree'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
-import IconPicker from '@/components/IconPicker'
+import XnIconPicker from '@/components/XnIconPicker'
+import XnModal from '@/components/XnModal'
 import { usePageUi } from '@/hooks/usePageUi'
 import { create, list as listPermissions, remove, update } from '@/api/permission'
 import { list as listRoutes } from '@/api/route'
@@ -313,7 +313,7 @@ export default function PermissionsContentPage() {
           onActionClick={({ action, row: r }) => {
             const p = r as unknown as Permission
             if (action === 'delete') {
-              Modal.confirm({
+              XnModal.confirm({
                 title: '确认删除',
                 content: `确定删除「${p.name}」吗？`,
                 okType: 'danger',
@@ -406,7 +406,7 @@ export default function PermissionsContentPage() {
         />
       </div>
 
-      <Modal
+      <XnModal
         title={mode === 'add' ? '新增权限' : mode === 'view' ? '查看权限' : '编辑权限'}
         open={editOpen}
         onCancel={() => setEditOpen(false)}
@@ -436,10 +436,10 @@ export default function PermissionsContentPage() {
                 <Input />
               </Form.Item>
               <Form.Item name="icon" label="图标(Element)" extra="Vue 端使用">
-                <IconPicker placeholder="Plus / Edit" />
+                <Input allowClear placeholder="Plus / Edit" />
               </Form.Item>
-              <Form.Item name="iconAntd" label="图标(Ant)" extra="React 端优先">
-                <IconPicker placeholder="mdi:plus / antd:PlusOutlined" />
+              <Form.Item name="iconAntd" label="图标(Ant)" extra="React 端优先；Ant / Iconify / SVG">
+                <XnIconPicker placeholder="选择 Ant / Iconify / SVG 图标" />
               </Form.Item>
               <Form.Item name="buttonColor" label="颜色">
                 <Select
@@ -480,7 +480,7 @@ export default function PermissionsContentPage() {
             <InputNumber min={0} max={9999} style={{ width: '100%' }} />
           </Form.Item>
         </Form>
-      </Modal>
+      </XnModal>
     </div>
   )
 }

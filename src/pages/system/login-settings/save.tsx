@@ -1,5 +1,6 @@
+import XnModal from '@/components/XnModal'
 ﻿import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Form, Input, Modal, Radio, Select, Switch, message } from 'antd'
+import { Form, Input, Radio, Select, Switch, message } from 'antd'
 import { create, get, update } from '@/api/login-page'
 import type { LoginPageConfigForm } from '@/types'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
@@ -78,7 +79,7 @@ const LoginPageSave = forwardRef<LoginPageSaveHandle, Props>(function LoginPageS
   const readonly = mode === 'view'
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '登录页配置')}
       open={visible}
       width={560}
@@ -136,8 +137,9 @@ const LoginPageSave = forwardRef<LoginPageSaveHandle, Props>(function LoginPageS
           <Input.TextArea rows={2} maxLength={200} />
         </Form.Item>
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 
 export default LoginPageSave
+

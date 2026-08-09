@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
-import { Card, Col, Row, Statistic, Tag, Typography } from 'antd'
+import { Card, Col, Empty, Image, Row, Statistic, Tag, Typography, message } from 'antd'
 import { Line, Pie } from '@ant-design/plots'
 import {
   TeamOutlined,
@@ -8,10 +8,14 @@ import {
   SafetyCertificateOutlined,
   BankOutlined,
   NotificationOutlined,
+  PhoneOutlined,
+  CoffeeOutlined,
 } from '@ant-design/icons'
 import { appConfig } from '@/config/app'
 import { homeConfig } from '@/config/home'
 import { getDashboardStats } from '@/api/dashboard'
+import { getPublicSiteContact } from '@/api/site-contact'
+import { resolveContactType, type SiteContactItem, type SiteDonation } from '@/types/site-contact'
 import XnAppIcon from '@/components/XnAppIcon'
 import type { DashboardStats } from '@/types'
 import styles from './dashboard.module.scss'
@@ -25,7 +29,16 @@ const STAT_META = [
   { key: 'publishedNotices', title: '已发公告', icon: NotificationOutlined, tone: 'magenta' },
 ] as const
 
-const PIE_COLORS = ['#1677ff', '#13c2c2', '#52c41a', '#722ed1', '#fa8c16', '#eb2f96', '#2f54eb', '#a0d911']
+const PIE_COLORS = [
+  '#1677ff',
+  '#13c2c2',
+  '#52c41a',
+  '#722ed1',
+  '#fa8c16',
+  '#eb2f96',
+  '#2f54eb',
+  '#a0d911',
+]
 
 type StatKey = (typeof STAT_META)[number]['key']
 
@@ -38,12 +51,52 @@ function formatAxisDate(value: unknown) {
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [contacts, setContacts] = useState<SiteContactItem[]>(() =>
+    homeConfig.contacts.map((c) => ({ ...c, groups: c.groups?.map((g) => ({ ...g })) })),
+  )
+  const [donation, setDonation] = useState<SiteDonation>(() => ({
+    tip: homeConfig.donation.tip,
+    qrcodes: homeConfig.donation.qrcodes.map((q) => ({ ...q })),
+  }))
 
   useEffect(() => {
     void getDashboardStats()
       .then((res) => setStats(res.data || null))
       .catch(() => setStats(null))
   }, [])
+
+  useEffect(() => {
+    void getPublicSiteContact()
+      .then((res) => {
+        const data = res.data
+        if (data?.contacts?.length) {
+          setContacts(data.contacts)
+        }
+        if (data?.donation) {
+          setDonation({
+            tip: data.donation.tip || homeConfig.donation.tip,
+            qrcodes: data.donation.qrcodes?.length
+              ? data.donation.qrcodes
+              : homeConfig.donation.qrcodes.map((q) => ({ ...q })),
+          })
+        }
+      })
+      .catch(() => {
+        // 后端未就绪时沿用本地默认配置
+      })
+  }, [])
+
+  async function copyQq(value: string, full?: boolean) {
+    if (full || !value) return
+    try {
+      await navigator.clipboard.writeText(value)
+      message.success(`已复制群号 ${value}`)
+    } catch {
+      message.error('复制失败，请手动选择')
+    }
+  }
+
+  const visibleQrcodes = donation.qrcodes.filter((q) => q.src)
 
   const trendConfig = useMemo(() => {
     const points = stats?.registerTrend || []
@@ -114,7 +167,7 @@ export default function DashboardPage() {
           <Typography.Title level={3} className={styles.heroTitle}>
             {appConfig.app.name || homeConfig.intro.title}
           </Typography.Title>
-          <Tag color="processing" bordered={false}>
+          <Tag color="processing" variant="filled">
             {homeConfig.intro.version}
           </Tag>
         </div>
@@ -188,6 +241,96 @@ export default function DashboardPage() {
           ))}
         </div>
       </section>
+
+      <Row gutter={[14, 14]} className={styles.contactRow}>
+        <Col xs={24} lg={12}>
+          <Card
+            size="small"
+            className={styles.panel}
+            title={
+              <span className={styles.cardTitle}>
+                <PhoneOutlined />
+                联系信息
+              </span>
+            }
+          >
+            <div className={styles.contactList}>
+              {contacts.map((c, ci) => (
+                <div key={`${c.label}-${ci}`} className={styles.contactItem}>
+                  {c.icon ? (
+                    <span className={styles.contactIcon}>
+                      <XnAppIcon name={c.icon} size={16} />
+                    </span>
+                  ) : null}
+                  <span className={styles.contactLabel}>{c.label}</span>
+                  {resolveContactType(c) === 'qq' && c.groups?.length ? (
+                    <div className={styles.contactGroups}>
+                      {c.groups.map((g, gi) => (
+                        <button
+                          key={`${g.value}-${gi}`}
+                          type="button"
+                          className={`${styles.qqChip}${g.full ? ` ${styles.qqChipFull}` : ''}`}
+                          title={g.full ? '群已满' : '点击复制群号'}
+                          disabled={!!g.full}
+                          onClick={() => void copyQq(g.value, g.full)}
+                        >
+                          <XnAppIcon name="ri:qq-fill" size={14} className={styles.qqIcon} />
+                          <span className={styles.qqNum}>{g.value}</span>
+                          {g.full ? <span className={styles.qqBadge}>已满</span> : null}
+                        </button>
+                      ))}
+                    </div>
+                  ) : c.link ? (
+                    <a
+                      href={c.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${styles.contactValue} ${styles.contactLink}`}
+                    >
+                      {c.value}
+                    </a>
+                  ) : (
+                    <span className={styles.contactValue}>{c.value}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} lg={12}>
+          <Card
+            size="small"
+            className={styles.panel}
+            title={
+              <span className={styles.cardTitle}>
+                <CoffeeOutlined />
+                捐赠情况
+              </span>
+            }
+          >
+            {donation.tip ? <p className={styles.donationTip}>{donation.tip}</p> : null}
+            <div className={styles.donationBody}>
+              {visibleQrcodes.length ? (
+                visibleQrcodes.map((qr) => (
+                  <div key={`${qr.label}-${qr.src}`} className={styles.donationQr}>
+                    <Image
+                      src={qr.src}
+                      alt={qr.label}
+                      width={160}
+                      height={220}
+                      style={{ objectFit: 'contain', borderRadius: 10 }}
+                      className={styles.donationQrImg}
+                    />
+                    <span className={styles.donationQrLabel}>{qr.label}</span>
+                  </div>
+                ))
+              ) : (
+                <Empty description="暂未配置捐赠二维码" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              )}
+            </div>
+          </Card>
+        </Col>
+      </Row>
     </div>
   )
 }

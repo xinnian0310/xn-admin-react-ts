@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Button, Form, Input, Modal, Select, Space, Switch, message } from 'antd'
+import { Button, Form, Input, Select, Space, Switch, message } from 'antd'
 import XnAppIcon from '@/components/XnAppIcon'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
 import {
@@ -9,7 +9,7 @@ import {
   type SiteContactItem,
   type SiteContactType,
 } from '@/types/site-contact'
-
+import XnModal from '@/components/XnModal'
 export interface ContactSaveHandle {
   open: (mode: SaveMode, row?: SiteContactItem, index?: number) => void
 }
@@ -132,7 +132,7 @@ const ContactSave = forwardRef<ContactSaveHandle, Props>(function ContactSave({ 
   const readonly = mode === 'view'
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '联系项')}
       open={visible}
       width={580}
@@ -266,8 +266,9 @@ const ContactSave = forwardRef<ContactSaveHandle, Props>(function ContactSave({ 
           </Form.Item>
         ) : null}
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 
 export default ContactSave
+

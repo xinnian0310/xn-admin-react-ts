@@ -72,7 +72,7 @@ a {
 
 /* ========== 全局 UI 变量（Ant Design 默认；启动时由 theme 覆盖） ========== */
 :root {
-  --app-dialog-max-height: 70vh;
+  --app-dialog-max-height: 95vh;
   --app-font-size-sidebar: 14px;
   --app-font-size-header: 14px;
   --app-font-size-tags-view: 14px;
@@ -166,4 +166,30 @@ a {
 .notice-ws-notify__actions {
   flex-shrink: 0;
   padding-top: 0;
+}
+
+/* 全局弹窗限高（与 Vue .el-dialog 对齐；由 appConfig.ui.dialog.maxHeight 写入变量） */
+.ant-modal {
+  max-height: var(--app-dialog-max-height);
+  padding-bottom: 0;
+}
+
+.ant-modal .ant-modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: var(--app-dialog-max-height);
+  overflow: hidden;
+}
+
+.ant-modal .ant-modal-header,
+.ant-modal .ant-modal-footer {
+  flex-shrink: 0;
+}
+
+.ant-modal .ant-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
 }

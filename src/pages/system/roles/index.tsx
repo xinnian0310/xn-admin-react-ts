@@ -5,7 +5,7 @@ import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnTable from '@/components/XnTable'
-import Auth from '@/components/Auth'
+import XnAuth from '@/components/XnAuth'
 import RoleSave, { type RoleSaveHandle } from './save'
 import { usePageUi } from '@/hooks/usePageUi'
 import { list, remove, batchRemove, updateStatus } from '@/api/role'
@@ -226,13 +226,13 @@ export default function RolesPage() {
               status: ({ row }) => {
                 const r = row as unknown as Role
                 return (
-                  <Auth permission="role:update">
+                  <XnAuth permission="role:update">
                     <Switch
                       checked={r.status === 1}
                       disabled={r.builtIn && r.code === 'SUPER_ADMIN'}
                       onChange={(val) => void handleStatusChange(r, val)}
                     />
-                  </Auth>
+                  </XnAuth>
                 )
               },
               actions: ({ row }) => (
@@ -267,13 +267,13 @@ export default function RolesPage() {
                 </div>
                 <div>描述：{row.description || '—'}</div>
                 <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between' }}>
-                  <Auth permission="role:update">
+                  <XnAuth permission="role:update">
                     <Switch
                       checked={row.status === 1}
                       disabled={row.builtIn && row.code === 'SUPER_ADMIN'}
                       onChange={(val) => void handleStatusChange(row, val)}
                     />
-                  </Auth>
+                  </XnAuth>
                   <XnTableActions
                     items={tableButtonItems}
                     row={row as unknown as Record<string, unknown>}

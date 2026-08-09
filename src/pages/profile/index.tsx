@@ -1,12 +1,7 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
 import { Alert, Avatar, Button, Form, Input, Space, Tag, Upload, message } from 'antd'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import {
-  changePassword,
-  getPasswordRules,
-  uploadAvatar,
-  type PasswordRules,
-} from '@/api/auth'
+import { changePassword, getPasswordRules, uploadAvatar, type PasswordRules } from '@/api/auth'
 import { useUserStore } from '@/stores/user'
 import './profile.scss'
 
@@ -25,7 +20,9 @@ export default function ProfilePage() {
   const [form] = Form.useForm()
   const [pwdForm] = Form.useForm()
 
-  const canEdit = user?.username !== 'SuperAdmin'
+  const canEditProfile = user?.username !== 'SuperAdmin'
+  const canEditPassword = true
+  const canEdit = canEditProfile || canEditPassword
   const roleText = useMemo(
     () => (user?.roleList || []).map((r) => r.name).join('、') || user?.role || '—',
     [user],
@@ -60,14 +57,10 @@ export default function ProfilePage() {
   }, [])
 
   useEffect(() => {
-    if (forcePwd && canEdit) setEditing(true)
-  }, [forcePwd, canEdit])
+    if (forcePwd && canEditPassword) setEditing(true)
+  }, [forcePwd, canEditPassword])
 
   function startEdit() {
-    if (!canEdit) {
-      message.warning('超级管理员禁止编辑个人信息')
-      return
-    }
     syncForm()
     pwdForm.resetFields()
     setEditing(true)
@@ -80,29 +73,37 @@ export default function ProfilePage() {
   }
 
   async function handleSave() {
-    if (!canEdit) return
-    const values = await form.validateFields()
     const pwdValues = pwdForm.getFieldsValue()
     const hasPwdInput = Boolean(
       pwdValues.oldPassword || pwdValues.newPassword || pwdValues.confirmPassword,
     )
-    if (forcePwd || hasPwdInput) await pwdForm.validateFields()
+
+    if (canEditProfile) {
+      await form.validateFields()
+    }
+    if (forcePwd || hasPwdInput || !canEditProfile) {
+      await pwdForm.validateFields()
+    }
 
     setSaving(true)
     try {
-      await updateProfile({
-        nickname: values.nickname,
-        email: values.email,
-        phone: values.phone,
-      })
-      if (forcePwd || hasPwdInput) {
+      if (canEditProfile) {
+        const values = form.getFieldsValue()
+        await updateProfile({
+          nickname: values.nickname,
+          email: values.email,
+          phone: values.phone,
+        })
+      }
+      if (forcePwd || hasPwdInput || !canEditProfile) {
+        const pwd = await pwdForm.validateFields()
         await changePassword({
-          oldPassword: pwdValues.oldPassword,
-          newPassword: pwdValues.newPassword,
+          oldPassword: pwd.oldPassword,
+          newPassword: pwd.newPassword,
         })
         pwdForm.resetFields()
         await fetchProfile()
-        message.success(forcePwd ? '密码已修改' : '资料与密码已保存')
+        message.success(forcePwd ? '密码已修改' : canEditProfile ? '资料与密码已保存' : '密码已修改')
         if (forcePwd) {
           setEditing(false)
           navigate('/dashboard', { replace: true })
@@ -128,7 +129,8 @@ export default function ProfilePage() {
     }
   }
 
-  const formDisabled = !canEdit || !editing
+  const profileFormDisabled = !canEditProfile || !editing
+  const passwordFormDisabled = !canEditPassword || !editing
 
   return (
     <div className="page-card profile-page" style={{ opacity: loading ? 0.7 : 1 }}>
@@ -145,12 +147,12 @@ export default function ProfilePage() {
           message="按安全策略要求，请先修改密码后再继续使用系统"
         />
       ) : null}
-      {!canEdit ? (
+      {!canEditProfile ? (
         <Alert
           type="warning"
           showIcon
           className="profile-page__alert"
-          message="超级管理员账号禁止编辑个人信息"
+          message="超级管理员仅可修改密码，不可改用户名与基本资料"
         />
       ) : null}
 
@@ -161,7 +163,7 @@ export default function ProfilePage() {
           </Avatar>
           <div className="profile-page__name">{user?.nickname || user?.username}</div>
           <div className="profile-page__role">{roleText}</div>
-          {canEdit ? (
+          {canEditProfile ? (
             <Upload
               showUploadList={false}
               accept="image/jpeg,image/png,image/gif,image/webp"
@@ -181,7 +183,7 @@ export default function ProfilePage() {
           <div className="profile-page__panels">
             <div className="profile-page__panel">
               <div className="profile-page__section-title">基本信息</div>
-              <Form form={form} labelCol={{ flex: '88px' }} disabled={formDisabled}>
+              <Form form={form} labelCol={{ flex: '88px' }} disabled={profileFormDisabled}>
                 <Form.Item label="用户名" name="username">
                   <Input disabled />
                 </Form.Item>
@@ -219,7 +221,7 @@ export default function ProfilePage() {
 
             <div className="profile-page__panel">
               <div className="profile-page__section-title">修改密码</div>
-              <Form form={pwdForm} labelCol={{ flex: '88px' }} disabled={formDisabled}>
+              <Form form={pwdForm} labelCol={{ flex: '88px' }} disabled={passwordFormDisabled}>
                 <Form.Item
                   label="原密码"
                   name="oldPassword"
@@ -272,7 +274,7 @@ export default function ProfilePage() {
                 </Space>
               ) : (
                 <Button type="primary" onClick={startEdit}>
-                  修改
+                  {canEditProfile ? '修改' : '修改密码'}
                 </Button>
               )
             ) : null}

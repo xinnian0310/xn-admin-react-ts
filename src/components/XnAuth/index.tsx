@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { usePermission } from '@/hooks/usePermission'
 
-interface AuthProps {
+interface XnAuthProps {
   permission?: string | string[]
   /** 无权限时渲染的内容，默认隐藏 */
   fallback?: ReactNode
@@ -9,7 +9,7 @@ interface AuthProps {
 }
 
 /** 无对应权限时不渲染 children */
-export default function Auth({ permission, fallback = null, children }: AuthProps) {
+export default function XnAuth({ permission, fallback = null, children }: XnAuthProps) {
   const { hasPermission, hasAnyPermission } = usePermission()
 
   if (!permission) return <>{children}</>

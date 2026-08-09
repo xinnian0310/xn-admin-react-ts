@@ -1,5 +1,6 @@
+import XnModal from '@/components/XnModal'
 ﻿import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Form, Input, Modal, message } from 'antd'
+import { Form, Input, message } from 'antd'
 import XnRichEditor from '@/components/XnRichEditor'
 import { create, get, update } from '@/api/notice'
 import type { NoticeForm } from '@/types'
@@ -63,7 +64,7 @@ const NoticeSave = forwardRef<NoticeSaveHandle, Props>(function NoticeSave({ onS
   const readonly = mode === 'view'
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '公告')}
       open={visible}
       width={820}
@@ -93,8 +94,9 @@ const NoticeSave = forwardRef<NoticeSaveHandle, Props>(function NoticeSave({ onS
           <XnRichEditor disabled={readonly} height="360px" />
         </Form.Item>
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 
 export default NoticeSave
+

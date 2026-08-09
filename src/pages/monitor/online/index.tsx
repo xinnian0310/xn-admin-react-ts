@@ -147,6 +147,7 @@ export default function MonitorOnlinePage() {
             setSize(s)
             applyLocalPage(p, s)
           }}
+          onRefresh={() => void loadData()}
           slots={{
             sessionCount: ({ row }) => <Tag>{String(row.sessionCount ?? 0)}</Tag>,
             onlineSeconds: ({ row }) => <>{formatDuration(Number(row.onlineSeconds || 0))}</>,

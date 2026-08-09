@@ -184,7 +184,12 @@ export default function SecurityPage() {
           }}
         >
           <div style={{ fontWeight: 600 }}>安全策略</div>
-          <Form layout="horizontal" labelCol={{ flex: '140px' }} wrapperCol={{ flex: 1 }} style={{ flex: 1 }}>
+          <Form
+            layout="horizontal"
+            labelCol={{ flex: '140px' }}
+            wrapperCol={{ flex: 1 }}
+            style={{ flex: 1 }}
+          >
             <div style={{ fontWeight: 600, margin: '4px 0 12px', fontSize: 13 }}>登录防护</div>
             <Form.Item label="失败锁定阈值">
               <InputNumber
@@ -344,6 +349,7 @@ export default function SecurityPage() {
             setSize(s)
             applyLocalPage(p, s)
           }}
+          onRefresh={() => void loadData()}
           slots={{
             remainSeconds: ({ row }) =>
               formatRemain(Number((row as unknown as LockedAccount).remainSeconds || 0)),

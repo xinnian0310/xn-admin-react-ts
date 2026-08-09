@@ -1,0 +1,99 @@
+.site-contact-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.site-contact-page__spin {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-contact-page__spin > .ant-spin-container {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.site-contact-page__heading {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+}
+
+.site-contact-page__heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.site-contact-page__hint {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.site-contact-page__tabs {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.site-contact-page__tabs.ant-tabs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-contact-page__tabs > .ant-tabs-nav {
+  flex-shrink: 0;
+}
+
+.site-contact-page__tabs > .ant-tabs-content-holder {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.site-contact-page__tabs .ant-tabs-content {
+  height: 100%;
+}
+
+.site-contact-page__tabs .ant-tabs-tabpane {
+  height: 100%;
+  outline: none;
+}
+
+.site-contact-page__tabs .ant-tabs-tabpane-active {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.site-contact-page__pane {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.site-contact-page__pane > .xn-page-layout {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.site-contact-page__donation-tip {
+  flex-shrink: 0;
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+}

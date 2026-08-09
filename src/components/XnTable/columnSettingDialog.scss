@@ -1,0 +1,66 @@
+.column-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 60vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.column-setting__head,
+.column-setting__row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1.2fr) minmax(0, 1fr) 150px 88px;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.column-setting__head {
+  padding: 0 8px 8px;
+  color: var(--app-text-muted, rgba(0, 0, 0, 0.45));
+  font-size: var(--app-font-size-main, 14px);
+  border-bottom: 1px solid var(--app-border-color, #f0f0f0);
+}
+
+.column-setting__row {
+  padding: 8px;
+  border: 1px solid var(--app-border-color, #f0f0f0);
+  border-radius: 6px;
+  background: var(--app-card-bg, #fff);
+  cursor: grab;
+}
+
+.column-setting__row.is-locked {
+  cursor: default;
+  background: var(--app-fill-color, #fafafa);
+}
+
+.column-setting__row.is-locked .col-drag {
+  color: #c0c4cc;
+  cursor: not-allowed;
+}
+
+.column-setting__row.is-dragging {
+  opacity: 0.6;
+  border-color: var(--app-color-primary, #1677ff);
+}
+
+.col-drag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--app-text-muted, rgba(0, 0, 0, 0.45));
+}
+
+.col-label,
+.col-prop,
+.col-width {
+  min-width: 0;
+}
+
+.col-enable {
+  display: inline-flex;
+  justify-content: center;
+}

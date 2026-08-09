@@ -1,9 +1,10 @@
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
-import { Form, Modal, Select, message } from 'antd'
+import { Form, Select, message } from 'antd'
 import { assignRoles, get } from '@/api/unit'
 import { getOptions as getRoleOptions } from '@/api/role'
 import { usePermission } from '@/hooks/usePermission'
 import type { Role, SysUnit } from '@/types'
+import XnModal from '@/components/XnModal'
 
 export interface UnitAssignRolesHandle {
   open: (row: SysUnit) => Promise<void>
@@ -51,7 +52,7 @@ const UnitAssignRoles = forwardRef<UnitAssignRolesHandle, { onSuccess?: () => vo
     }
 
     return (
-      <Modal
+      <XnModal
         title={`分配角色 - ${unit?.name || ''}`}
         open={visible}
         onCancel={() => setVisible(false)}
@@ -75,9 +76,10 @@ const UnitAssignRoles = forwardRef<UnitAssignRolesHandle, { onSuccess?: () => vo
             />
           </Form.Item>
         </Form>
-      </Modal>
+      </XnModal>
     )
   },
 )
 
 export default UnitAssignRoles
+

@@ -222,4 +222,23 @@ export const menus: MenuItem[] = [
       },
     ],
   },
+  {
+    id: 'demo',
+    title: '组件演示',
+    permission: 'menu:demo',
+    children: [
+      {
+        id: 'demo-ui',
+        title: '基础组件',
+        path: '/demos/ui',
+        permission: 'menu:demo:ui',
+      },
+      {
+        id: 'demo-xn',
+        title: '系统组件',
+        path: '/demos/xn',
+        permission: 'menu:demo:xn',
+      },
+    ],
+  },
 ]

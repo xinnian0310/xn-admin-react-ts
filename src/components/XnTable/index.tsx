@@ -21,10 +21,11 @@ import type { ButtonListItem } from '@/types/button'
 import type { TableColumnItem, TableColumnOption } from '@/types/table'
 import { formatDateTime, isIsoDateTimeLike } from '@/utils/datetime'
 import { estimateTableActionsWidth } from '@/utils/table-actions'
-import { getTableColumns, saveTableColumns } from '@/api/table-column'
+import { getTableColumns, saveTableColumns, type TableColumnSetting } from '@/api/table-column'
 import XnAppIcon from '@/components/XnAppIcon'
 import XnLongText from '@/components/XnLongText'
 import { usePermission } from '@/hooks/usePermission'
+import ColumnSettingDialog from './ColumnSettingDialog'
 import './xnTable.scss'
 
 export interface XnTableHandle {
@@ -58,11 +59,67 @@ interface XnTableProps {
   stripe?: boolean
   rowKey?: string | ((row: Record<string, unknown>) => Key)
   onPageChange?: (page: number, pageSize: number) => void
+  /** 刷新：data 模式下优先于 onPageChange，用于真正重新拉数 */
+  onRefresh?: () => void
   onSelectionChange?: (rows: unknown[]) => void
   onSwitchChange?: (payload: { row: Record<string, unknown>; prop: string; value: unknown }) => void
   onDataChange?: (rows: unknown[]) => void
   onSuccess?: () => void
   slots?: Record<string, (ctx: { row: Record<string, unknown>; index: number }) => ReactNode>
+}
+
+function columnIdentity(col: TableColumnItem) {
+  if (col.prop) return col.prop
+  if (col.slot) return `slot:${col.slot}`
+  if (col.type) return `type:${col.type}`
+  return `label:${col.label ?? ''}`
+}
+
+function toSettingRow(col: TableColumnItem, index: number): TableColumnSetting {
+  const widthNum = col.width == null || col.width === '' ? undefined : Number(col.width)
+  const locked = col.type === 'selection'
+  return {
+    key: columnIdentity(col),
+    prop: col.prop,
+    label: locked ? '选择框' : col.label,
+    width: Number.isFinite(widthNum) ? widthNum : undefined,
+    visible: col.visible !== false,
+    sort: index,
+    locked,
+  }
+}
+
+function applyColumnSettings(
+  defaults: TableColumnItem[],
+  settings: TableColumnSetting[],
+): TableColumnItem[] {
+  if (!settings.length) {
+    return defaults.map((col) => ({ ...col }))
+  }
+  const defaultMap = new Map(defaults.map((col) => [columnIdentity(col), col]))
+  const used = new Set<string>()
+  const result: TableColumnItem[] = []
+  const sorted = [...settings].sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+
+  for (const setting of sorted) {
+    const base = defaultMap.get(setting.key)
+    if (!base) continue
+    used.add(setting.key)
+    result.push({
+      ...base,
+      label: base.type === 'selection' ? '选择框' : (setting.label ?? base.label),
+      width: setting.width ?? base.width,
+      visible: setting.visible !== false,
+    })
+  }
+
+  for (const col of defaults) {
+    const key = columnIdentity(col)
+    if (!used.has(key)) {
+      result.push({ ...col })
+    }
+  }
+  return result
 }
 
 function emptyOf(col: TableColumnItem) {
@@ -113,6 +170,7 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
     actionItems,
     rowKey = 'id',
     onPageChange,
+    onRefresh,
     onSelectionChange,
     onSwitchChange,
     onDataChange,
@@ -128,7 +186,9 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
   const [innerLoading, setInnerLoading] = useState(false)
   const [selected, setSelected] = useState<Record<string, unknown>[]>([])
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([])
-  const [columnPrefs, setColumnPrefs] = useState<Record<string, boolean>>({})
+  const [savedColumnSettings, setSavedColumnSettings] = useState<TableColumnSetting[]>([])
+  const [columnSettingVisible, setColumnSettingVisible] = useState(false)
+  const [columnSaving, setColumnSaving] = useState(false)
   const [apiModule, setApiModule] = useState<CrudApiModule | null>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
   const [scrollY, setScrollY] = useState<number>()
@@ -143,16 +203,31 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
   >[]
   const displayTotal = isApiMode ? innerTotal : totalProp
 
+  const resolvedColumns = useMemo(
+    () => applyColumnSettings(columns, savedColumnSettings),
+    [columns, savedColumnSettings],
+  )
+  const visibleColumns = useMemo(
+    () => resolvedColumns.filter((col) => col.visible !== false),
+    [resolvedColumns],
+  )
+  const settingRows = useMemo(
+    () => resolvedColumns.map((col, index) => toSettingRow(col, index)),
+    [resolvedColumns],
+  )
+
   useLayoutEffect(() => {
     const el = bodyRef.current
     if (!el) return
     const measure = () => {
       const h = el.getBoundingClientRect().height
       if (h <= 0) return
-      // 表头高度：优先量实际 thead，否则回退 47
+      // 表头高度：优先量实际 sticky header，否则回退 thead / 47
       const head = el.querySelector('.ant-table-header, .ant-table-thead') as HTMLElement | null
       const headH = head?.getBoundingClientRect().height || 47
-      setScrollY(Math.max(120, Math.floor(h - headH)))
+      const next = Math.max(120, Math.floor(h - headH))
+      setScrollY(next)
+      el.style.setProperty('--xn-table-scroll-y', `${next}px`)
     }
     measure()
     const raf = requestAnimationFrame(() => measure())
@@ -200,27 +275,18 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
   }, [api, immediate, loadData])
 
   useEffect(() => {
-    if (!tableKey) return
+    if (!tableKey) {
+      setSavedColumnSettings([])
+      return
+    }
     void getTableColumns(tableKey)
       .then((res) => {
-        const map: Record<string, boolean> = {}
-        for (const c of res.data?.columns || []) {
-          if (c.prop) map[c.prop] = c.visible !== false
-        }
-        setColumnPrefs(map)
+        setSavedColumnSettings(res.data?.columns ?? [])
       })
       .catch(() => {
-        /* ignore */
+        setSavedColumnSettings([])
       })
   }, [tableKey])
-
-  const visibleColumns = useMemo(() => {
-    return columns.filter((col) => {
-      if (col.visible === false) return false
-      if (col.prop && col.prop in columnPrefs) return columnPrefs[col.prop]
-      return true
-    })
-  }, [columns, columnPrefs])
 
   const visibleActionItems = useMemo(
     () => (actionItems || []).filter((item) => !item.permission || hasPermission(item.permission)),
@@ -362,19 +428,19 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
           render: (_v, row) => (
             <Space size={0} wrap={false}>
               {visibleActionItems.map((item) => {
-                  const action = item.action || item.name
-                  return (
-                    <Button
-                      key={action}
-                      type="link"
-                      size="small"
-                      danger={item.typeColor === 'danger'}
-                      onClick={() => handleAction(action, row)}
-                    >
-                      {item.name}
-                    </Button>
-                  )
-                })}
+                const action = item.action || item.name
+                return (
+                  <Button
+                    key={action}
+                    type="link"
+                    size="small"
+                    danger={item.typeColor === 'danger'}
+                    onClick={() => handleAction(action, row)}
+                  >
+                    {item.name}
+                  </Button>
+                )
+              })}
             </Space>
           ),
         })
@@ -465,27 +531,56 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
   }
 
   async function openColumnSetting() {
-    if (!tableKey) return
-    Modal.info({
-      title: '列设置',
-      content: '列个性化设置将在后续完善；当前已支持从服务端读取列可见性偏好。',
-    })
-    try {
-      await saveTableColumns({
-        tableKey,
-        columns: columns
-          .filter((c) => c.prop)
-          .map((c, index) => ({
-            key: c.prop!,
-            prop: c.prop!,
-            label: c.label,
-            visible: columnPrefs[c.prop!] !== false,
-            sort: index,
-          })),
-      })
-    } catch {
-      /* ignore */
+    if (!tableKey) {
+      message.warning('未配置 tableKey，无法使用列设置')
+      return
     }
+    setColumnSettingVisible(true)
+  }
+
+  async function handleSaveColumns(nextColumns: TableColumnSetting[]) {
+    if (!tableKey) return
+    setColumnSaving(true)
+    try {
+      const res = await saveTableColumns({
+        tableKey,
+        columns: nextColumns,
+      })
+      setSavedColumnSettings(res.data?.columns ?? nextColumns)
+      setColumnSettingVisible(false)
+      message.success('列设置已保存')
+    } finally {
+      setColumnSaving(false)
+    }
+  }
+
+  async function handleResetColumns() {
+    if (!tableKey) return
+    const defaults = columns.map((col, index) => toSettingRow(col, index))
+    setColumnSaving(true)
+    try {
+      const res = await saveTableColumns({
+        tableKey,
+        columns: defaults,
+      })
+      setSavedColumnSettings(res.data?.columns ?? defaults)
+      setColumnSettingVisible(false)
+      message.success('已恢复默认列设置')
+    } finally {
+      setColumnSaving(false)
+    }
+  }
+
+  function handleRefresh() {
+    if (isApiMode) {
+      void loadData()
+      return
+    }
+    if (onRefresh) {
+      onRefresh()
+      return
+    }
+    onPageChange?.(currentPage, currentPageSize)
   }
 
   return (
@@ -517,14 +612,7 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
             />
             <Space>
               <Tooltip title="刷新">
-                <Button
-                  shape="circle"
-                  icon={<ReloadOutlined />}
-                  onClick={() => {
-                    if (isApiMode) void loadData()
-                    else onPageChange?.(currentPage, currentPageSize)
-                  }}
-                />
+                <Button shape="circle" icon={<ReloadOutlined />} onClick={handleRefresh} />
               </Tooltip>
               {tableKey ? (
                 <Tooltip title="列设置">
@@ -539,6 +627,17 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
           </div>
         ) : null}
       </div>
+
+      {tableKey ? (
+        <ColumnSettingDialog
+          open={columnSettingVisible}
+          columns={settingRows}
+          saving={columnSaving}
+          onCancel={() => setColumnSettingVisible(false)}
+          onSave={(cols) => void handleSaveColumns(cols)}
+          onReset={() => void handleResetColumns()}
+        />
+      ) : null}
     </CrudApiContext.Provider>
   )
 })

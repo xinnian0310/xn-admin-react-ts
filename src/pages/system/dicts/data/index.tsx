@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, Tag, message, Modal } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -195,6 +195,7 @@ export default function DictDataPage() {
               setSize(s)
               void loadData(p, s)
             }}
+            onRefresh={() => void loadData()}
             slots={{
               preview: ({ row }) => {
                 const d = row as unknown as DictData

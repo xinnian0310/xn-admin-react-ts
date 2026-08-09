@@ -1,5 +1,5 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react'
-import { Checkbox, Modal, Select, Table, message } from 'antd'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Checkbox, Select, Table, message } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
@@ -14,6 +14,7 @@ import type { SaveMode } from '@/types/save'
 import type { TableColumnItem } from '@/types/table'
 import { formatDateTime } from '@/utils/datetime'
 import MessageSave, { type MessageSaveHandle } from './save'
+import XnModal from '@/components/XnModal'
 
 export default function MessagesPage() {
   const { searchItems, buttonItems, tableButtonItems } = usePageUi('/system/messages')
@@ -91,7 +92,7 @@ export default function MessagesPage() {
   }, [])
 
   async function handleDelete(row: Message) {
-    Modal.confirm({
+    XnModal.confirm({
       title: '删除确认',
       content: `确定删除「${row.title}」吗？`,
       okType: 'danger',
@@ -112,7 +113,7 @@ export default function MessagesPage() {
       message.warning('仅草稿可删除')
       return
     }
-    Modal.confirm({
+    XnModal.confirm({
       title: '删除确认',
       content: `确定删除选中的 ${selected.length} 条消息吗？`,
       okType: 'danger',
@@ -241,6 +242,7 @@ export default function MessagesPage() {
               setSize(s)
               void loadData(p, s)
             }}
+            onRefresh={() => void loadData()}
             slots={{
               readCount: ({ row }) => {
                 const m = row as unknown as Message
@@ -264,7 +266,7 @@ export default function MessagesPage() {
         }
       />
       <MessageSave ref={saveRef} onSuccess={() => void loadData()} />
-      <Modal
+      <XnModal
         title="发送站内信"
         open={sendVisible}
         confirmLoading={sendLoading}
@@ -289,8 +291,8 @@ export default function MessagesPage() {
             optionFilterProp="label"
           />
         ) : null}
-      </Modal>
-      <Modal
+      </XnModal>
+      <XnModal
         title="已读明细"
         open={readersVisible}
         width={640}
@@ -307,7 +309,8 @@ export default function MessagesPage() {
           scroll={{ y: 420 }}
           size="small"
         />
-      </Modal>
+      </XnModal>
     </>
   )
 }
+

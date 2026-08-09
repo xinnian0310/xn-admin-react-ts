@@ -1,5 +1,6 @@
+import XnModal from '@/components/XnModal'
 ﻿import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
-import { Form, Input, InputNumber, Modal, Radio, Select, TreeSelect, message } from 'antd'
+import { Form, Input, InputNumber, Radio, Select, TreeSelect, message } from 'antd'
 import { create, get, list, update } from '@/api/unit'
 import { getOptions as getRoleOptions } from '@/api/role'
 import { usePermission } from '@/hooks/usePermission'
@@ -114,7 +115,7 @@ const UnitSave = forwardRef<UnitSaveHandle, { onSuccess?: () => void }>(function
   const lockBuiltIn = builtIn && mode !== 'add'
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '单位')}
       open={visible}
       onCancel={() => setVisible(false)}
@@ -167,8 +168,9 @@ const UnitSave = forwardRef<UnitSaveHandle, { onSuccess?: () => void }>(function
           <Input.TextArea rows={3} />
         </Form.Item>
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 
 export default UnitSave
+

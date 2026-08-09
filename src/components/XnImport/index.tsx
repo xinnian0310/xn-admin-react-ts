@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
-import { Alert, Button, Modal, Space, Table, Upload, message } from 'antd'
+import { Alert, Button, Space, Table, Upload, message } from 'antd'
 import {
   DownloadOutlined,
   InboxOutlined,
@@ -13,7 +13,7 @@ import {
   parseExcelFile,
   validateImportRows,
 } from '@/utils/excel'
-
+import XnModal from '@/components/XnModal'
 export interface XnImportHandle {
   open: () => void
 }
@@ -140,7 +140,7 @@ const XnImport = forwardRef<XnImportHandle, XnImportProps>(function XnImport(
   }))
 
   return (
-    <Modal
+    <XnModal
       title={title}
       open={visible}
       onCancel={() => setVisible(false)}
@@ -265,8 +265,9 @@ const XnImport = forwardRef<XnImportHandle, XnImportProps>(function XnImport(
           </div>
         ) : null}
       </div>
-    </Modal>
+    </XnModal>
   )
 })
 
 export default XnImport
+

@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Tag, message, Modal } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
@@ -166,6 +166,7 @@ export default function SystemRecyclePage() {
             setSize(s)
             void loadData(p, s)
           }}
+          onRefresh={() => void loadData()}
           slots={{
             bizType: ({ row }) => (
               <Tag color={row.bizType === 'USER' ? 'warning' : 'processing'}>

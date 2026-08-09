@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Card, Tag, message, Modal } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import XnPageLayout from '@/components/XnPageLayout'
@@ -214,6 +214,7 @@ export default function DictsPage() {
               setSize(s)
               void loadData(p, s)
             }}
+            onRefresh={() => void loadData()}
             slots={{
               type: ({ row }) => (
                 <code

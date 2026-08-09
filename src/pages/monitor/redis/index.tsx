@@ -1,9 +1,10 @@
-﻿import { useEffect, useMemo, useState } from 'react'
-import { Descriptions, Modal, Tag, message } from 'antd'
+import { useEffect, useMemo, useState } from 'react'
+import { Descriptions, Tag, message } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnTable from '@/components/XnTable'
+import XnModal from '@/components/XnModal'
 import { usePageUi } from '@/hooks/usePageUi'
 import { deleteRedisKey, flushRedis, getRedisMonitor } from '@/api/monitor'
 import type { RedisMonitor } from '@/types'
@@ -39,7 +40,10 @@ export default function MonitorRedisPage() {
   const toolbarButtons = useMemo(
     () =>
       buttonItems.map((item) => {
-        if (item.action === 'delete' && monitor?.status !== 'ENABLED') {
+        if (
+          (item.action === 'delete' || item.action === 'flush') &&
+          monitor?.status !== 'ENABLED'
+        ) {
           return { ...item, disabled: true } as ButtonListItem
         }
         return item
@@ -98,7 +102,7 @@ export default function MonitorRedisPage() {
 
   async function handleDeleteKey(key: string) {
     if (!key) return
-    Modal.confirm({
+    XnModal.confirm({
       title: '删除确认',
       content: `确定删除 Key「${key}」吗？`,
       okType: 'danger',
@@ -111,7 +115,7 @@ export default function MonitorRedisPage() {
   }
 
   async function handleFlush() {
-    Modal.confirm({
+    XnModal.confirm({
       title: '危险操作',
       content: '确定清空当前 Redis 数据库吗？此操作不可恢复！',
       okType: 'danger',
@@ -131,23 +135,25 @@ export default function MonitorRedisPage() {
       }
       openDetail(selected[0].key, action === 'edit')
     } else if (action === 'delete') {
-      if (selected.length) {
-        Modal.confirm({
-          title: '删除确认',
-          content: `确定删除选中的 ${selected.length} 个 Key 吗？`,
-          okType: 'danger',
-          onOk: async () => {
-            for (const row of selected) {
-              await deleteRedisKey(row.key)
-            }
-            message.success('删除成功')
-            setSelected([])
-            await loadData()
-          },
-        })
-      } else {
-        await handleFlush()
+      if (!selected.length) {
+        message.warning('请至少选择一个 Key')
+        return
       }
+      XnModal.confirm({
+        title: '删除确认',
+        content: `确定删除选中的 ${selected.length} 个 Key 吗？`,
+        okType: 'danger',
+        onOk: async () => {
+          for (const row of selected) {
+            await deleteRedisKey(row.key)
+          }
+          message.success('删除成功')
+          setSelected([])
+          await loadData()
+        },
+      })
+    } else if (action === 'flush') {
+      void handleFlush()
     }
   }
 
@@ -202,6 +208,7 @@ export default function MonitorRedisPage() {
               setSize(s)
               applyLocalPage(p, s)
             }}
+            onRefresh={() => void loadData()}
             slots={{
               actions: ({ row }) => (
                 <XnTableActions
@@ -219,7 +226,7 @@ export default function MonitorRedisPage() {
           />
         }
       />
-      <Modal
+      <XnModal
         title={detailTitle}
         open={detailVisible}
         onCancel={() => setDetailVisible(false)}
@@ -236,7 +243,8 @@ export default function MonitorRedisPage() {
             {monitor ? `${monitor.host}:${monitor.port}` : '—'}
           </Descriptions.Item>
         </Descriptions>
-      </Modal>
+      </XnModal>
     </>
   )
 }
+

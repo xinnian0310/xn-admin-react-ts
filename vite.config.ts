@@ -20,6 +20,11 @@ export default defineConfig({
   optimizeDeps: {
     include: ['exceljs', '@ant-design/plots', 'tslib'],
   },
+  // 与服务器 /opt/xn/www/xn-admin-react-ts 同名，便于直接上传
+  build: {
+    outDir: '../www/xn-admin-react-ts',
+    emptyOutDir: true,
+  },
   server: {
     host: '0.0.0.0',
     // Dedicated port so it won't collide with Vue frontends / xn-home

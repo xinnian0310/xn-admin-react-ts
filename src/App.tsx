@@ -2,13 +2,16 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { App as AntdApp, ConfigProvider, Spin, theme as antdTheme } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
+import enUS from 'antd/locale/en_US'
+import type { Locale } from 'antd/es/locale'
 import AppRouter from '@/router'
 import {
   applyAppConfig,
   applyRemoteAppConfig,
   captureGlobalUiBaseline,
-  mapAntdComponentSize,
   appConfig,
+  subscribeAppConfig,
+  type AntdLocale,
 } from '@/config/app'
 import { isLightColor } from '@/utils/color'
 import { getPublicConfig } from '@/api/system-config'
@@ -16,19 +19,29 @@ import { useUserStore } from '@/stores/user'
 import { useThemeStore } from '@/stores/theme'
 import { useUiPreferenceStore } from '@/stores/uiPreference'
 import { startSessionGuard } from '@/utils/session-guard'
-import ThemePicker from '@/components/ThemePicker'
+import XnThemePicker from '@/components/XnThemePicker'
+
+function mapAntdLocale(locale: AntdLocale | string | undefined): Locale {
+  return locale === 'en' ? enUS : zhCN
+}
 
 function AntdThemeBridge({ children }: { children: ReactNode }) {
   const currentTheme = useThemeStore((s) => s.currentTheme)
   const effectiveAppearance = useThemeStore((s) => s.effectiveAppearance)
+  const [, setConfigTick] = useState(0)
+  useEffect(() => subscribeAppConfig(() => setConfigTick((n) => n + 1)), [])
   const colors = currentTheme.colors
   const primary = colors.primary
   const siderLight = isLightColor(colors.sidebar.bg)
+  const antd = appConfig.ui.antd
 
   return (
     <ConfigProvider
-      locale={zhCN}
-      componentSize={mapAntdComponentSize(appConfig.ui.elementPlus.size)}
+      locale={mapAntdLocale(antd.locale)}
+      componentSize={antd.componentSize}
+      prefixCls={antd.prefixCls || 'ant'}
+      button={{ autoInsertSpace: antd.button.autoInsertSpace }}
+      modal={{ centered: antd.modal.centered }}
       theme={{
         cssVar: {},
         algorithm:
@@ -68,9 +81,9 @@ function AntdThemeBridge({ children }: { children: ReactNode }) {
         },
       }}
     >
-      <AntdApp>
+      <AntdApp message={{ maxCount: antd.message.maxCount }}>
         {children}
-        <ThemePicker />
+        <XnThemePicker />
       </AntdApp>
     </ConfigProvider>
   )

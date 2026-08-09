@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Tag, message, Modal } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
@@ -167,6 +167,7 @@ export default function SystemJobsPage() {
               setSize(s)
               void loadData(p, s)
             }}
+            onRefresh={() => void loadData()}
             slots={{
               misfirePolicy: ({ row }) => <>{misfireLabel(String(row.misfirePolicy ?? ''))}</>,
               status: ({ row }) => (

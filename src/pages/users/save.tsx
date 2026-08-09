@@ -1,5 +1,5 @@
-﻿import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
-import { Form, Input, Modal, Radio, Select, TreeSelect, message } from 'antd'
+import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
+import { Form, Input, Radio, Select, TreeSelect, message } from 'antd'
 import { getPasswordRules, type PasswordRules } from '@/api/auth'
 import { getOptions as getRoleOptions } from '@/api/role'
 import { getTree as getUnitTree } from '@/api/unit'
@@ -8,6 +8,7 @@ import { create, get, update } from '@/api/user'
 import { usePermission } from '@/hooks/usePermission'
 import type { Post, Role, SysUnit, UserForm } from '@/types'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
+import XnModal from '@/components/XnModal'
 
 export interface UserSaveHandle {
   open: (mode: SaveMode, id?: number) => Promise<void>
@@ -125,10 +126,12 @@ const UserSave = forwardRef<UserSaveHandle, Props>(function UserSave({ onSuccess
   }
 
   const usernameDisabled =
-    mode === 'view' || (editingId !== null && form.getFieldValue('username') === 'admin')
+    mode === 'view' ||
+    (editingId !== null &&
+      ['admin', 'SuperAdmin'].includes(String(form.getFieldValue('username') || '')))
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '用户')}
       open={visible}
       onCancel={() => setVisible(false)}
@@ -228,7 +231,7 @@ const UserSave = forwardRef<UserSaveHandle, Props>(function UserSave({ onSuccess
           />
         </Form.Item>
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 

@@ -146,6 +146,10 @@ export function parseIcon(value?: string | null): ParsedIcon | null {
   if (raw.includes(':')) {
     return { type: 'iconify', value: raw, name: raw }
   }
+  // 裸名：Ant（*Outlined|Filled|TwoTone）优先，其余兼容历史 Element 名
+  if (/(?:Outlined|Filled|TwoTone)$/.test(raw) && antdIconMap[raw]) {
+    return { type: 'antd', value: raw, name: raw }
+  }
   return { type: 'element', value: raw, name: raw }
 }
 
@@ -181,7 +185,7 @@ export function resolveIconifyName(name?: string): string | undefined {
 
 export function listAntdIconNames(): string[] {
   return Object.keys(antdIconMap)
-    .filter((k) => /^[A-Z]/.test(k))
+    .filter((k) => /(?:Outlined|Filled|TwoTone)$/.test(k))
     .sort((a, b) => a.localeCompare(b))
 }
 
@@ -198,7 +202,8 @@ export function buildIconValue(type: IconType, name: string): string {
   if (!n) return ''
   if (type === 'svg') return `svg:${n.replace(/^svg:/, '')}`
   if (type === 'iconify') return n
-  if (type === 'antd') return `antd:${n.replace(/^(antd|ant):/, '')}`
+  // Ant / Element：存裸名，兼容后端 sys_route.icon / icon_antd
+  if (type === 'antd') return n.replace(/^(antd|ant):/, '')
   return n.replace(/^(element|ep):/, '')
 }
 

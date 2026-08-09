@@ -6,7 +6,7 @@ import { appConfig, type LayoutMode } from '@/config/app'
 import { useNoticeStore } from '@/stores/notice'
 import { useTagsViewStore } from '@/stores/tagsView'
 import { useMenuStore } from '@/stores/menu'
-import UiPreferenceFab from '@/components/UiPreferenceFab'
+import XnUiPreferenceFab from '@/components/XnUiPreferenceFab'
 import XnTagsView from '@/components/XnTagsView'
 import SideLayout from './modes/SideLayout'
 import TopLayout from './modes/TopLayout'
@@ -40,7 +40,10 @@ export default function AdminLayout() {
   }, [mode])
 
   useEffect(() => {
-    startRealtime()
+    // 延迟连接，避免 React Strict Mode 先挂再卸时在 CONNECTING 阶段被关掉
+    const timer = window.setTimeout(() => {
+      startRealtime()
+    }, 0)
     const onKeydown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && useTagsViewStore.getState().isFullscreen) {
         setFullscreen(false)
@@ -48,6 +51,7 @@ export default function AdminLayout() {
     }
     window.addEventListener('keydown', onKeydown)
     return () => {
+      window.clearTimeout(timer)
       window.removeEventListener('keydown', onKeydown)
       setFullscreen(false)
       stopRealtime()
@@ -66,7 +70,7 @@ export default function AdminLayout() {
           </div>
         </Layout.Content>
       </LayoutComp>
-      <UiPreferenceFab />
+      <XnUiPreferenceFab />
       {isFullscreen ? (
         <Button
           className="exit-fullscreen"

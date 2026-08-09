@@ -1,5 +1,6 @@
+import XnModal from '@/components/XnModal'
 ﻿import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Form, Input, InputNumber, Modal, Radio, message } from 'antd'
+import { Form, Input, InputNumber, Radio, message } from 'antd'
 import { create, get, update } from '@/api/post'
 import type { PostForm } from '@/types/post'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
@@ -60,7 +61,7 @@ const PostSave = forwardRef<PostSaveHandle, { onSuccess?: () => void }>(function
   }
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '岗位')}
       open={visible}
       onCancel={() => setVisible(false)}
@@ -101,8 +102,9 @@ const PostSave = forwardRef<PostSaveHandle, { onSuccess?: () => void }>(function
           <Input.TextArea rows={3} maxLength={200} />
         </Form.Item>
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 
 export default PostSave
+

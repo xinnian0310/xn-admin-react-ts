@@ -1,17 +1,6 @@
+import XnModal from '@/components/XnModal'
 ﻿import { useEffect, useMemo, useState } from 'react'
-import {
-  Alert,
-  Button,
-  Checkbox,
-  Form,
-  Input,
-  Modal,
-  Select,
-  Space,
-  Steps,
-  Table,
-  message,
-} from 'antd'
+import { Alert, Button, Checkbox, Form, Input, Select, Space, Steps, Table, message } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
@@ -321,7 +310,7 @@ export default function SystemCodegenPage() {
         }
       />
 
-      <Modal
+      <XnModal
         title={`代码生成 — ${form.tableName || ''}`}
         open={wizardVisible}
         onCancel={() => setWizardVisible(false)}
@@ -556,7 +545,8 @@ export default function SystemCodegenPage() {
             />
           </div>
         ) : null}
-      </Modal>
+      </XnModal>
     </>
   )
 }
+

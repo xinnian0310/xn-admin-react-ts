@@ -1,5 +1,6 @@
+import XnModal from '@/components/XnModal'
 ﻿import { forwardRef, useImperativeHandle, useState } from 'react'
-import { Form, Input, Modal, Radio, message } from 'antd'
+import { Form, Input, Radio, message } from 'antd'
 import { create, get, update } from '@/api/dict-type'
 import type { DictTypeForm } from '@/types'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
@@ -66,7 +67,7 @@ const DictTypeSave = forwardRef<DictTypeSaveHandle, Props>(function DictTypeSave
   const readonly = mode === 'view'
 
   return (
-    <Modal
+    <XnModal
       title={saveDialogTitle(mode, '字典')}
       open={visible}
       width={520}
@@ -111,8 +112,9 @@ const DictTypeSave = forwardRef<DictTypeSaveHandle, Props>(function DictTypeSave
           <Input.TextArea rows={3} />
         </Form.Item>
       </Form>
-    </Modal>
+    </XnModal>
   )
 })
 
 export default DictTypeSave
+

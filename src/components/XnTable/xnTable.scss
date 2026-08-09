@@ -37,6 +37,34 @@
   flex-direction: column;
 }
 
+.xn-table__body .ant-table-header {
+  flex-shrink: 0;
+}
+
+/*
+ * Ant Design scroll.y 只写 max-height：行少/空数据时 body 按内容收缩，
+ * 下方会留白。用测量高度强制 height，使表格区占满剩余空间。
+ */
+.xn-table__body .ant-table-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: var(--xn-table-scroll-y, auto) !important;
+  max-height: var(--xn-table-scroll-y, none) !important;
+  overflow: auto !important;
+}
+
+/* 只撑开滚动容器，不要拉高数据行（table min-height:100% 会导致一行占满） */
+.xn-table__body .ant-table-tbody > tr:not(.ant-table-placeholder) > td {
+  height: auto;
+}
+
+/* 空数据时占位垂直居中，不影响有数据的行高 */
+.xn-table__body .ant-table-placeholder > .ant-table-cell {
+  height: var(--xn-table-scroll-y, auto);
+  vertical-align: middle;
+  border-bottom: none;
+}
+
 .xn-table__pagination {
   display: flex;
   align-items: center;

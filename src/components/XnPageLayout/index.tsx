@@ -99,7 +99,7 @@ export default function XnPageLayout({
           </div>
         </div>
         <div className="xn-page-layout__body">
-          <Spin spinning={loading} wrapperClassName="xn-page-layout__spin-wrap">
+          <Spin spinning={loading} classNames={{ root: 'xn-page-layout__spin-wrap' }}>
             <div className="xn-page-layout__content">
               {viewMode === 'card' && card ? card : table}
               {children}

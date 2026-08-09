@@ -1,5 +1,5 @@
-﻿import { useEffect, useState } from 'react'
-import { Descriptions, Modal, Tag, message } from 'antd'
+import { useEffect, useState } from 'react'
+import { Descriptions, Tag, message } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
@@ -10,6 +10,7 @@ import { formatDateTime } from '@/utils/datetime'
 import type { SqlRecord } from '@/types'
 import type { SearchForm } from '@/types/search'
 import type { TableColumnItem } from '@/types/table'
+import XnModal from '@/components/XnModal'
 
 const columns: TableColumnItem[] = [
   { type: 'selection', width: 50, fixed: true },
@@ -85,13 +86,27 @@ export default function MonitorSqlPage() {
       message.warning('无法删除该记录')
       return
     }
-    Modal.confirm({
+    XnModal.confirm({
       title: '删除确认',
       content: '确定删除该条 SQL 记录吗？',
       okType: 'danger',
       onOk: async () => {
         await removeSqlRecord(row.id!)
         message.success('删除成功')
+        await loadData()
+      },
+    })
+  }
+
+  async function handleClean() {
+    XnModal.confirm({
+      title: '清空确认',
+      content: '确定清空全部 SQL 监控缓冲吗？',
+      okType: 'danger',
+      onOk: async () => {
+        await cleanSqlMonitor()
+        message.success('已清空')
+        setSelected([])
         await loadData()
       },
     })
@@ -105,32 +120,25 @@ export default function MonitorSqlPage() {
       }
       openDetail(selected[0])
     } else if (action === 'delete') {
-      if (selected.length) {
-        Modal.confirm({
-          title: '删除确认',
-          content: `确定删除选中的 ${selected.length} 条 SQL 记录吗？`,
-          okType: 'danger',
-          onOk: async () => {
-            for (const row of selected) {
-              if (row.id != null) await removeSqlRecord(row.id)
-            }
-            message.success('删除成功')
-            setSelected([])
-            await loadData()
-          },
-        })
-      } else {
-        Modal.confirm({
-          title: '清空确认',
-          content: '确定清空全部 SQL 监控缓冲吗？',
-          okType: 'danger',
-          onOk: async () => {
-            await cleanSqlMonitor()
-            message.success('已清空')
-            await loadData()
-          },
-        })
+      if (!selected.length) {
+        message.warning('请至少选择一条 SQL 记录')
+        return
       }
+      XnModal.confirm({
+        title: '删除确认',
+        content: `确定删除选中的 ${selected.length} 条 SQL 记录吗？`,
+        okType: 'danger',
+        onOk: async () => {
+          for (const row of selected) {
+            if (row.id != null) await removeSqlRecord(row.id)
+          }
+          message.success('删除成功')
+          setSelected([])
+          await loadData()
+        },
+      })
+    } else if (action === 'clean') {
+      void handleClean()
     }
   }
 
@@ -175,6 +183,7 @@ export default function MonitorSqlPage() {
               setSize(s)
               applyLocalPage(p, s)
             }}
+            onRefresh={() => void loadData()}
             slots={{
               executedAt: ({ row }) => <>{formatDateTime(row.executedAt as string)}</>,
               durationMs: ({ row }) => <>{row.durationMs ?? '—'}</>,
@@ -193,7 +202,7 @@ export default function MonitorSqlPage() {
           />
         }
       />
-      <Modal
+      <XnModal
         title="SQL 详情"
         open={detailVisible}
         onCancel={() => setDetailVisible(false)}
@@ -223,7 +232,7 @@ export default function MonitorSqlPage() {
             </Descriptions.Item>
           </Descriptions>
         ) : null}
-      </Modal>
+      </XnModal>
     </>
   )
 }
