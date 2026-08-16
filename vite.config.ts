@@ -53,6 +53,16 @@ export default defineConfig({
         ws: true,
         changeOrigin: true,
       },
+      // /minio/obj → :9000/xn-admin/obj
+      '/minio': {
+        target: 'http://127.0.0.1:9000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/minio/, '/xn-admin'),
+      },
+      '/kkFileView': {
+        target: 'http://127.0.0.1:8012',
+        changeOrigin: true,
+      },
     },
   },
 })

@@ -293,7 +293,7 @@ export default function RemoteStoragePage() {
               type="info"
               showIcon
               style={{ marginBottom: 12 }}
-              message="可新增多条「名字 / 路径」，新增 / 编辑 / 删除即时落库。保存结果组装为对象覆盖前端 appConfig.storage（如 { minio: 'http://127.0.0.1:9000/xn-admin/' }）。云端为空时使用本地 app.ts 兜底。密钥勿写入前端。"
+              message="可新增多条「名字 / 路径」，新增 / 编辑 / 删除即时落库。保存结果覆盖前端 appConfig.storage。推荐同源相对路径（minio → /minio/，kkFileView → /kkFileView/），由 Vite / Nginx 反代，勿写 127.0.0.1。云端为空时使用本地 app.ts 兜底。密钥勿写入前端。"
             />
             <XnSearch
               searchItem={resolvedSearchItems}
@@ -354,7 +354,7 @@ export default function RemoteStoragePage() {
             <Input maxLength={64} placeholder="如 minio" />
           </Form.Item>
           <Form.Item name="path" label="路径" rules={[{ required: true, message: '请输入路径' }]}>
-            <Input maxLength={1000} placeholder="如 http://127.0.0.1:9000/xn-admin/" />
+            <Input maxLength={1000} placeholder="如 /minio/" />
           </Form.Item>
         </Form>
       </XnModal>

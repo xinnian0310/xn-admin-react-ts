@@ -99,9 +99,10 @@ export const defaultAppConfig = {
     },
   },
   storage: {
-    minio: 'http://127.0.0.1:9000/xn-admin/',
-    /** kkFileView 5.0 预览服务根地址 */
-    kkFileView: 'http://127.0.0.1:8012/',
+    /** 同源相对路径：/minio/… → Vite/Nginx 再拼桶名 xn-admin 转到 :9000 */
+    minio: '/minio/',
+    /** 同源相对路径：/kkFileView/… → Vite/Nginx 反代到 :8012（需 KK_CONTEXT_PATH=/kkFileView） */
+    kkFileView: '/kkFileView/',
   },
   logRetention: {
     loginDays: 90,
@@ -289,15 +290,15 @@ export function resolveStorageUrl(objectPath: string, storageName = 'minio'): st
 }
 
 /**
- * 业务附件访问地址：优先远程连接配置 storage.minio；
- * 已是绝对地址或 /uploads 路径时原样返回；再兜底本地 uploads。
+ * 业务附件访问地址：优先远程连接配置 storage.minio（支持 http(s) 或同源相对前缀）；
+ * 已是绝对地址或 / 开头路径时原样返回；再兜底本地 uploads。
  */
 export function resolveAttachmentUrl(filePath: string, storageName = 'minio'): string {
   const path = (filePath || '').trim()
   if (!path) return ''
   if (/^https?:\/\//i.test(path) || path.startsWith('/')) return path
   const remote = resolveStorageUrl(path, storageName)
-  if (remote && /^https?:\/\//i.test(remote)) return remote
+  if (remote && (/^https?:\/\//i.test(remote) || remote.startsWith('/'))) return remote
   return `/uploads/${path.replace(/^\/+/, '')}`
 }
 
