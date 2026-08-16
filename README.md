@@ -130,24 +130,30 @@ XnPageLayout
 └── table → XnTable
 ```
 
-| 组件           | 说明                                      |
-| -------------- | ----------------------------------------- |
-| XnAppIcon      | 统一图标（Ant Design / Iconify / SVG）    |
-| XnAppBrandLogo | 品牌 Logo                                 |
-| IconPicker     | 图标选择器                                |
-| NoticeInbox    | 消息中心抽屉                              |
-| XnPageLayout   | 列表页骨架                                |
-| XnRichEditor   | 富文本编辑器（wangEditor）                |
-| XnSidebarMenu  | 多级菜单                                  |
-| XnTagsView     | 页面标签栏                                |
-| ThemePicker    | 主题设置                                  |
-| XnTreePanel    | 左侧树面板                                |
-| XnButton       | 工具栏 / 行操作按钮                       |
-| XnImport       | Excel 导入对话框                          |
-| XnLongText     | 长文本截断 + 点击弹窗查看                 |
-| XnSearch       | 配置化搜索表单                            |
-| XnTable        | 配置化表格                                |
-| Auth           | 按钮级权限（对应 Vue 端 `v-permission`）  |
+每个组件目录下有独立文档，入口见 [`src/components/README.md`](./src/components/README.md)。
+
+| 组件               | 说明                                      |
+| ------------------ | ----------------------------------------- |
+| XnAppIcon          | 统一图标（Ant Design / Iconify / SVG）    |
+| XnAppBrandLogo     | 品牌 Logo                                 |
+| XnAuth             | 按钮级权限（对应 Vue 端 `v-permission`）  |
+| XnButton           | 工具栏 / 行操作按钮                       |
+| XnErrorPage        | 403 / 404 / 503 错误页                    |
+| XnIconPicker       | 图标选择器                                |
+| XnImport           | Excel 导入对话框                          |
+| XnLongText         | 长文本截断 + 点击弹窗查看                 |
+| XnModal            | 可拖拽、限高的 Modal                      |
+| XnNoticeInbox      | 消息中心抽屉                              |
+| XnPageLayout       | 列表页骨架                                |
+| XnRichEditor       | 富文本编辑器（wangEditor）                |
+| XnSearch           | 配置化搜索表单                            |
+| XnSidebarMenu      | 多级菜单                                  |
+| XnTable            | 配置化表格                                |
+| XnTagsView         | 页面标签栏                                |
+| XnThemePicker      | 主题设置                                  |
+| XnTreePanel        | 左侧树面板                                |
+| XnUiPreferenceFab  | 个人界面偏好 FAB                          |
+| XnUpload           | 大文件分片上传                            |
 
 配置通常来自后端 page-ui 与路由权限。
 
@@ -180,11 +186,14 @@ XnPageLayout
 
 ### 日志管理
 
-| 模块     | 截图                                          |
-| -------- | --------------------------------------------- |
-| 登录日志 | ![登录日志](./docs/images/logs-login.png)     |
-| 操作日志 | ![操作日志](./docs/images/logs-oper.png)      |
-| 异常日志 | ![异常日志](./docs/images/logs-exception.png) |
+后端 `xn-log` / `xn-job` 已提供登录 / 操作 / 异常 / 任务日志接口（查询、详情、删除、清空、导出），菜单与 page-ui 已种子。本仓库**尚未落地页面**（`view-loader` 会落到 404）：
+
+| 页面     | 路由                    | 前端现状                                      |
+| -------- | ----------------------- | --------------------------------------------- |
+| 登录日志 | `/system/logs/login`    | 有 `api/login-log`，无 `pages/.../index.tsx`  |
+| 操作日志 | `/system/logs/oper`     | 有 `api/oper-log`，无页面                     |
+| 异常日志 | `/system/logs/exception`| 有 `api/exception-log`，无页面                |
+| 任务日志 | `/system/jobs/logs`     | 定时任务页会跳转至此，无页面                  |
 
 ### 组织与账号
 
@@ -218,6 +227,8 @@ XnPageLayout
 | 登录页设置 | ![登录页设置](./docs/images/login-settings.png) |
 | 系统配置   | ![系统配置](./docs/images/config.png)           |
 | 安全策略   | ![安全策略](./docs/images/security.png)         |
+| 远程连接   | ![远程连接](./docs/images/remote-storage.png)   |
+| 联系与捐赠 | ![联系与捐赠](./docs/images/site-contact.png)   |
 
 ### 系统工具
 
@@ -225,22 +236,22 @@ XnPageLayout
 | -------- | -------------------------------------- |
 | 文件管理 | ![文件管理](./docs/images/files.png)   |
 | 定时任务 | ![定时任务](./docs/images/jobs.png)    |
-| 任务日志 | ![任务日志](./docs/images/jobs-log.png) |
 | 回收站   | ![回收站](./docs/images/recycle.png)   |
 | 代码生成 | ![代码生成](./docs/images/codegen.png) |
+| 接口文档 | ![接口文档](./docs/images/api-docs.png) |
 
 ## 功能概览
 
 - JWT 登录与会话刷新；`<Auth>` / `usePermission` 按钮级权限
 - 动态菜单 / 路由注册（后端路由 + `pages` 懒加载）
-- 角色、权限、用户、单位、字典、公告、站内信、登录页配置、系统配置、安全策略
+- 角色、权限、用户、单位、岗位、字典、公告、站内信、登录页配置、系统配置、安全策略、远程连接、联系与捐赠
 - 页面标签栏、多布局模式、主题（含自定义色与背景）
 - 通用系统配置 + 登录用户个人布局/字号（右下角悬浮入口）
-- Excel 导入；日志 Excel 导出
+- 表格列个性化、Excel 导入导出
 - 系统监控：在线用户 / 服务 / Redis / SQL
-- 日志管理：登录日志、操作日志、异常日志（查询、详情、删除、清空、导出）
-- 文件管理、定时任务 / 任务日志、回收站、代码生成、接口文档页（Swagger UI / API 切换）
+- 文件管理、定时任务、回收站、代码生成、接口文档页（Swagger UI / API 切换）
 - 公告 WebSocket 推送（`/ws`）
+- 日志页面前端待补：登录 / 操作 / 异常 / 任务日志（后端接口与菜单已齐）
 
 ## 环境与约定
 

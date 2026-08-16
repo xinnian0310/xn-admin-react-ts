@@ -44,12 +44,13 @@
 | 页面                                          | 状态                                                              |
 | --------------------------------------------- | ----------------------------------------------------------------- |
 | `system/files`                                | 完整：目录树 + 上传 + 删除/预览                                   |
-| `system/jobs` + `logs`                        | 完整：CRUD/执行/日志导出                                          |
+| `system/jobs`                                 | 完整：CRUD / 执行；「日志」按钮会跳 `/system/jobs/logs`           |
+| `system/jobs/logs`                            | **待补页面**：有 `api/job-log`，无 `pages/system/jobs/logs`       |
 | `system/recycle`                              | 完整：恢复 / 彻底删除                                             |
 | `system/codegen`                              | 完整：表列表 + 向导 + ZIP                                         |
 | `system/api-docs`                             | 完整：工具栏 **UI / API** 切换；无刷新；Swagger iframe + 登记列表 |
 | `monitor/online` · `server` · `redis` · `sql` | 完整                                                              |
-| `system/logs/login` · `oper` · `exception`    | 完整：详情/清空/导出                                              |
+| `system/logs/login` · `oper` · `exception`    | **待补页面**：有 api 模块与后端接口，无 `pages/system/logs/*`     |
 
 ## 有意栈差异
 
@@ -66,7 +67,8 @@
 
 ## 剩余缺口（建议人工对照）
 
-- 表格列设置完整 UI、Keep-alive 等价缓存
+- **日志四页**（与基准同一缺口）：`system/logs/login` · `oper` · `exception` · `system/jobs/logs` — 后端与 API 已齐，缺 `pages/**/index.tsx`
+- Keep-alive 等价缓存（Vue 端有 `<keep-alive>`，本栈 `cachedViews` 尚未挂到页面缓存）
 - 第 6 章逐页与基准点对点浏览器验收（同账号交叉操作）
 - api-docs UI 模式依赖网关转发 `/swagger-ui/**`、`/v3/api-docs/**` → xn-system
 
@@ -76,5 +78,5 @@ Dashboard 已对齐：统计/图表（本栈增强）+ 技术选型 + Git 更新
 
 1. 启动 `xn-admin-cloud` 网关 `8088`
 2. `npm run dev` → http://localhost:1800
-3. SuperAdmin 登录 → 动态菜单 → 用户管理 / 系统配置 / api-docs UI·API / 监控 / 日志导出
+3. SuperAdmin 登录 → 动态菜单 → 用户管理 / 系统配置 / api-docs UI·API / 监控（日志页尚未落地，勿按导出验收）
 4. `npm run typecheck` / `npm run build`
