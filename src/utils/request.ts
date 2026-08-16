@@ -43,6 +43,18 @@ function showRequestError(content: string) {
   message.error(content)
 }
 
+const toastedErrors = new WeakSet<object>()
+
+function markErrorToasted(error: unknown) {
+  if (error && typeof error === 'object') toastedErrors.add(error)
+}
+
+/** 页面 catch 复用：拦截器已提示过的请求错误不会再弹一次 */
+export function showCaughtError(error: unknown, fallback = '请求失败') {
+  if (error && typeof error === 'object' && toastedErrors.has(error)) return
+  showRequestError(formatRequestError(error, fallback))
+}
+
 const HTTP_STATUS_MESSAGES: Record<number, string> = {
   400: '请求参数错误',
   401: '登录已过期，请重新登录',
@@ -141,11 +153,13 @@ request.interceptors.request.use((config) => {
 
   if (isRegistryLoaded() && !isWhitelisted(fullPath) && !isApiRegistered(method, fullPath)) {
     const key = `${method} ${fullPath}`
+    const err = new Error(`接口未登记，已拦截：${key}`)
     if (!warnedApis.has(key)) {
       warnedApis.add(key)
       showRequestError(`接口未在权限内容中登记，无法访问：${key}`)
     }
-    return Promise.reject(new Error(`接口未登记，已拦截：${key}`))
+    markErrorToasted(err)
+    return Promise.reject(err)
   }
 
   return config
@@ -155,10 +169,12 @@ request.interceptors.response.use(
   (response) => {
     const res = response.data as ApiResponse<unknown>
     if (res.code !== 200) {
+      const err = new Error(res.message || '请求失败')
       if (!response.config?.silentError) {
-        showRequestError(res.message || '请求失败')
+        showRequestError(err.message)
+        markErrorToasted(err)
       }
-      return Promise.reject(new Error(res.message || '请求失败'))
+      return Promise.reject(err)
     }
     if (res.data !== undefined) {
       res.data = normalizeDateTimes(res.data)
@@ -175,11 +191,13 @@ request.interceptors.response.use(
     if (status === 401) {
       // 由强制下线弹窗接管清理与跳转，这里不再叠加一条 toast
       handleForceLogout(errMessage)
+      markErrorToasted(error)
       return Promise.reject(error)
     }
 
     if (!error.config?.silentError) {
       showRequestError(errMessage)
+      markErrorToasted(error)
     }
     return Promise.reject(error)
   },

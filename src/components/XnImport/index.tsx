@@ -13,6 +13,7 @@ import {
   parseExcelFile,
   validateImportRows,
 } from '@/utils/excel'
+import { showCaughtError } from '@/utils/request'
 import XnModal from '@/components/XnModal'
 export interface XnImportHandle {
   open: () => void
@@ -126,7 +127,7 @@ const XnImport = forwardRef<XnImportHandle, XnImportProps>(function XnImport(
         setVisible(false)
       }
     } catch (e) {
-      message.error(e instanceof Error ? e.message : '导入失败')
+      showCaughtError(e, '导入失败')
     } finally {
       setSubmitting(false)
     }

@@ -16,6 +16,7 @@ import {
   type TableCodegenRequest,
   type TableInfo,
 } from '@/api/codegen'
+import { showCaughtError } from '@/utils/request'
 import type { SearchForm, SearchItem } from '@/types/search'
 import type { TableColumnItem } from '@/types/table'
 
@@ -150,7 +151,7 @@ export default function SystemCodegenPage() {
       setAllTables(list)
       applyFilter(list, nextQuery)
     } catch (e: unknown) {
-      message.error(e instanceof Error ? e.message : '加载库表失败')
+      showCaughtError(e, '加载库表失败')
     } finally {
       setLoading(false)
     }
@@ -215,7 +216,7 @@ export default function SystemCodegenPage() {
         })),
       })
     } catch (e: unknown) {
-      message.error(e instanceof Error ? e.message : '加载表结构失败')
+      showCaughtError(e, '加载表结构失败')
       setWizardVisible(false)
     } finally {
       setWizardLoading(false)
@@ -241,7 +242,7 @@ export default function SystemCodegenPage() {
       message.success('生成成功，已下载 ZIP')
       setWizardVisible(false)
     } catch (e: unknown) {
-      message.error(e instanceof Error ? e.message : '生成失败')
+      showCaughtError(e, '生成失败')
     } finally {
       setGenerating(false)
     }

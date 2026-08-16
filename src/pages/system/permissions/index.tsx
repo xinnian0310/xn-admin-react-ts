@@ -1,24 +1,14 @@
 ﻿import { useEffect, useMemo, useState, type Key, type ReactNode } from 'react'
-import {
-  Alert,
-  Badge,
-  Button,
-  Card,
-  Checkbox,
-  Empty,
-  Input,
-  Modal,
-  Space,
-  Tag,
-  Tree,
-  message,
-} from 'antd'
+import { Alert, Badge, Button, Checkbox, Empty, Modal, Space, Tag, Tree, message } from 'antd'
 import type { DataNode } from 'antd/es/tree'
 import { useSearchParams } from 'react-router-dom'
+import XnPageLayout from '@/components/XnPageLayout'
+import XnTreePanel from '@/components/XnTreePanel'
 import { assignPermissions, get, getOptions } from '@/api/role'
 import { list as listPermissions } from '@/api/permission'
 import { list as listRoutes } from '@/api/route'
 import type { Permission, Role, SysRoute } from '@/types'
+import './rolePermissions.scss'
 
 type MenuNode = SysRoute & {
   permissionId?: number
@@ -76,7 +66,6 @@ export default function RolePermissionsPage() {
   const [currentRole, setCurrentRole] = useState<Role | null>(null)
   const [routes, setRoutes] = useState<MenuNode[]>([])
   const [permByCode, setPermByCode] = useState<Map<string, Permission>>(new Map())
-  const [permById, setPermById] = useState<Map<number, Permission>>(new Map())
   const [menuFilter, setMenuFilter] = useState('')
   const [selectedRouteKey, setSelectedRouteKey] = useState<string>()
   const [selectedRoute, setSelectedRoute] = useState<MenuNode | null>(null)
@@ -102,17 +91,14 @@ export default function RolePermissionsPage() {
 
   function indexPermissions(nodes: Permission[]) {
     const byCode = new Map<string, Permission>()
-    const byId = new Map<number, Permission>()
     const walk = (list: Permission[]) => {
       for (const n of list) {
         byCode.set(n.code, n)
-        byId.set(n.id, n)
         if (n.children?.length) walk(n.children)
       }
     }
     walk(nodes)
     setPermByCode(byCode)
-    setPermById(byId)
   }
 
   function linkRoutes(routeNodes: SysRoute[], byCode: Map<string, Permission>): MenuNode[] {
@@ -258,7 +244,7 @@ export default function RolePermissionsPage() {
         return {
           key: String(n.id),
           title: (
-            <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
+            <span className="role-perm__menu-title">
               {n.permissionId != null ? (
                 <Checkbox
                   checked={menuChecked}
@@ -315,155 +301,154 @@ export default function RolePermissionsPage() {
   const locked = currentRole?.code === 'SUPER_ADMIN'
 
   return (
-    <div
-      className="page-card"
-      style={{ display: 'flex', gap: 12, minHeight: 560, opacity: loading ? 0.7 : 1 }}
-    >
-      <Card size="small" title="角色" style={{ width: 240, flexShrink: 0 }}>
-        <Input
-          allowClear
-          placeholder="筛选角色"
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
-          style={{ marginBottom: 8 }}
-        />
-        <div style={{ maxHeight: 480, overflow: 'auto' }}>
-          {filteredRoles.map((r) => (
-            <div
-              key={r.id}
-              onClick={() => void selectRole(r)}
-              style={{
-                padding: '8px 10px',
-                borderRadius: 6,
-                cursor: 'pointer',
-                background:
-                  currentRole?.id === r.id ? 'var(--app-surface-soft, #e6f4ff)' : 'transparent',
-                marginBottom: 4,
-              }}
-            >
-              <div style={{ fontWeight: 600 }}>{r.name}</div>
-              <div style={{ fontSize: 12, color: '#94a3b8' }}>{r.code}</div>
-            </div>
-          ))}
+    <XnPageLayout
+      showViewSwitch={false}
+      loading={loading}
+      aside={
+        <XnTreePanel
+          title="角色"
+          width={240}
+          filter={roleFilter}
+          onFilterChange={setRoleFilter}
+          filterPlaceholder="筛选角色"
+        >
+          {filteredRoles.length ? (
+            filteredRoles.map((r) => (
+              <div
+                key={r.id}
+                className={`role-perm__role${currentRole?.id === r.id ? ' is-active' : ''}`}
+                onClick={() => void selectRole(r)}
+              >
+                <div className="role-perm__role-name">{r.name}</div>
+                <div className="role-perm__role-code">{r.code}</div>
+              </div>
+            ))
+          ) : (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="无匹配角色" />
+          )}
+        </XnTreePanel>
+      }
+      toolbar={
+        <div>
+          <strong>
+            {locked
+              ? '超级管理员拥有全部权限'
+              : currentRole
+                ? `为「${currentRole.name}」配置权限`
+                : '请选择角色'}
+          </strong>
+          {dirty ? (
+            <Tag color="warning" style={{ marginLeft: 8 }}>
+              未保存
+            </Tag>
+          ) : null}
         </div>
-      </Card>
-
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <strong>
-              {locked
-                ? '超级管理员拥有全部权限'
-                : currentRole
-                  ? `为「${currentRole.name}」配置权限`
-                  : '请选择角色'}
-            </strong>
-            {dirty ? (
-              <Tag color="warning" style={{ marginLeft: 8 }}>
-                未保存
-              </Tag>
-            ) : null}
+      }
+      toolbarExtra={
+        <Button
+          type="primary"
+          disabled={!currentRole || locked}
+          loading={saving}
+          onClick={() => void handleSave()}
+        >
+          保存
+        </Button>
+      }
+      table={
+        locked ? (
+          <div className="role-perm__locked">
+            <Alert type="info" showIcon message="超级管理员默认拥有全部权限，无需配置。" />
           </div>
-          <Button
-            type="primary"
-            disabled={!currentRole || locked}
-            loading={saving}
-            onClick={() => void handleSave()}
-          >
-            保存
-          </Button>
-        </div>
-
-        {locked ? (
-          <Alert type="info" showIcon message="超级管理员默认拥有全部权限，无需配置。" />
         ) : (
-          <div style={{ display: 'flex', gap: 12, minHeight: 0, flex: 1 }}>
-            <Card size="small" title="菜单" style={{ width: 280, flexShrink: 0 }}>
-              <Input
-                allowClear
-                placeholder="筛选菜单"
-                value={menuFilter}
-                onChange={(e) => setMenuFilter(e.target.value)}
-                style={{ marginBottom: 8 }}
-              />
-              <Tree
-                treeData={menuTreeData}
-                selectedKeys={selectedRouteKey ? [selectedRouteKey] : []}
-                expandedKeys={menuExpandedKeys}
-                onExpand={(keys) => setMenuExpandedKeys(keys)}
-                onSelect={(keys, info) => {
-                  const raw = (info.node as DataNode & { raw?: MenuNode; disabled?: boolean }).raw
-                  if (!raw || info.node.disabled) return
-                  setSelectedRouteKey(String(keys[0] || ''))
-                  setSelectedRoute(raw)
-                }}
-              />
-            </Card>
+          <div className="role-perm__body">
+            <div className="role-perm__menus">
+              <XnTreePanel
+                title="菜单"
+                width={280}
+                filter={menuFilter}
+                onFilterChange={setMenuFilter}
+                filterPlaceholder="筛选菜单"
+              >
+                <Tree
+                  treeData={menuTreeData}
+                  selectedKeys={selectedRouteKey ? [selectedRouteKey] : []}
+                  expandedKeys={menuExpandedKeys}
+                  onExpand={(keys) => setMenuExpandedKeys(keys)}
+                  onSelect={(keys, info) => {
+                    const raw = (info.node as DataNode & { raw?: MenuNode; disabled?: boolean }).raw
+                    if (!raw || info.node.disabled) return
+                    setSelectedRouteKey(String(keys[0] || ''))
+                    setSelectedRoute(raw)
+                  }}
+                />
+              </XnTreePanel>
+            </div>
 
-            <Card size="small" title={selectedRoute?.title || '权限明细'} style={{ flex: 1 }}>
+            <section className="role-perm__detail">
               {!selectedRoute ? (
-                <Empty description="请选择左侧菜单" />
+                <div className="role-perm__detail-empty">
+                  <Empty description="请选择左侧菜单" />
+                </div>
               ) : !groups.length ? (
-                <Empty description="该菜单下暂无按钮/接口权限" />
+                <div className="role-perm__detail-empty">
+                  <Empty description="该菜单下暂无按钮/接口权限" />
+                </div>
               ) : (
-                <Space direction="vertical" style={{ width: '100%' }} size="middle">
-                  {groups.map((g) => {
-                    const allChecked = g.items.every((i) => checkedIds.has(i.id))
-                    const someChecked = g.items.some((i) => checkedIds.has(i.id))
-                    return (
-                      <div key={g.key}>
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            marginBottom: 8,
-                          }}
-                        >
-                          <strong>{g.title}</strong>
-                          <Checkbox
-                            checked={allChecked}
-                            indeterminate={!allChecked && someChecked}
-                            onChange={(e) => toggleGroup(g.items, e.target.checked)}
-                          >
-                            全选
-                          </Checkbox>
-                        </div>
-                        <div style={{ display: 'grid', gap: 6 }}>
-                          {g.items.map((item) => (
+                <>
+                  <div className="role-perm__detail-header">
+                    <strong>{selectedRoute.title}</strong>
+                  </div>
+                  <div className="role-perm__detail-scroll">
+                    {groups.map((g) => {
+                      const allChecked = g.items.every((i) => checkedIds.has(i.id))
+                      const someChecked = g.items.some((i) => checkedIds.has(i.id))
+                      return (
+                        <div key={g.key} className="role-perm__group">
+                          <div className="role-perm__group-title">
+                            <strong>{g.title}</strong>
                             <Checkbox
-                              key={item.id}
-                              checked={checkedIds.has(item.id)}
-                              onChange={(e) => {
-                                const next = new Set(checkedIds)
-                                if (e.target.checked) next.add(item.id)
-                                else next.delete(item.id)
-                                setCheckedIds(next)
-                              }}
+                              checked={allChecked}
+                              indeterminate={!allChecked && someChecked}
+                              onChange={(e) => toggleGroup(g.items, e.target.checked)}
                             >
-                              <Space size={6}>
-                                {g.key === 'sensitive' ? <Tag color="error">敏感</Tag> : null}
-                                {item.type === 'API' ? (
-                                  <Tag color={methodColor(item.method)}>{item.method}</Tag>
-                                ) : null}
-                                <span>{item.name}</span>
-                                <span style={{ color: '#94a3b8', fontSize: 12 }}>
-                                  {item.type === 'API' ? item.path : item.code}
-                                </span>
-                              </Space>
+                              全选
                             </Checkbox>
-                          ))}
+                          </div>
+                          <div className="role-perm__group-items">
+                            {g.items.map((item) => (
+                              <Checkbox
+                                key={item.id}
+                                checked={checkedIds.has(item.id)}
+                                onChange={(e) => {
+                                  const next = new Set(checkedIds)
+                                  if (e.target.checked) next.add(item.id)
+                                  else next.delete(item.id)
+                                  setCheckedIds(next)
+                                }}
+                              >
+                                <Space size={6}>
+                                  {g.key === 'sensitive' ? <Tag color="error">敏感</Tag> : null}
+                                  {item.type === 'API' ? (
+                                    <Tag color={methodColor(item.method)}>{item.method}</Tag>
+                                  ) : null}
+                                  <span>{item.name}</span>
+                                  <span style={{ color: '#94a3b8', fontSize: 12 }}>
+                                    {item.type === 'API' ? item.path : item.code}
+                                  </span>
+                                </Space>
+                              </Checkbox>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )
-                  })}
-                </Space>
+                      )
+                    })}
+                  </div>
+                </>
               )}
-            </Card>
+            </section>
           </div>
-        )}
-      </div>
-      {/* keep permById referenced for future detail lookup */}
-      <span style={{ display: 'none' }}>{permById.size}</span>
-    </div>
+        )
+      }
+    />
   )
 }

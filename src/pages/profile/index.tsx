@@ -2,6 +2,7 @@
 import { Alert, Avatar, Button, Form, Input, Space, Tag, Upload, message } from 'antd'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { changePassword, getPasswordRules, uploadAvatar, type PasswordRules } from '@/api/auth'
+import { usePermissionStore } from '@/stores/permission'
 import { useUserStore } from '@/stores/user'
 import './profile.scss'
 
@@ -12,6 +13,7 @@ export default function ProfilePage() {
   const user = useUserStore((s) => s.user)
   const fetchProfile = useUserStore((s) => s.fetchProfile)
   const updateProfile = useUserStore((s) => s.updateProfile)
+  const roles = usePermissionStore((s) => s.roles)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [avatarUploading, setAvatarUploading] = useState(false)
@@ -20,8 +22,8 @@ export default function ProfilePage() {
   const [form] = Form.useForm()
   const [pwdForm] = Form.useForm()
 
-  const canEditProfile = user?.username !== 'SuperAdmin'
-  const canEditPassword = true
+  const canEditProfile = !roles.includes('SUPER_ADMIN') && !roles.includes('ADMIN')
+  const canEditPassword = !roles.includes('ADMIN')
   const canEdit = canEditProfile || canEditPassword
   const roleText = useMemo(
     () => (user?.roleList || []).map((r) => r.name).join('、') || user?.role || '—',
@@ -154,7 +156,11 @@ export default function ProfilePage() {
           type="warning"
           showIcon
           className="profile-page__alert"
-          message="超级管理员仅可修改密码，不可改用户名与基本资料"
+          message={
+            canEditPassword
+              ? '超级管理员仅可修改密码，不可改用户名与基本资料'
+              : '管理员不可修改个人信息与密码'
+          }
         />
       ) : null}
 

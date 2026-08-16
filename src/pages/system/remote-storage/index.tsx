@@ -14,6 +14,7 @@ import {
   type SystemConfigPayload,
 } from '@/api/system-config'
 import { APP_CLIENT_ID } from '@/config/client'
+import { showCaughtError } from '@/utils/request'
 import type { SearchForm, SearchItem } from '@/types/search'
 import type { TableColumnItem } from '@/types/table'
 import type { ButtonListItem } from '@/types/button'
@@ -162,7 +163,7 @@ export default function RemoteStoragePage() {
       const res = await getSystemConfigSection('storage')
       applySection(res.data)
     } catch (e: unknown) {
-      message.error(e instanceof Error ? e.message : '加载失败')
+      showCaughtError(e, '加载失败')
     } finally {
       setLoading(false)
     }
@@ -218,7 +219,7 @@ export default function RemoteStoragePage() {
       message.success(successText)
       return true
     } catch (e: unknown) {
-      message.error(e instanceof Error ? e.message : '保存失败')
+      showCaughtError(e, '保存失败')
       return false
     } finally {
       setSaving(false)

@@ -1,0 +1,105 @@
+/* 三栏铺满内容区，避免 XnPageLayout 左右内边距把整页撑出一条总滚动条 */
+.xn-page-layout__content:has(.role-perm__body),
+.xn-page-layout__content:has(.role-perm__locked) {
+  padding: 0;
+}
+
+.role-perm__role {
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+.role-perm__role:hover {
+  background: var(--app-fill-color, #f5f7fa);
+}
+
+.role-perm__role.is-active {
+  background: var(--app-surface-soft, #e6f4ff);
+}
+
+.role-perm__role-name {
+  font-weight: 600;
+}
+
+.role-perm__role-code {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.role-perm__body {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.role-perm__menus {
+  flex: 0 0 280px;
+  width: 280px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--app-border-color, #f0f0f0);
+}
+
+.role-perm__detail {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 12px 16px;
+}
+
+.role-perm__detail-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--app-border-color, #f0f0f0);
+}
+
+.role-perm__detail-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.role-perm__detail-empty,
+.role-perm__locked {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.role-perm__group {
+  margin-bottom: 16px;
+}
+
+.role-perm__group-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.role-perm__group-items {
+  display: grid;
+  gap: 6px;
+}
+
+.role-perm__menu-title {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}

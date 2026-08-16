@@ -36,6 +36,7 @@ import {
   type SystemConfigPayload,
   type SystemConfigSection,
 } from '@/api/system-config'
+import { showCaughtError } from '@/utils/request'
 import { useUiPreferenceStore } from '@/stores/uiPreference'
 import { parsePxInt, toPx } from '@/utils/px'
 import './systemConfig.scss'
@@ -195,7 +196,7 @@ export default function SystemConfigPage() {
       const res = await getSystemConfig()
       if (res.data) assignForm(res.data)
     } catch (e: unknown) {
-      message.error(e instanceof Error ? e.message : '加载失败')
+      showCaughtError(e, '加载失败')
     } finally {
       setLoading(false)
     }
@@ -266,7 +267,7 @@ export default function SystemConfigPage() {
       applySectionData(section, res.data)
       message.success('已刷新')
     } catch (e: unknown) {
-      message.error(e instanceof Error ? e.message : '刷新失败')
+      showCaughtError(e, '刷新失败')
     } finally {
       setLoading(false)
     }
@@ -306,7 +307,7 @@ export default function SystemConfigPage() {
       setEditing((prev) => ({ ...prev, [section]: false }))
       message.success('保存成功，已即时生效')
     } catch (e: unknown) {
-      message.error(e instanceof Error ? e.message : '保存失败')
+      showCaughtError(e, '保存失败')
     } finally {
       setSavingSection('')
     }
@@ -395,7 +396,7 @@ export default function SystemConfigPage() {
                     message.success('上传成功')
                     opt.onSuccess?.(res)
                   } catch (e: unknown) {
-                    message.error(e instanceof Error ? e.message : '上传失败')
+                    showCaughtError(e, '上传失败')
                     opt.onError?.(e as Error)
                   }
                 }}

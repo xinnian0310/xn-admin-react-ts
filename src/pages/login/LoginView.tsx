@@ -211,7 +211,7 @@ export default function LoginView() {
               <p className="welcome">{isRegister ? '创建账号' : '欢迎回来'}</p>
               <h1>{appConfig.app.name}</h1>
               <p className="hint">
-                {isRegister ? '注册后将以游客身份使用系统' : '登录以继续管理您的系统'}
+                {isRegister ? '注册后将以普通用户身份使用系统' : '登录以继续管理您的系统'}
               </p>
             </header>
             <Form

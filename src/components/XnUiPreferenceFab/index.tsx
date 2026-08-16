@@ -6,6 +6,7 @@ import { useUiPreferenceStore } from '@/stores/uiPreference'
 import { useThemeStore } from '@/stores/theme'
 import { appConfig, type LayoutMode } from '@/config/app'
 import { parsePxInt, toPx } from '@/utils/px'
+import { showCaughtError } from '@/utils/request'
 import './uiPreferenceFab.scss'
 
 const STORAGE_KEY = 'xn-ui-pref-fab-top'
@@ -176,7 +177,7 @@ export default function XnUiPreferenceFab() {
       message.success('个人布局已保存')
       closeDrawer()
     } catch (err: unknown) {
-      message.error(err instanceof Error ? err.message : '保存失败')
+      showCaughtError(err, '保存失败')
     } finally {
       setSaving(false)
     }
@@ -189,7 +190,7 @@ export default function XnUiPreferenceFab() {
       form.setFieldsValue(readFormFromApp())
       message.success('已恢复为通用配置')
     } catch (err: unknown) {
-      message.error(err instanceof Error ? err.message : '重置失败')
+      showCaughtError(err, '重置失败')
     } finally {
       setResetting(false)
     }

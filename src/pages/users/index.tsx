@@ -10,6 +10,7 @@ import XnAuth from '@/components/XnAuth'
 import UserSave, { type UserSaveHandle } from './save'
 import { usePageUi } from '@/hooks/usePageUi'
 import { list, batchRemove, remove, updateStatus, importUsers, exportUsers } from '@/api/user'
+import { showCaughtError } from '@/utils/request'
 import { getOptions as getRoleOptions } from '@/api/role'
 import { getTree as getUnitTree } from '@/api/unit'
 import { getOptions as getPostOptions } from '@/api/post'
@@ -249,7 +250,7 @@ export default function UsersPage() {
       })
       message.success('导出成功')
     } catch (e: unknown) {
-      message.error(e instanceof Error ? e.message : '导出失败')
+      showCaughtError(e, '导出失败')
     }
   }
 

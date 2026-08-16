@@ -3,6 +3,7 @@ import { Form, Input, Upload, Image, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import type { UploadFile } from 'antd/es/upload/interface'
 import { uploadDonationQrcode } from '@/api/site-contact'
+import { showCaughtError } from '@/utils/request'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
 import type { SiteDonationQrcode } from '@/types/site-contact'
 import XnModal from '@/components/XnModal'
@@ -109,7 +110,7 @@ const QrcodeSave = forwardRef<QrcodeSaveHandle, Props>(function QrcodeSave({ onS
                 } catch (e: unknown) {
                   form.setFieldValue('src', '')
                   setFileList([])
-                  message.error(e instanceof Error ? e.message : '上传失败')
+                  showCaughtError(e, '上传失败')
                   opt.onError?.(e as Error)
                 } finally {
                   setUploading(false)
