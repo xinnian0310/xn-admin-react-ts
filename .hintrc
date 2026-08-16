@@ -1,0 +1,12 @@
+{
+  "extends": ["development"],
+  "browserslist": ["Chrome >= 121", "Edge >= 121", "Firefox >= 121"],
+  "hints": {
+    "compat-api/css": "off",
+    "typescript-config/is-valid": "off",
+    "typescript-config/target": "off",
+    "typescript-config/strict": "off",
+    "typescript-config/no-comments": "off",
+    "typescript-config/consistent-casing": "off"
+  }
+}

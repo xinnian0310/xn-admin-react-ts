@@ -8,6 +8,7 @@
 .xn-modal--draggable {
   .ant-modal-header {
     cursor: move;
+    -webkit-user-select: none;
     user-select: none;
   }
 }

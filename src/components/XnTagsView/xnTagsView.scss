@@ -62,6 +62,7 @@
 .xn-tags-view__item.ant-tag {
   margin-inline-end: 0;
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
   font-size: inherit;
   line-height: 22px;

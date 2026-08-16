@@ -1,3 +1,4 @@
 {
-  "recommendations": ["oxc.oxc-vscode", "esbenp.prettier-vscode", "EditorConfig.EditorConfig"]
+  "recommendations": ["oxc.oxc-vscode", "esbenp.prettier-vscode", "EditorConfig.EditorConfig"],
+  "unwantedRecommendations": ["ms-edgedevtools.vscode-edge-devtools"]
 }

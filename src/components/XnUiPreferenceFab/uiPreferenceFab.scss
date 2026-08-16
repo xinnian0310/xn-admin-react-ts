@@ -20,8 +20,8 @@
     transform 0.2s ease,
     filter 0.15s ease;
   touch-action: none;
-  user-select: none;
   -webkit-user-select: none;
+  user-select: none;
 }
 
 /* 扩大可点/可靠近热区（半隐时仍易触达） */

@@ -1,0 +1,4 @@
+# 管理端面向现代 Chromium / Firefox；滚动条与 color-mix 已按此基线使用
+Chrome >= 121
+Edge >= 121
+Firefox >= 121

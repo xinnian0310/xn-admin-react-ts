@@ -32,6 +32,17 @@
   "[scss]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "json.schemas": [
+    {
+      "fileMatch": ["tsconfig.json", "tsconfig.*.json", "jsconfig.json"],
+      "url": "https://json.schemastore.org/tsconfig"
+    }
+  ],
+  "vscode-edge-devtools.webhint": false,
+  "css.lint.compatibleVendorPrefixes": "ignore",
+  "scss.lint.compatibleVendorPrefixes": "ignore",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
