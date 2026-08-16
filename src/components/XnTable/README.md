@@ -53,49 +53,49 @@ tableRef.current?.openSave('edit', id)
 
 ## 传参
 
-| 名称               | 类型                         | 默认值           | 说明                            |
-| ------------------ | ---------------------------- | ---------------- | ------------------------------- |
-| `data`             | `unknown[]`                  | —                | 数据模式；与 `api` 二选一       |
-| `api`              | `string`                     | —                | API 模式，对应 `@/api/{api}.ts` |
-| `columns`          | `TableColumnItem[]`          | `[]`             | 列配置                          |
-| `loading`          | `boolean`                    | `false`          | 数据模式加载态                  |
-| `tableHeight`      | `string \| number`           | —                | 表格高度                        |
-| `showPagination`   | `boolean`                    | `true`           | 是否分页                        |
-| `page` / `pageSize` / `total` | `number`            | `1` / `10` / `0` | 分页                            |
-| `pageSizes`        | `number[]`                   | —                | 每页条数选项                    |
-| `queryParams`      | `Record<string, unknown>`    | —                | 查询参数（api 模式）            |
-| `listFilter`       | `(row) => boolean`           | —                | 客户端过滤                      |
-| `entityName`       | `string`                     | —                | 实体中文名                      |
-| `nameField`        | `string`                     | —                | 名称字段                        |
-| `idField`          | `string`                     | —                | 主键字段                        |
-| `immediate`        | `boolean`                    | —                | 挂载后是否立即拉数（api 模式）  |
-| `tableKey`         | `string`                     | —                | 有值则启用列设置持久化          |
-| `actionItems`      | `ButtonListItem[]`           | —                | 操作列按钮                      |
-| `stripe`           | `boolean`                    | —                | 斑马纹                          |
-| `rowKey`           | `string \| (row) => Key`     | —                | 行键                            |
-| `slots`            | `Record<string, (ctx) => ReactNode>` | —          | 自定义列渲染                    |
+| 名称                          | 类型                                 | 默认值           | 说明                            |
+| ----------------------------- | ------------------------------------ | ---------------- | ------------------------------- |
+| `data`                        | `unknown[]`                          | —                | 数据模式；与 `api` 二选一       |
+| `api`                         | `string`                             | —                | API 模式，对应 `@/api/{api}.ts` |
+| `columns`                     | `TableColumnItem[]`                  | `[]`             | 列配置                          |
+| `loading`                     | `boolean`                            | `false`          | 数据模式加载态                  |
+| `tableHeight`                 | `string \| number`                   | —                | 表格高度                        |
+| `showPagination`              | `boolean`                            | `true`           | 是否分页                        |
+| `page` / `pageSize` / `total` | `number`                             | `1` / `10` / `0` | 分页                            |
+| `pageSizes`                   | `number[]`                           | —                | 每页条数选项                    |
+| `queryParams`                 | `Record<string, unknown>`            | —                | 查询参数（api 模式）            |
+| `listFilter`                  | `(row) => boolean`                   | —                | 客户端过滤                      |
+| `entityName`                  | `string`                             | —                | 实体中文名                      |
+| `nameField`                   | `string`                             | —                | 名称字段                        |
+| `idField`                     | `string`                             | —                | 主键字段                        |
+| `immediate`                   | `boolean`                            | —                | 挂载后是否立即拉数（api 模式）  |
+| `tableKey`                    | `string`                             | —                | 有值则启用列设置持久化          |
+| `actionItems`                 | `ButtonListItem[]`                   | —                | 操作列按钮                      |
+| `stripe`                      | `boolean`                            | —                | 斑马纹                          |
+| `rowKey`                      | `string \| (row) => Key`             | —                | 行键                            |
+| `slots`                       | `Record<string, (ctx) => ReactNode>` | —                | 自定义列渲染                    |
 
 ## 回调
 
-| 名称                 | 签名                                      |
-| -------------------- | ----------------------------------------- |
-| `onPageChange`       | `(page, pageSize) => void`                |
-| `onRefresh`          | `() => void`（data 模式优先于 onPageChange） |
-| `onSelectionChange`  | `(rows) => void`                          |
-| `onSwitchChange`     | `({ row, prop, value }) => void`          |
-| `onDataChange`       | `(rows) => void`                          |
-| `onSuccess`          | `() => void`                              |
+| 名称                | 签名                                         |
+| ------------------- | -------------------------------------------- |
+| `onPageChange`      | `(page, pageSize) => void`                   |
+| `onRefresh`         | `() => void`（data 模式优先于 onPageChange） |
+| `onSelectionChange` | `(rows) => void`                             |
+| `onSwitchChange`    | `({ row, prop, value }) => void`             |
+| `onDataChange`      | `(rows) => void`                             |
+| `onSuccess`         | `() => void`                                 |
 
 ## Ref（`XnTableHandle`）
 
-| 名称            | 说明                               |
-| --------------- | ---------------------------------- |
-| `openSave`      | `(mode, id?)` 打开保存（需页面配合） |
-| `handleDelete`  | 删除指定行                         |
-| `handleAction`  | `add` / `edit` / `view` / `delete` |
-| `loadData`      | 重新加载（api 模式）               |
-| `selected`      | 当前选中                           |
-| `getApi`        | 当前 CRUD API 模块                 |
+| 名称           | 说明                                 |
+| -------------- | ------------------------------------ |
+| `openSave`     | `(mode, id?)` 打开保存（需页面配合） |
+| `handleDelete` | 删除指定行                           |
+| `handleAction` | `add` / `edit` / `view` / `delete`   |
+| `loadData`     | 重新加载（api 模式）                 |
+| `selected`     | 当前选中                             |
+| `getApi`       | 当前 CRUD API 模块                   |
 
 ## 列类型（`TableColumnItem.type`）
 

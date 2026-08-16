@@ -1,5 +1,5 @@
 import XnModal from '@/components/XnModal'
-﻿import { forwardRef, useImperativeHandle, useState } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, Radio, message } from 'antd'
 import { create, get, update } from '@/api/dict-type'
 import type { DictTypeForm } from '@/types'
@@ -117,4 +117,3 @@ const DictTypeSave = forwardRef<DictTypeSaveHandle, Props>(function DictTypeSave
 })
 
 export default DictTypeSave
-

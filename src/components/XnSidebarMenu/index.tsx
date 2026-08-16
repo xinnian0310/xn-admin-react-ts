@@ -117,7 +117,9 @@ export default function XnSidebarMenu({
   const menuNode = (
     <Menu
       className={className}
-      style={enableSearch ? { ...style, flex: 1, overflow: 'auto', borderInlineEnd: 'none' } : style}
+      style={
+        enableSearch ? { ...style, flex: 1, overflow: 'auto', borderInlineEnd: 'none' } : style
+      }
       theme={theme}
       mode={mode}
       inlineCollapsed={collapsed}

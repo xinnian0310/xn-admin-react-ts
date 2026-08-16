@@ -348,7 +348,9 @@ export default function SiteContactPage() {
                                     >
                                       <XnAppIcon name="ri:qq-fill" size={14} />
                                       {g.value}
-                                      {g.full ? <em style={{ fontStyle: 'normal' }}>已满</em> : null}
+                                      {g.full ? (
+                                        <em style={{ fontStyle: 'normal' }}>已满</em>
+                                      ) : null}
                                     </span>
                                   ))}
                                 </span>

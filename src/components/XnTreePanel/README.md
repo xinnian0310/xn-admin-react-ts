@@ -17,7 +17,7 @@
 ```tsx
 import XnTreePanel from '@/components/XnTreePanel'
 
-<XnTreePanel
+;<XnTreePanel
   title="组织"
   width={260}
   filter={keyword}
@@ -39,17 +39,17 @@ import XnTreePanel from '@/components/XnTreePanel'
 
 ## 传参
 
-| 名称                | 类型                                      | 默认值    | 说明                         |
-| ------------------- | ----------------------------------------- | --------- | ---------------------------- |
-| `title`             | `string`                                  | —         | 标题                         |
-| `width`             | `string \| number`                        | —         | 面板宽度                     |
-| `filterable`        | `boolean`                                 | `true`    | 是否显示过滤框               |
-| `filter`            | `string`                                  | —         | 过滤关键字                   |
-| `onFilterChange`    | `(value: string) => void`                 | —         | 过滤变化                     |
-| `filterPlaceholder` | `string`                                  | —         | 过滤占位                     |
-| `data`              | `T[]`                                     | —         | 树数据（内置树模式）         |
-| `treeProps`         | `{ label?; children?; key?; disabled? }`  | —         | 字段映射                     |
-| `currentKey`        | `string \| number`                        | —         | 当前选中键                   |
-| `onNodeClick`       | `(node: T) => void`                       | —         | 点击节点                     |
-| `children`          | `ReactNode`                               | —         | 替换内置树                   |
-| `footer`            | `ReactNode`                               | —         | 底部固定区                   |
+| 名称                | 类型                                     | 默认值 | 说明                 |
+| ------------------- | ---------------------------------------- | ------ | -------------------- |
+| `title`             | `string`                                 | —      | 标题                 |
+| `width`             | `string \| number`                       | —      | 面板宽度             |
+| `filterable`        | `boolean`                                | `true` | 是否显示过滤框       |
+| `filter`            | `string`                                 | —      | 过滤关键字           |
+| `onFilterChange`    | `(value: string) => void`                | —      | 过滤变化             |
+| `filterPlaceholder` | `string`                                 | —      | 过滤占位             |
+| `data`              | `T[]`                                    | —      | 树数据（内置树模式） |
+| `treeProps`         | `{ label?; children?; key?; disabled? }` | —      | 字段映射             |
+| `currentKey`        | `string \| number`                       | —      | 当前选中键           |
+| `onNodeClick`       | `(node: T) => void`                      | —      | 点击节点             |
+| `children`          | `ReactNode`                              | —      | 替换内置树           |
+| `footer`            | `ReactNode`                              | —      | 底部固定区           |

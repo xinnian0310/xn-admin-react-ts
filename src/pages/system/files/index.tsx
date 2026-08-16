@@ -1,5 +1,5 @@
 import XnModal from '@/components/XnModal'
-﻿import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Input, message } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnTreePanel from '@/components/XnTreePanel'
@@ -332,4 +332,3 @@ export default function SystemFilesPage() {
     </>
   )
 }
-

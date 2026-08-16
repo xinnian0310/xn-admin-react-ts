@@ -6,10 +6,10 @@
 
 ## 文件
 
-| 文件                  | 说明                    |
-| --------------------- | ----------------------- |
-| `index.tsx`           | 右侧半隐 FAB + 偏好抽屉 |
-| `uiPreferenceFab.scss` | 样式                   |
+| 文件                   | 说明                    |
+| ---------------------- | ----------------------- |
+| `index.tsx`            | 右侧半隐 FAB + 偏好抽屉 |
+| `uiPreferenceFab.scss` | 样式                    |
 
 ## 介绍
 
@@ -29,7 +29,7 @@
 ```tsx
 import XnUiPreferenceFab from '@/components/XnUiPreferenceFab'
 
-<XnUiPreferenceFab />
+;<XnUiPreferenceFab />
 ```
 
 ```ts

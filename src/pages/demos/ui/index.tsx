@@ -86,7 +86,9 @@ const cascaderOptions = [
   {
     value: 'jiangsu',
     label: '江苏',
-    children: [{ value: 'nanjing', label: '南京', children: [{ value: 'zhonghuamen', label: '中华门' }] }],
+    children: [
+      { value: 'nanjing', label: '南京', children: [{ value: 'zhonghuamen', label: '中华门' }] },
+    ],
   },
 ]
 
@@ -167,9 +169,10 @@ export default function DemoUiPage() {
               标题 Typography.Title
             </Title>
             <Paragraph>
-              这是一段正文。支持 <Text type="secondary">次要</Text>、<Text type="success">成功</Text>、
-              <Text type="warning">警告</Text>、<Text type="danger">危险</Text>、
-              <Text code>code</Text>、<Text mark>标记</Text>、<Text strong>加粗</Text>。
+              这是一段正文。支持 <Text type="secondary">次要</Text>、
+              <Text type="success">成功</Text>、<Text type="warning">警告</Text>、
+              <Text type="danger">危险</Text>、<Text code>code</Text>、<Text mark>标记</Text>、
+              <Text strong>加粗</Text>。
             </Paragraph>
             <Paragraph copyable>可复制文本</Paragraph>
           </Section>
@@ -355,7 +358,10 @@ export default function DemoUiPage() {
                   </Col>
                   <Col span={12}>
                     <Form.Item label="TimePicker">
-                      <TimePicker style={{ width: '100%' }} defaultValue={dayjs('12:00:00', 'HH:mm:ss')} />
+                      <TimePicker
+                        style={{ width: '100%' }}
+                        defaultValue={dayjs('12:00:00', 'HH:mm:ss')}
+                      />
                     </Form.Item>
                   </Col>
                   <Col span={24}>
@@ -381,10 +387,7 @@ export default function DemoUiPage() {
                   </Col>
                   <Col span={12}>
                     <Form.Item label="Checkbox">
-                      <Checkbox.Group
-                        options={['苹果', '香蕉', '橙子']}
-                        defaultValue={['苹果']}
-                      />
+                      <Checkbox.Group options={['苹果', '香蕉', '橙子']} defaultValue={['苹果']} />
                     </Form.Item>
                   </Col>
                   <Col span={12}>
@@ -616,7 +619,10 @@ export default function DemoUiPage() {
                 </Card>
               </Col>
               <Col span={8}>
-                <Card size="small" actions={[<SettingOutlined key="s" />, <DownloadOutlined key="d" />]}>
+                <Card
+                  size="small"
+                  actions={[<SettingOutlined key="s" />, <DownloadOutlined key="d" />]}
+                >
                   带操作区
                 </Card>
               </Col>
@@ -633,13 +639,19 @@ export default function DemoUiPage() {
         <div>
           <h2 className={styles.title}>Ant Design 基础组件</h2>
           <p className={styles.desc}>
-            按 Ant Design 常用分类展示组件示例，便于对照主题色、尺寸与暗色模式效果。完整 API 请参阅官方文档。
+            按 Ant Design 常用分类展示组件示例，便于对照主题色、尺寸与暗色模式效果。完整 API
+            请参阅官方文档。
           </p>
         </div>
         <Tag color="blue">antd</Tag>
       </div>
       <Tabs items={items} tabPosition="left" className={styles.tabs} />
-      <Modal title="Modal 示例" open={modalOpen} onOk={() => setModalOpen(false)} onCancel={() => setModalOpen(false)}>
+      <Modal
+        title="Modal 示例"
+        open={modalOpen}
+        onOk={() => setModalOpen(false)}
+        onCancel={() => setModalOpen(false)}
+      >
         <p>这是 Ant Design Modal 的基础用法。</p>
       </Modal>
       <Drawer title="Drawer 示例" open={drawerOpen} onClose={() => setDrawerOpen(false)}>

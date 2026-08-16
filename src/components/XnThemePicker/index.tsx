@@ -90,7 +90,8 @@ export default function XnThemePicker() {
             children: (
               <>
                 <p className="theme-tab__hint">
-                  基于 Ant Design 中性色板与拂晓蓝主色：亮色白底、暗色深底，侧栏 / 顶栏 / 内容区一并切换。
+                  基于 Ant Design 中性色板与拂晓蓝主色：亮色白底、暗色深底，侧栏 / 顶栏 /
+                  内容区一并切换。
                 </p>
                 <div className="theme-mode">
                   {(
@@ -159,7 +160,11 @@ export default function XnThemePicker() {
                       >
                         <div className="theme-card__ramp" aria-hidden>
                           {t.palette.map((c) => (
-                            <span key={c} className="theme-card__ramp-stop" style={{ background: c }} />
+                            <span
+                              key={c}
+                              className="theme-card__ramp-stop"
+                              style={{ background: c }}
+                            />
                           ))}
                         </div>
                         <div className="theme-card__meta">
@@ -280,4 +285,3 @@ export default function XnThemePicker() {
     </XnModal>
   )
 }
-

@@ -12,11 +12,11 @@
 
 ## 相关仓库
 
-| 仓库 | 说明 |
-|------|------|
-| `xn-admin-cloud` | 微服务后端（必需） |
-| `xn-admin-vue3-ts` | 功能基准（Vue 3 + TypeScript） |
-| `xn-admin-vue3-js` / `xn-admin-vue2-js` | 其它 Vue 管理端 |
+| 仓库                                    | 说明                           |
+| --------------------------------------- | ------------------------------ |
+| `xn-admin-cloud`                        | 微服务后端（必需）             |
+| `xn-admin-vue3-ts`                      | 功能基准（Vue 3 + TypeScript） |
+| `xn-admin-vue3-js` / `xn-admin-vue2-js` | 其它 Vue 管理端                |
 
 ## 前提
 
@@ -60,6 +60,7 @@ npm run build         # tsc -b + vite 生产构建
 npm run preview       # 本地预览构建产物
 npm run typecheck     # TypeScript：仅做类型检查
 npm run lint          # oxlint：代码检查
+npm run lint:fix      # oxlint：自动修复可修复项
 npm run format        # Prettier：格式化代码
 npm run format:check  # Prettier：仅检查格式，不改文件
 ```
@@ -72,34 +73,38 @@ npm run format:check  # Prettier：仅检查格式，不改文件
 npm run typecheck     # TypeScript 类型检查
 npm run lint          # oxlint
 npm run format:check  # Prettier 格式检查
-npm run build         # 类型检查 + 生产构建
+npm run ci            # 全量检查：typecheck + lint + format:check + build
 ```
+
+提交前会经 Husky 跑 lint-staged（oxlint 修复 + Prettier 格式化）；提交信息需符合 [Conventional Commits](https://www.conventionalcommits.org/)（如 `feat: xxx`）。约定详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+在 Cursor / VS Code 中打开本仓库并安装推荐扩展后：**保存文件会自动 Prettier 格式化，并执行 oxlint 可自动修复项**（见 `.vscode/settings.json`）。
 
 ## 技术栈
 
-| 类别          | 技术                                     |
-| ------------- | ---------------------------------------- |
-| 框架          | React 19、TypeScript 6、Vite 8           |
-| UI            | Ant Design 6、@ant-design/icons、Iconify |
-| 状态 / 路由   | Zustand 5、React Router 7                |
-| 请求          | Axios                                    |
-| 图表 / 编辑器 | ECharts、wangEditor                      |
-| Excel         | ExcelJS、xlsx                            |
-| 工程化        | oxlint、Prettier                         |
+| 类别          | 技术                                             |
+| ------------- | ------------------------------------------------ |
+| 框架          | React 19、TypeScript 6、Vite 8                   |
+| UI            | Ant Design 6、@ant-design/icons、Iconify         |
+| 状态 / 路由   | Zustand 5、React Router 7                        |
+| 请求          | Axios                                            |
+| 图表 / 编辑器 | ECharts、wangEditor                              |
+| Excel         | ExcelJS、xlsx                                    |
+| 工程化        | oxlint、Prettier、Husky、lint-staged、commitlint |
 
 ## 与基准差异
 
-| 项               | 基准 Vue（xn-admin-vue3-ts） | 本工程 React                              |
-| ---------------- | --------------------- | ----------------------------------------- |
-| UI               | Element Plus          | **Ant Design 原生视觉**                   |
-| 默认主色 / 侧栏  | `#409eff` 同色顶栏侧栏 | `#1677ff` + 浅色侧栏 + 白顶栏（可切换）   |
-| 菜单图标字段     | `icon`（Element）     | 优先 `iconAntd`，回退 `icon`              |
-| 状态             | Pinia                 | Zustand                                   |
-| 路由             | vue-router `addRoute` | 动态 `RouteObject` 挂载                   |
-| 视图目录         | `src/views`           | `src/pages`                               |
-| 权限             | `v-permission`        | `<Auth>` / `usePermission`                |
-| `APP_CLIENT_ID`  | `xn-admin-vue3-ts`    | `xn-admin-react-ts`（`src/config/client.ts`） |
-| 开发端口         | `1803`                | `1800`                                    |
+| 项              | 基准 Vue（xn-admin-vue3-ts） | 本工程 React                                  |
+| --------------- | ---------------------------- | --------------------------------------------- |
+| UI              | Element Plus                 | **Ant Design 原生视觉**                       |
+| 默认主色 / 侧栏 | `#409eff` 同色顶栏侧栏       | `#1677ff` + 浅色侧栏 + 白顶栏（可切换）       |
+| 菜单图标字段    | `icon`（Element）            | 优先 `iconAntd`，回退 `icon`                  |
+| 状态            | Pinia                        | Zustand                                       |
+| 路由            | vue-router `addRoute`        | 动态 `RouteObject` 挂载                       |
+| 视图目录        | `src/views`                  | `src/pages`                                   |
+| 权限            | `v-permission`               | `<Auth>` / `usePermission`                    |
+| `APP_CLIENT_ID` | `xn-admin-vue3-ts`           | `xn-admin-react-ts`（`src/config/client.ts`） |
+| 开发端口        | `1803`                       | `1800`                                        |
 
 ## 目录结构
 
@@ -132,28 +137,28 @@ XnPageLayout
 
 每个组件目录下有独立文档，入口见 [`src/components/README.md`](./src/components/README.md)。
 
-| 组件               | 说明                                      |
-| ------------------ | ----------------------------------------- |
-| XnAppIcon          | 统一图标（Ant Design / Iconify / SVG）    |
-| XnAppBrandLogo     | 品牌 Logo                                 |
-| XnAuth             | 按钮级权限（对应 Vue 端 `v-permission`）  |
-| XnButton           | 工具栏 / 行操作按钮                       |
-| XnErrorPage        | 403 / 404 / 503 错误页                    |
-| XnIconPicker       | 图标选择器                                |
-| XnImport           | Excel 导入对话框                          |
-| XnLongText         | 长文本截断 + 点击弹窗查看                 |
-| XnModal            | 可拖拽、限高的 Modal                      |
-| XnNoticeInbox      | 消息中心抽屉                              |
-| XnPageLayout       | 列表页骨架                                |
-| XnRichEditor       | 富文本编辑器（wangEditor）                |
-| XnSearch           | 配置化搜索表单                            |
-| XnSidebarMenu      | 多级菜单                                  |
-| XnTable            | 配置化表格                                |
-| XnTagsView         | 页面标签栏                                |
-| XnThemePicker      | 主题设置                                  |
-| XnTreePanel        | 左侧树面板                                |
-| XnUiPreferenceFab  | 个人界面偏好 FAB                          |
-| XnUpload           | 大文件分片上传                            |
+| 组件              | 说明                                     |
+| ----------------- | ---------------------------------------- |
+| XnAppIcon         | 统一图标（Ant Design / Iconify / SVG）   |
+| XnAppBrandLogo    | 品牌 Logo                                |
+| XnAuth            | 按钮级权限（对应 Vue 端 `v-permission`） |
+| XnButton          | 工具栏 / 行操作按钮                      |
+| XnErrorPage       | 403 / 404 / 503 错误页                   |
+| XnIconPicker      | 图标选择器                               |
+| XnImport          | Excel 导入对话框                         |
+| XnLongText        | 长文本截断 + 点击弹窗查看                |
+| XnModal           | 可拖拽、限高的 Modal                     |
+| XnNoticeInbox     | 消息中心抽屉                             |
+| XnPageLayout      | 列表页骨架                               |
+| XnRichEditor      | 富文本编辑器（wangEditor）               |
+| XnSearch          | 配置化搜索表单                           |
+| XnSidebarMenu     | 多级菜单                                 |
+| XnTable           | 配置化表格                               |
+| XnTagsView        | 页面标签栏                               |
+| XnThemePicker     | 主题设置                                 |
+| XnTreePanel       | 左侧树面板                               |
+| XnUiPreferenceFab | 个人界面偏好 FAB                         |
+| XnUpload          | 大文件分片上传                           |
 
 配置通常来自后端 page-ui 与路由权限。
 
@@ -188,12 +193,12 @@ XnPageLayout
 
 后端 `xn-log` / `xn-job` 已提供登录 / 操作 / 异常 / 任务日志接口（查询、详情、删除、清空、导出），菜单与 page-ui 已种子。本仓库**尚未落地页面**（`view-loader` 会落到 404）：
 
-| 页面     | 路由                    | 前端现状                                      |
-| -------- | ----------------------- | --------------------------------------------- |
-| 登录日志 | `/system/logs/login`    | 有 `api/login-log`，无 `pages/.../index.tsx`  |
-| 操作日志 | `/system/logs/oper`     | 有 `api/oper-log`，无页面                     |
-| 异常日志 | `/system/logs/exception`| 有 `api/exception-log`，无页面                |
-| 任务日志 | `/system/jobs/logs`     | 定时任务页会跳转至此，无页面                  |
+| 页面     | 路由                     | 前端现状                                     |
+| -------- | ------------------------ | -------------------------------------------- |
+| 登录日志 | `/system/logs/login`     | 有 `api/login-log`，无 `pages/.../index.tsx` |
+| 操作日志 | `/system/logs/oper`      | 有 `api/oper-log`，无页面                    |
+| 异常日志 | `/system/logs/exception` | 有 `api/exception-log`，无页面               |
+| 任务日志 | `/system/jobs/logs`      | 定时任务页会跳转至此，无页面                 |
 
 ### 组织与账号
 
@@ -232,12 +237,12 @@ XnPageLayout
 
 ### 系统工具
 
-| 模块     | 截图                                   |
-| -------- | -------------------------------------- |
-| 文件管理 | ![文件管理](./docs/images/files.png)   |
-| 定时任务 | ![定时任务](./docs/images/jobs.png)    |
-| 回收站   | ![回收站](./docs/images/recycle.png)   |
-| 代码生成 | ![代码生成](./docs/images/codegen.png) |
+| 模块     | 截图                                    |
+| -------- | --------------------------------------- |
+| 文件管理 | ![文件管理](./docs/images/files.png)    |
+| 定时任务 | ![定时任务](./docs/images/jobs.png)     |
+| 回收站   | ![回收站](./docs/images/recycle.png)    |
+| 代码生成 | ![代码生成](./docs/images/codegen.png)  |
 | 接口文档 | ![接口文档](./docs/images/api-docs.png) |
 
 ## 功能概览

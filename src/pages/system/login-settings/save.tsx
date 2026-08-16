@@ -1,5 +1,5 @@
 import XnModal from '@/components/XnModal'
-﻿import { forwardRef, useImperativeHandle, useState } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, Radio, Select, Switch, message } from 'antd'
 import { create, get, update } from '@/api/login-page'
 import type { LoginPageConfigForm } from '@/types'
@@ -142,4 +142,3 @@ const LoginPageSave = forwardRef<LoginPageSaveHandle, Props>(function LoginPageS
 })
 
 export default LoginPageSave
-

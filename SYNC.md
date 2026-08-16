@@ -54,16 +54,16 @@
 
 ## 有意栈差异
 
-| 项                        | 基准 Vue               | 本工程 React                                 |
-| ------------------------- | ---------------------- | -------------------------------------------- |
-| UI                        | Element Plus           | **Ant Design 原生视觉**（不仿 Element 壳层） |
-| 默认主色 / 侧栏           | `#409eff` + `#337ecc` 品牌侧栏 | `#1677ff` + Pro 深色侧栏 `#001529`；其余预设 id/色与 Vue 对齐 |
-| 菜单图标字段              | `icon`（Element）      | 优先 `iconAntd`，回退 `icon`                 |
-| 状态                      | Pinia                  | Zustand                                      |
-| 路由                      | vue-router `addRoute`  | 动态 `RouteObject` 挂载                      |
-| 视图目录                  | `src/views`            | `src/pages`                                  |
-| 权限                      | `v-permission`         | `<Auth>` / `usePermission`                   |
-| 后端 `ui.antd` / `ui.elementPlus` | 仅 EP                 | React 只读写 `ui.antd`；后端 PUT 深合并，互不覆盖 |
+| 项                                | 基准 Vue                       | 本工程 React                                                  |
+| --------------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| UI                                | Element Plus                   | **Ant Design 原生视觉**（不仿 Element 壳层）                  |
+| 默认主色 / 侧栏                   | `#409eff` + `#337ecc` 品牌侧栏 | `#1677ff` + Pro 深色侧栏 `#001529`；其余预设 id/色与 Vue 对齐 |
+| 菜单图标字段                      | `icon`（Element）              | 优先 `iconAntd`，回退 `icon`                                  |
+| 状态                              | Pinia                          | Zustand                                                       |
+| 路由                              | vue-router `addRoute`          | 动态 `RouteObject` 挂载                                       |
+| 视图目录                          | `src/views`                    | `src/pages`                                                   |
+| 权限                              | `v-permission`                 | `<Auth>` / `usePermission`                                    |
+| 后端 `ui.antd` / `ui.elementPlus` | 仅 EP                          | React 只读写 `ui.antd`；后端 PUT 深合并，互不覆盖             |
 
 ## 剩余缺口（建议人工对照）
 

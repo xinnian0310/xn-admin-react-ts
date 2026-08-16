@@ -21,7 +21,7 @@ React 端 `cachedViews` 已记录，但尚未挂到页面级 Keep-alive（见 `S
 ```tsx
 import XnTagsView from '@/components/XnTagsView'
 
-<XnTagsView />
+;<XnTagsView />
 ```
 
 ## 传参 / 回调

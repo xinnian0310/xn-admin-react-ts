@@ -6,7 +6,7 @@
 
 1. Fork 本仓库并创建功能分支
 2. 本地按下方命令完成检查
-3. 提交信息建议遵循 Conventional Commits
+3. 提交信息遵循 Conventional Commits
 4. 发起 Pull Request，说明动机与验证方式
 
 安全相关问题请优先阅读 [SECURITY.md](./SECURITY.md)。
@@ -17,13 +17,20 @@
 npm run typecheck
 npm run lint
 npm run format:check
-npm run build
+npm run ci
 ```
 
-- `typecheck`：TypeScript 类型检查
-- `lint`：oxlint
-- `format:check`：Prettier 仅检查
-- `build`：类型检查 + 生产构建
+- `typecheck` / `lint` / `format:check`：单项检查
+- `ci`：typecheck + lint + format:check + build
+
+## Git Hooks
+
+安装依赖后 Husky 会配置本地 hooks。
+
+| Hook         | 作用                                  |
+| ------------ | ------------------------------------- |
+| `pre-commit` | lint-staged（oxlint 修复 + Prettier） |
+| `commit-msg` | Conventional Commits                  |
 
 ## 提交信息
 

@@ -26,9 +26,9 @@ import XnAppBrandLogo from '@/components/XnAppBrandLogo'
 
 ## 传参
 
-| 名称        | 类型            | 默认值 | 说明                 |
-| ----------- | --------------- | ------ | -------------------- |
-| `showTitle` | `boolean`       | `true` | 是否显示应用名       |
+| 名称        | 类型            | 默认值 | 说明                      |
+| ----------- | --------------- | ------ | ------------------------- |
+| `showTitle` | `boolean`       | `true` | 是否显示应用名            |
 | `title`     | `string`        | —      | 覆盖 `appConfig.app.name` |
-| `className` | `string`        | —      | 容器类名             |
-| `style`     | `CSSProperties` | —      | 容器样式             |
+| `className` | `string`        | —      | 容器类名                  |
+| `style`     | `CSSProperties` | —      | 容器样式                  |

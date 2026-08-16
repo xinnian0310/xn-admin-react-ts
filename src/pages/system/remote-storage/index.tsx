@@ -350,18 +350,10 @@ export default function RemoteStoragePage() {
         onCancel={closeDialog}
       >
         <Form form={form} labelCol={{ span: 5 }} disabled={readonly} style={{ marginTop: 16 }}>
-          <Form.Item
-            name="name"
-            label="名字"
-            rules={[{ required: true, message: '请输入名字' }]}
-          >
+          <Form.Item name="name" label="名字" rules={[{ required: true, message: '请输入名字' }]}>
             <Input maxLength={64} placeholder="如 minio" />
           </Form.Item>
-          <Form.Item
-            name="path"
-            label="路径"
-            rules={[{ required: true, message: '请输入路径' }]}
-          >
+          <Form.Item name="path" label="路径" rules={[{ required: true, message: '请输入路径' }]}>
             <Input maxLength={1000} placeholder="如 http://127.0.0.1:9000/xn-admin/" />
           </Form.Item>
         </Form>

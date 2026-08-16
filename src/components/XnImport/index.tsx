@@ -270,4 +270,3 @@ const XnImport = forwardRef<XnImportHandle, XnImportProps>(function XnImport(
 })
 
 export default XnImport
-

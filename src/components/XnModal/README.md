@@ -4,10 +4,10 @@
 
 ## 文件
 
-| 文件            | 说明     |
-| --------------- | -------- |
-| `index.tsx`     | 弹窗封装 |
-| `xnModal.scss`  | 拖拽与限高样式 |
+| 文件           | 说明           |
+| -------------- | -------------- |
+| `index.tsx`    | 弹窗封装       |
+| `xnModal.scss` | 拖拽与限高样式 |
 
 ## 介绍
 
@@ -18,13 +18,7 @@
 ```tsx
 import XnModal from '@/components/XnModal'
 
-<XnModal
-  title="编辑用户"
-  open={open}
-  onOk={submit}
-  onCancel={() => setOpen(false)}
-  width={560}
->
+;<XnModal title="编辑用户" open={open} onOk={submit} onCancel={() => setOpen(false)} width={560}>
   <Form>...</Form>
 </XnModal>
 ```
@@ -48,12 +42,12 @@ XnModal.info({ title: '提示', content: '操作成功' })
 
 继承全部 `antd` `ModalProps`，并增加：
 
-| 名称        | 类型      | 默认值                                      | 说明                         |
-| ----------- | --------- | ------------------------------------------- | ---------------------------- |
-| `draggable` | `boolean` | `appConfig.ui.antd.modal.draggable`         | 是否允许拖标题栏             |
-| `centered`  | `boolean` | `appConfig.ui.antd.modal.centered`          | 是否垂直居中                 |
-| `open`      | `boolean` | —                                           | 显隐                         |
-| 其余        | —         | antd 默认                                   | 原样传给 `Modal`             |
+| 名称        | 类型      | 默认值                              | 说明             |
+| ----------- | --------- | ----------------------------------- | ---------------- |
+| `draggable` | `boolean` | `appConfig.ui.antd.modal.draggable` | 是否允许拖标题栏 |
+| `centered`  | `boolean` | `appConfig.ui.antd.modal.centered`  | 是否垂直居中     |
+| `open`      | `boolean` | —                                   | 显隐             |
+| 其余        | —         | antd 默认                           | 原样传给 `Modal` |
 
 限高来自 `appConfig.ui.dialog.maxHeight`（其次 `ui.antd.modal.maxHeight`，默认 `80vh`）。
 

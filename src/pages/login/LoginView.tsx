@@ -224,9 +224,7 @@ export default function LoginView() {
                 name="username"
                 rules={[
                   { required: true, message: '请输入用户名' },
-                  ...(isRegister
-                    ? [{ min: 2, max: 50, message: '用户名长度需在2-50之间' }]
-                    : []),
+                  ...(isRegister ? [{ min: 2, max: 50, message: '用户名长度需在2-50之间' }] : []),
                 ]}
               >
                 <Input prefix={<UserOutlined />} placeholder="请输入用户名" allowClear />
@@ -320,7 +318,11 @@ export default function LoginView() {
               {isRegister ? (
                 <>
                   已有账号？
-                  <button type="button" className="login-switch-link" onClick={() => switchMode('login')}>
+                  <button
+                    type="button"
+                    className="login-switch-link"
+                    onClick={() => switchMode('login')}
+                  >
                     去登录
                   </button>
                 </>

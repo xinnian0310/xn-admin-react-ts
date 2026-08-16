@@ -283,7 +283,10 @@ export const DEFAULT_THEME_ID = 'blue'
 
 export function findTheme(id: string): AppTheme {
   const resolved = THEME_ID_ALIASES[id] ?? id
-  return builtinThemes.find((t) => t.id === resolved) ?? builtinThemes.find((t) => t.id === DEFAULT_THEME_ID)!
+  return (
+    builtinThemes.find((t) => t.id === resolved) ??
+    builtinThemes.find((t) => t.id === DEFAULT_THEME_ID)!
+  )
 }
 
 export function findAppearanceTheme(mode: AppearanceMode): AppTheme {

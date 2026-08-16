@@ -44,9 +44,7 @@ export default function XnButton({ listItem = [], selected = [], onButtonClick }
     if (isDisabled(item)) {
       const action = resolveButtonAction(item)
       if (item.index != null) {
-        message.warning(
-          item.index === 0 ? '请选择一项操作' : `请选择 ${item.index + 1} 项操作`,
-        )
+        message.warning(item.index === 0 ? '请选择一项操作' : `请选择 ${item.index + 1} 项操作`)
       } else if (action === 'delete' || action === 'publish' || action === 'revoke') {
         message.warning('请至少选择一项')
       }

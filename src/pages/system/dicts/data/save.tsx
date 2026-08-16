@@ -1,5 +1,5 @@
 import XnModal from '@/components/XnModal'
-﻿import { forwardRef, useImperativeHandle, useState } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, InputNumber, Radio, Select, Switch, Tag, message } from 'antd'
 import { create, get, update } from '@/api/dict-data'
 import { DICT_LIST_CLASS_OPTIONS, type DictDataForm } from '@/types'
@@ -153,4 +153,3 @@ const DictDataSave = forwardRef<DictDataSaveHandle, Props>(function DictDataSave
 })
 
 export default DictDataSave
-

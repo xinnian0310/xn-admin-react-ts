@@ -219,8 +219,7 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
         viewPath,
         linkUrl,
         permissionControl: values.type === 'MENU' ? Boolean(values.permissionControl) : false,
-        affix:
-          values.type === 'MENU' || values.type === 'LINK' ? Boolean(values.affix) : undefined,
+        affix: values.type === 'MENU' || values.type === 'LINK' ? Boolean(values.affix) : undefined,
       }
 
       if (mode === 'edit' && editingId) {
@@ -316,11 +315,7 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
             </Form.Item>
           </>
         ) : null}
-        <Form.Item
-          name="iconAntd"
-          label="图标"
-          extra="可从 Ant / Iconify / SVG 中选择"
-        >
+        <Form.Item name="iconAntd" label="图标" extra="可从 Ant / Iconify / SVG 中选择">
           <XnIconPicker placeholder="选择 Ant / Iconify / SVG 图标" />
         </Form.Item>
         <Row gutter={16}>

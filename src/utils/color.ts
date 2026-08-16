@@ -88,7 +88,10 @@ function scaleFromPalette(palette: string[], fallback: string): PrimaryScale {
 }
 
 /** 由主色生成 Ant Design 10 阶色板（color-1 ~ color-10） */
-export function buildPrimaryScale(primary: string, appearance: 'light' | 'dark' = 'light'): PrimaryScale {
+export function buildPrimaryScale(
+  primary: string,
+  appearance: 'light' | 'dark' = 'light',
+): PrimaryScale {
   try {
     const palette = generate(primary, appearance === 'dark' ? { theme: 'dark' } : undefined)
     return scaleFromPalette(palette, primary)

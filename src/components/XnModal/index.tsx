@@ -29,6 +29,20 @@ type XnModalComponent = ((props: XnModalProps) => ReactElement) & {
   displayName?: string
 }
 
+type ModalStyles = Exclude<
+  ModalProps['styles'],
+  ((info: { props: ModalProps }) => unknown) | undefined
+>
+
+function resolveModalStyles(
+  styles: ModalProps['styles'],
+  info: { props: ModalProps },
+): ModalStyles {
+  if (!styles) return {}
+  if (typeof styles === 'function') return styles(info) ?? {}
+  return styles
+}
+
 function useAppConfigTick() {
   const [, setTick] = useState(0)
   useEffect(() => subscribeAppConfig(() => setTick((n) => n + 1)), [])
@@ -51,8 +65,7 @@ function XnModalInner({
   const draggable = draggableProp ?? appConfig.ui.antd.modal.draggable
   const resolvedCentered = centered ?? appConfig.ui.antd.modal.centered
   const resolvedDestroyOnHidden = destroyOnHidden ?? destroyOnClose
-  const maxHeight =
-    appConfig.ui.dialog.maxHeight || appConfig.ui.antd.modal.maxHeight || '80vh'
+  const maxHeight = appConfig.ui.dialog.maxHeight || appConfig.ui.antd.modal.maxHeight || '80vh'
 
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const offsetRef = useRef(offset)
@@ -122,25 +135,28 @@ function XnModalInner({
       className={['xn-modal', draggable ? 'xn-modal--draggable' : '', className]
         .filter(Boolean)
         .join(' ')}
-      styles={{
-        ...stylesProp,
-        wrapper: { overflow: 'hidden', ...stylesProp?.wrapper },
-        container: {
-          ...stylesProp?.container,
-          maxHeight,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-        },
-        header: { flexShrink: 0, ...stylesProp?.header },
-        body: {
-          ...stylesProp?.body,
-          flex: '1 1 auto',
-          minHeight: 0,
-          overflowX: 'hidden',
-          overflowY: 'auto',
-        },
-        footer: { flexShrink: 0, ...stylesProp?.footer },
+      styles={(info) => {
+        const resolved = resolveModalStyles(stylesProp, info)
+        return {
+          ...resolved,
+          wrapper: { overflow: 'hidden', ...resolved.wrapper },
+          container: {
+            ...resolved.container,
+            maxHeight,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          },
+          header: { flexShrink: 0, ...resolved.header },
+          body: {
+            ...resolved.body,
+            flex: '1 1 auto',
+            minHeight: 0,
+            overflowX: 'hidden',
+            overflowY: 'auto',
+          },
+          footer: { flexShrink: 0, ...resolved.footer },
+        }
       }}
       modalRender={renderModal}
       afterOpenChange={(v) => {

@@ -550,4 +550,3 @@ export default function SystemCodegenPage() {
     </>
   )
 }
-

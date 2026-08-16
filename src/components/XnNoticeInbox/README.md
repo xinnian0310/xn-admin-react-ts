@@ -18,7 +18,7 @@
 import XnNoticeInbox from '@/components/XnNoticeInbox'
 import { useNoticeStore } from '@/stores/notice'
 
-<XnNoticeInbox />
+;<XnNoticeInbox />
 
 useNoticeStore.getState().openDrawer()
 ```

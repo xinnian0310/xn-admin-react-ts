@@ -1,5 +1,5 @@
 import XnModal from '@/components/XnModal'
-﻿import { forwardRef, useImperativeHandle, useState } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, InputNumber, Radio, message } from 'antd'
 import { create, get, update } from '@/api/post'
 import type { PostForm } from '@/types/post'
@@ -107,4 +107,3 @@ const PostSave = forwardRef<PostSaveHandle, { onSuccess?: () => void }>(function
 })
 
 export default PostSave
-

@@ -20,7 +20,7 @@
 import XnThemePicker from '@/components/XnThemePicker'
 import { useThemeStore } from '@/stores/theme'
 
-<XnThemePicker />
+;<XnThemePicker />
 
 // 打开
 useThemeStore.getState().openDialog()

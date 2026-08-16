@@ -87,9 +87,7 @@ export default function LayoutHeaderTools() {
           <Avatar size={28} src={user?.avatar}>
             {avatarText}
           </Avatar>
-          <span className="layout-header-tools__username">
-            {user?.nickname || user?.username}
-          </span>
+          <span className="layout-header-tools__username">{user?.nickname || user?.username}</span>
         </span>
       </Dropdown>
     </div>

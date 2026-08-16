@@ -4,10 +4,10 @@
 
 ## 文件
 
-| 文件              | 说明         |
-| ----------------- | ------------ |
-| `index.tsx`       | 页面布局骨架 |
-| `xnPageLayout.scss` | 布局样式   |
+| 文件                | 说明         |
+| ------------------- | ------------ |
+| `index.tsx`         | 页面布局骨架 |
+| `xnPageLayout.scss` | 布局样式     |
 
 ## 介绍
 
@@ -18,7 +18,7 @@ React 用 **props 插槽**（`aside` / `search` / `toolbar` / `table`…）而�
 ```tsx
 import XnPageLayout from '@/components/XnPageLayout'
 
-<XnPageLayout
+;<XnPageLayout
   aside={<XnTreePanel title="单位" data={tree} onNodeClick={onNode} />}
   search={<XnSearch searchItem={searchItems} onQueryForm={onQuery} onReset={onReset} />}
   toolbar={<XnButton listItem={buttonItems} selected={selected} onButtonClick={onToolbar} />}
@@ -28,28 +28,32 @@ import XnPageLayout from '@/components/XnPageLayout'
   pageSize={pageSize}
   total={total}
   loading={loading}
-  onPageChange={(p, s) => { setPage(p); setPageSize(s); load() }}
+  onPageChange={(p, s) => {
+    setPage(p)
+    setPageSize(s)
+    load()
+  }}
 />
 ```
 
 ## 传参
 
-| 名称               | 类型                          | 默认值    | 说明                      |
-| ------------------ | ----------------------------- | --------- | ------------------------- |
-| `aside`            | `ReactNode`                   | —         | 左侧面板                  |
-| `search`           | `ReactNode`                   | —         | 搜索区                    |
-| `toolbar`          | `ReactNode`                   | —         | 工具栏左侧                |
-| `toolbarExtra`     | `ReactNode`                   | —         | 工具栏右侧（视图切换前）  |
-| `table`            | `ReactNode`                   | —         | 表格视图                  |
-| `card`             | `ReactNode`                   | —         | 卡片视图                  |
-| `pagination`       | `ReactNode`                   | —         | 自定义分页                |
-| `children`         | `ReactNode`                   | —         | 未提供 table/card 时的内容 |
-| `viewMode`         | `'table' \| 'card'`           | 内部状态  | 受控视图模式              |
-| `onViewModeChange` | `(mode) => void`              | —         | 视图切换                  |
-| `showViewSwitch`   | `boolean`                     | `true`    | 是否显示表格/卡片切换     |
-| `showPagination`   | `boolean`                     | `false`   | 是否显示分页              |
-| `page`             | `number`                      | `1`       | 当前页                    |
-| `pageSize`         | `number`                      | `10`      | 每页条数                  |
-| `total`            | `number`                      | `0`       | 总条数                    |
-| `loading`          | `boolean`                     | `false`   | 加载态（Spin 包裹）       |
-| `onPageChange`     | `(page, pageSize) => void`    | —         | 分页变化                  |
+| 名称               | 类型                       | 默认值   | 说明                       |
+| ------------------ | -------------------------- | -------- | -------------------------- |
+| `aside`            | `ReactNode`                | —        | 左侧面板                   |
+| `search`           | `ReactNode`                | —        | 搜索区                     |
+| `toolbar`          | `ReactNode`                | —        | 工具栏左侧                 |
+| `toolbarExtra`     | `ReactNode`                | —        | 工具栏右侧（视图切换前）   |
+| `table`            | `ReactNode`                | —        | 表格视图                   |
+| `card`             | `ReactNode`                | —        | 卡片视图                   |
+| `pagination`       | `ReactNode`                | —        | 自定义分页                 |
+| `children`         | `ReactNode`                | —        | 未提供 table/card 时的内容 |
+| `viewMode`         | `'table' \| 'card'`        | 内部状态 | 受控视图模式               |
+| `onViewModeChange` | `(mode) => void`           | —        | 视图切换                   |
+| `showViewSwitch`   | `boolean`                  | `true`   | 是否显示表格/卡片切换      |
+| `showPagination`   | `boolean`                  | `false`  | 是否显示分页               |
+| `page`             | `number`                   | `1`      | 当前页                     |
+| `pageSize`         | `number`                   | `10`     | 每页条数                   |
+| `total`            | `number`                   | `0`      | 总条数                     |
+| `loading`          | `boolean`                  | `false`  | 加载态（Spin 包裹）        |
+| `onPageChange`     | `(page, pageSize) => void` | —        | 分页变化                   |

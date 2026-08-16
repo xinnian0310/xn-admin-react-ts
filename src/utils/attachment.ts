@@ -67,7 +67,5 @@ export function insertAttachmentByOrder(
 ): AttachmentItem[] {
   if (list.some((current) => current.path === item.path)) return list
   pathOrder.set(item.path, order)
-  return [...list, item].sort(
-    (a, b) => (pathOrder.get(a.path) ?? 0) - (pathOrder.get(b.path) ?? 0),
-  )
+  return [...list, item].sort((a, b) => (pathOrder.get(a.path) ?? 0) - (pathOrder.get(b.path) ?? 0))
 }

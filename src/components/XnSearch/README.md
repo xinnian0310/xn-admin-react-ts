@@ -4,10 +4,10 @@
 
 ## 文件
 
-| 文件           | 说明     |
-| -------------- | -------- |
-| `index.tsx`    | 搜索表单 |
-| `xnSearch.scss` | 样式    |
+| 文件            | 说明     |
+| --------------- | -------- |
+| `index.tsx`     | 搜索表单 |
+| `xnSearch.scss` | 样式     |
 
 ## 介绍
 
@@ -20,22 +20,28 @@
 ```tsx
 import XnSearch from '@/components/XnSearch'
 
-<XnSearch
+;<XnSearch
   searchItem={searchItems}
   collapseCount={3}
-  onQueryForm={(form) => { setQuery(form); load() }}
-  onReset={() => { setQuery({}); load() }}
+  onQueryForm={(form) => {
+    setQuery(form)
+    load()
+  }}
+  onReset={() => {
+    setQuery({})
+    load()
+  }}
 />
 ```
 
 ## 传参
 
-| 名称            | 类型                       | 默认值 | 说明         |
-| --------------- | -------------------------- | ------ | ------------ |
-| `searchItem`    | `SearchItem[]`             | `[]`   | 搜索项配置   |
-| `collapseCount` | `number`                   | `3`    | 折叠时可见项数 |
-| `onQueryForm`   | `(form: SearchForm) => void` | —    | 查询（空值已剥离） |
-| `onReset`       | `(form: SearchForm) => void` | —    | 重置         |
+| 名称            | 类型                         | 默认值 | 说明               |
+| --------------- | ---------------------------- | ------ | ------------------ |
+| `searchItem`    | `SearchItem[]`               | `[]`   | 搜索项配置         |
+| `collapseCount` | `number`                     | `3`    | 折叠时可见项数     |
+| `onQueryForm`   | `(form: SearchForm) => void` | —      | 查询（空值已剥离） |
+| `onReset`       | `(form: SearchForm) => void` | —      | 重置               |
 
 ## 字段类型（`SearchItem.type`）
 

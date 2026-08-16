@@ -103,7 +103,9 @@ export default function ProfilePage() {
         })
         pwdForm.resetFields()
         await fetchProfile()
-        message.success(forcePwd ? '密码已修改' : canEditProfile ? '资料与密码已保存' : '密码已修改')
+        message.success(
+          forcePwd ? '密码已修改' : canEditProfile ? '资料与密码已保存' : '密码已修改',
+        )
         if (forcePwd) {
           setEditing(false)
           navigate('/dashboard', { replace: true })

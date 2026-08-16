@@ -19,7 +19,7 @@
 ```tsx
 import XnLongText from '@/components/XnLongText'
 
-<XnLongText text={row.userAgent} title="浏览器" maxLength={48} />
+;<XnLongText text={row.userAgent} title="浏览器" maxLength={48} />
 ```
 
 列配置：

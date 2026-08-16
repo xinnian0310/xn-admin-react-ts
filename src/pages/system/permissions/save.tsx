@@ -1,5 +1,5 @@
 import XnModal from '@/components/XnModal'
-﻿import { forwardRef, useImperativeHandle, useState } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, InputNumber, TreeSelect, message } from 'antd'
 import { create, list, update } from '@/api/permission'
 import type { Permission, PermissionForm } from '@/types'
@@ -146,4 +146,3 @@ const PermissionSave = forwardRef<PermissionSaveHandle, { onSuccess?: () => void
 )
 
 export default PermissionSave
-

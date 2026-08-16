@@ -4,10 +4,10 @@
 
 ## 文件
 
-| 文件        | 说明             |
-| ----------- | ---------------- |
-| `index.tsx` | `XnButton` + `XnTableActions` |
-| `xnButton.scss` | 主色 / 链接色 |
+| 文件            | 说明                          |
+| --------------- | ----------------------------- |
+| `index.tsx`     | `XnButton` + `XnTableActions` |
+| `xnButton.scss` | 主色 / 链接色                 |
 
 ## 介绍
 
@@ -38,20 +38,20 @@ import XnButton, { XnTableActions } from '@/components/XnButton'
 
 ## 传参（XnButton）
 
-| 名称            | 类型                                              | 默认值 | 说明           |
-| --------------- | ------------------------------------------------- | ------ | -------------- |
-| `listItem`      | `ButtonListItem[]`                                | `[]`   | 传 `[]` 则不渲染 |
-| `selected`      | `unknown[]`                                       | `[]`   | 当前表格选中行 |
-| `onButtonClick` | `(action: string, item: ButtonListItem) => void`  | —      | 点击回调       |
+| 名称            | 类型                                             | 默认值 | 说明             |
+| --------------- | ------------------------------------------------ | ------ | ---------------- |
+| `listItem`      | `ButtonListItem[]`                               | `[]`   | 传 `[]` 则不渲染 |
+| `selected`      | `unknown[]`                                      | `[]`   | 当前表格选中行   |
+| `onButtonClick` | `(action: string, item: ButtonListItem) => void` | —      | 点击回调         |
 
 ## 传参（XnTableActions）
 
-| 名称            | 类型                                                           | 默认值 | 说明                     |
-| --------------- | -------------------------------------------------------------- | ------ | ------------------------ |
-| `items`         | `ButtonListItem[]`                                             | `[]`   | 行操作配置               |
-| `row`           | `Record<string, unknown>`                                      | —      | 当前行                   |
-| `disabled`      | `(action, row) => boolean \| string`                           | —      | 返回 `true`/字符串则禁用 |
-| `onActionClick` | `(payload: { action: string; row: Record<string, unknown> })`  | —      | 行内点击                 |
+| 名称            | 类型                                                          | 默认值 | 说明                     |
+| --------------- | ------------------------------------------------------------- | ------ | ------------------------ |
+| `items`         | `ButtonListItem[]`                                            | `[]`   | 行操作配置               |
+| `row`           | `Record<string, unknown>`                                     | —      | 当前行                   |
+| `disabled`      | `(action, row) => boolean \| string`                          | —      | 返回 `true`/字符串则禁用 |
+| `onActionClick` | `(payload: { action: string; row: Record<string, unknown> })` | —      | 行内点击                 |
 
 ## 行为说明
 

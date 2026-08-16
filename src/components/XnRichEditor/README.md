@@ -21,7 +21,7 @@
 ```tsx
 import XnRichEditor from '@/components/XnRichEditor'
 
-<XnRichEditor
+;<XnRichEditor
   value={form.content}
   onChange={(html) => setForm({ ...form, content: html })}
   height="400px"
@@ -39,13 +39,13 @@ import XnRichEditor from '@/components/XnRichEditor'
 
 ## 传参
 
-| 名称          | 类型                 | 默认值             | 说明                    |
-| ------------- | -------------------- | ------------------ | ----------------------- |
-| `value`       | `string`             | `''`               | HTML 内容               |
-| `onChange`    | `(html: string) => void` | —              | 内容变化                |
-| `disabled`    | `boolean`            | `false`            | 只读/禁用（隐藏工具栏） |
-| `height`      | `string \| number`   | `'320px'`          | 编辑区高度              |
-| `placeholder` | `string`             | `'请输入公告内容'` | 占位文案                |
+| 名称          | 类型                     | 默认值             | 说明                    |
+| ------------- | ------------------------ | ------------------ | ----------------------- |
+| `value`       | `string`                 | `''`               | HTML 内容               |
+| `onChange`    | `(html: string) => void` | —                  | 内容变化                |
+| `disabled`    | `boolean`                | `false`            | 只读/禁用（隐藏工具栏） |
+| `height`      | `string \| number`       | `'320px'`          | 编辑区高度              |
+| `placeholder` | `string`                 | `'请输入公告内容'` | 占位文案                |
 
 ## 依赖
 

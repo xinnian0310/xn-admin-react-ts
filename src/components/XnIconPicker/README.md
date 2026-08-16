@@ -18,7 +18,7 @@
 ```tsx
 import XnIconPicker from '@/components/XnIconPicker'
 
-<XnIconPicker
+;<XnIconPicker
   value={form.iconAntd}
   onChange={(v) => setForm({ ...form, iconAntd: v })}
   placeholder="选择 Ant / Iconify / SVG 图标"
@@ -35,12 +35,12 @@ import XnIconPicker from '@/components/XnIconPicker'
 
 ## 传参
 
-| 名称          | 类型                     | 默认值                         | 说明     |
-| ------------- | ------------------------ | ------------------------------ | -------- |
-| `value`       | `string`                 | `''`                           | 当前图标值 |
-| `onChange`    | `(value: string) => void` | —                             | 选中变更 |
-| `placeholder` | `string`                 | `'选择 Ant / Iconify / SVG 图标'` | 占位   |
-| `disabled`    | `boolean`                | `false`                        | 禁用     |
+| 名称          | 类型                      | 默认值                            | 说明       |
+| ------------- | ------------------------- | --------------------------------- | ---------- |
+| `value`       | `string`                  | `''`                              | 当前图标值 |
+| `onChange`    | `(value: string) => void` | —                                 | 选中变更   |
+| `placeholder` | `string`                  | `'选择 Ant / Iconify / SVG 图标'` | 占位       |
+| `disabled`    | `boolean`                 | `false`                           | 禁用       |
 
 ## 依赖
 

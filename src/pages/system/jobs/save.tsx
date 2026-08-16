@@ -1,5 +1,5 @@
 import XnModal from '@/components/XnModal'
-﻿import { forwardRef, useImperativeHandle, useState } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, Radio, Select, Switch, message } from 'antd'
 import { createJob, getJob, updateJob } from '@/api/file-job'
 import type { JobForm } from '@/types'
@@ -147,4 +147,3 @@ const JobSave = forwardRef<JobSaveHandle, { onSuccess?: () => void }>(function J
 })
 
 export default JobSave
-
