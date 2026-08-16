@@ -7,6 +7,13 @@ import { APP_CLIENT_ID } from '@/config/client'
 /** 后端系统配置（不含 theme 色）；clients 仅管理端读写，不进本地 app 配置 */
 export type ClientAppProfile = { name?: string; intro?: string }
 
+export type SystemConfigSection =
+  'app' | 'session' | 'ui' | 'storage' | 'logRetention' | 'sensitiveData'
+
+export type StorageItem = { name: string; path: string }
+
+export type StorageSectionPayload = { items: StorageItem[] }
+
 export type SystemConfigPayload = {
   app: AppConfig['app'] & {
     clients?: Record<string, ClientAppProfile>
@@ -19,7 +26,7 @@ export type SystemConfigPayload = {
     tagsView: AppConfig['ui']['tagsView']
     antd: AppConfig['ui']['antd']
   }
-  storage: AppConfig['storage']
+  storage: Record<string, string>
   logRetention: AppConfig['logRetention']
   sensitiveData: AppConfig['sensitiveData']
 }
@@ -47,8 +54,22 @@ export function getSystemConfig() {
   return request.get<any, ApiResponse<SystemConfigPayload>>('/system-config')
 }
 
-export function updateSystemConfig(data: SystemConfigPayload) {
-  return request.put<any, ApiResponse<SystemConfigPayload>>('/system-config', data)
+/** 分区 → 独立接口路径，每个分区在后端各自一张表 */
+const SECTION_PATH: Record<SystemConfigSection, string> = {
+  app: '/system-config/app',
+  session: '/system-config/session',
+  ui: '/system-config/ui',
+  storage: '/system-config/storage',
+  logRetention: '/system-config/log-retention',
+  sensitiveData: '/system-config/sensitive-data',
+}
+
+export function getSystemConfigSection(section: SystemConfigSection) {
+  return request.get<any, ApiResponse<unknown>>(SECTION_PATH[section])
+}
+
+export function updateSystemConfigSection(section: SystemConfigSection, data: unknown) {
+  return request.put<any, ApiResponse<SystemConfigPayload>>(SECTION_PATH[section], data)
 }
 
 export function uploadBrandAsset(file: File) {

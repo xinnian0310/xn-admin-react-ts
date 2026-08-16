@@ -78,16 +78,23 @@ export const useUserStore = create<UserState>((set, get) => ({
       captchaId: captcha?.captchaId,
       captchaCode: captcha?.captchaCode,
     })
-    const { token, user } = res.data
-    // 先写 localStorage / 权限，完成 registry 与 UI 偏好后再发布 token。
-    // 否则 LoginGuard 会在 bootstrap 未完成时立刻 Navigate，触发 AuthGuard 竞态。
+    const token = res.data?.token
+    const user = res.data?.user
+    if (!token || !user) {
+      throw new Error('登录响应无效')
+    }
+    // 与 Vue 一致：接口成功后立刻发布登录态，避免 bootstrap 失败时卡在登录页
     localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(user))
     usePermissionStore.getState().setAuthData(user.roles || [], user.permissions || [])
-    await get().loadRegistry()
-    startSessionGuard()
-    await useUiPreferenceStore.getState().load()
     set({ token, user })
+    try {
+      await get().loadRegistry()
+      startSessionGuard()
+      await useUiPreferenceStore.getState().load()
+    } catch (error) {
+      console.warn('[auth] 登录后初始化失败，已保留登录态', error)
+    }
     return res.data
   },
 

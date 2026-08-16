@@ -41,7 +41,26 @@ function AntdThemeBridge({ children }: { children: ReactNode }) {
       componentSize={antd.componentSize}
       prefixCls={antd.prefixCls || 'ant'}
       button={{ autoInsertSpace: antd.button.autoInsertSpace }}
-      modal={{ centered: antd.modal.centered }}
+      modal={{
+        centered: antd.modal.centered,
+        styles: {
+          wrapper: { overflow: 'hidden' },
+          container: {
+            maxHeight: appConfig.ui.dialog.maxHeight || antd.modal.maxHeight || '80vh',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          },
+          header: { flexShrink: 0 },
+          body: {
+            flex: '1 1 auto',
+            minHeight: 0,
+            overflowX: 'hidden',
+            overflowY: 'auto',
+          },
+          footer: { flexShrink: 0 },
+        },
+      }}
       theme={{
         cssVar: {},
         algorithm:
@@ -120,7 +139,7 @@ export default function App() {
 
   if (booting) {
     return (
-      <div style={{ height: '100vh', display: 'grid', placeItems: 'center' }}>
+      <div className="xn-global-spin xn-global-spin--viewport">
         <Spin size="large" description="初始化配置..." />
       </div>
     )

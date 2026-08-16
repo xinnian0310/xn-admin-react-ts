@@ -1,5 +1,6 @@
 import request from '@/utils/request'
 import type { ApiResponse, SysRoute, SysRouteForm } from '@/types'
+import { APP_CLIENT_ID } from '@/config/client'
 
 export type RouteListParams = {
   page?: number
@@ -15,6 +16,7 @@ export type RouteListParams = {
 export type RouteCodegenRequest = {
   modulePrefix: string
   apiBasePath: string
+  clientId?: string
   persistPermissions?: boolean
   generatePageUi?: boolean
 }
@@ -69,7 +71,10 @@ export function batchRemove(ids: number[]) {
   return request.post<any, ApiResponse<{ count: number }>>('/routes/batch-delete', { ids })
 }
 
-/** 代码生成：权限落库 + 代码/SQL 预览包 */
+/** 代码生成：权限落库 + 代码/SQL 预览包（按本工程 clientId 生成本栈前端） */
 export function generate(id: number, data: RouteCodegenRequest) {
-  return request.post<any, ApiResponse<RouteCodegenResult>>(`/routes/${id}/generate`, data)
+  return request.post<any, ApiResponse<RouteCodegenResult>>(`/routes/${id}/generate`, {
+    ...data,
+    clientId: data.clientId || APP_CLIENT_ID,
+  })
 }

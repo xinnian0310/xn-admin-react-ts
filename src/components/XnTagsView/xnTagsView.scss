@@ -27,8 +27,8 @@
 }
 
 .xn-tags-view__arrow:hover:not(:disabled) {
-  color: var(--app-color-primary, #1677ff);
-  background: var(--app-tags-item-hover-bg, var(--app-color-primary-light-9, #e6f4ff));
+  color: var(--ant-color-primary, var(--app-color-primary, #1677ff));
+  background: var(--ant-color-primary-bg, var(--app-color-primary-light-9, #e6f4ff));
 }
 
 .xn-tags-view__arrow:disabled {
@@ -39,8 +39,11 @@
 .xn-tags-view__scroll {
   display: flex;
   flex: 1;
+  align-items: center;
+  gap: 8px;
   min-width: 0;
   height: 100%;
+  padding: 0 10px;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -53,54 +56,40 @@
 
 .xn-tags-view__scroll .ant-dropdown-trigger {
   display: inline-flex;
-  height: 100%;
   flex-shrink: 0;
 }
 
-.xn-tags-view__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 100%;
-  padding: 0 12px;
-  background: var(--app-tags-item-bg, #fafafa);
-  color: var(--app-tags-item-text, rgba(0, 0, 0, 0.65));
-  font-size: inherit;
+.xn-tags-view__item.ant-tag {
+  margin-inline-end: 0;
   cursor: pointer;
-  white-space: nowrap;
-  border: none;
-  border-right: 1px solid var(--app-tags-border, #f0f0f0);
-  transition:
-    background 0.2s,
-    color 0.2s;
-  outline: none;
   user-select: none;
+  font-size: inherit;
+  line-height: 22px;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
 }
 
-.xn-tags-view__item:hover {
-  background: var(--app-tags-item-hover-bg, var(--app-color-primary-light-9, #e6f4ff));
+.xn-tags-view__item.ant-tag:not(.is-active) {
+  color: var(--app-tags-item-text, rgba(0, 0, 0, 0.65));
+  background: var(--app-tags-item-bg, #fafafa);
+  border-color: var(--app-tags-border, #f0f0f0);
 }
 
-.xn-tags-view__item.is-active {
-  background: var(--app-tags-item-active-bg, var(--app-color-primary, #1677ff));
-  color: var(--app-tags-item-active-text, #fff);
+.xn-tags-view__item.ant-tag:not(.is-active):hover {
+  color: var(--ant-color-primary, var(--app-color-primary, #1677ff));
+  background: var(--ant-color-primary-bg, var(--app-color-primary-light-9, #e6f4ff));
+  border-color: var(--ant-color-primary-border, var(--app-color-primary-light-5, #91caff));
 }
 
-.xn-tags-view__title {
-  line-height: 1;
+/* 选中态：预设 / 个性化底色为实心主色（Tag color 内联写入）；
+   外观模式底色 / 文字由组件 style 内联写入，跟随侧栏强调色 */
+.xn-tags-view__item.ant-tag.is-active {
+  color: #ffffff;
+  border-color: transparent;
 }
 
-.xn-tags-view__close {
-  font-size: 10px;
-  border-radius: 50%;
-  padding: 2px;
-}
-
-.xn-tags-view__item:not(.is-active) .xn-tags-view__close:hover {
-  color: var(--app-color-primary, #1677ff);
-  background: var(--app-color-primary-light-9, #e6f4ff);
-}
-
-.xn-tags-view__item.is-active .xn-tags-view__close:hover {
-  background: rgba(255, 255, 255, 0.2);
+.xn-tags-view__item.ant-tag.is-active .ant-tag-close-icon {
+  color: inherit;
 }

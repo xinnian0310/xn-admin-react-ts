@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from 'react'
 import { Modal } from 'antd'
-import type { ModalProps } from 'antd'
+import type { ModalFuncProps, ModalProps } from 'antd'
 import { appConfig, subscribeAppConfig } from '@/config/app'
 import './xnModal.scss'
 
@@ -40,6 +40,7 @@ function XnModalInner({
   open,
   modalRender,
   className,
+  styles: stylesProp,
   afterOpenChange,
   destroyOnClose,
   destroyOnHidden,
@@ -50,6 +51,8 @@ function XnModalInner({
   const draggable = draggableProp ?? appConfig.ui.antd.modal.draggable
   const resolvedCentered = centered ?? appConfig.ui.antd.modal.centered
   const resolvedDestroyOnHidden = destroyOnHidden ?? destroyOnClose
+  const maxHeight =
+    appConfig.ui.dialog.maxHeight || appConfig.ui.antd.modal.maxHeight || '80vh'
 
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const offsetRef = useRef(offset)
@@ -119,6 +122,26 @@ function XnModalInner({
       className={['xn-modal', draggable ? 'xn-modal--draggable' : '', className]
         .filter(Boolean)
         .join(' ')}
+      styles={{
+        ...stylesProp,
+        wrapper: { overflow: 'hidden', ...stylesProp?.wrapper },
+        container: {
+          ...stylesProp?.container,
+          maxHeight,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        },
+        header: { flexShrink: 0, ...stylesProp?.header },
+        body: {
+          ...stylesProp?.body,
+          flex: '1 1 auto',
+          minHeight: 0,
+          overflowX: 'hidden',
+          overflowY: 'auto',
+        },
+        footer: { flexShrink: 0, ...stylesProp?.footer },
+      }}
       modalRender={renderModal}
       afterOpenChange={(v) => {
         if (!v) {
@@ -131,13 +154,21 @@ function XnModalInner({
   )
 }
 
+function withModalDefaults(fn: (props: ModalFuncProps) => ReturnType<typeof Modal.info>) {
+  return (props: ModalFuncProps) =>
+    fn({
+      centered: appConfig.ui.antd.modal.centered,
+      ...props,
+    })
+}
+
 const XnModal = XnModalInner as XnModalComponent
 XnModal.displayName = 'XnModal'
-XnModal.info = Modal.info
-XnModal.success = Modal.success
-XnModal.error = Modal.error
-XnModal.warning = Modal.warning
-XnModal.confirm = Modal.confirm
+XnModal.info = withModalDefaults(Modal.info)
+XnModal.success = withModalDefaults(Modal.success)
+XnModal.error = withModalDefaults(Modal.error)
+XnModal.warning = withModalDefaults(Modal.warning)
+XnModal.confirm = withModalDefaults(Modal.confirm)
 XnModal.destroyAll = Modal.destroyAll
 XnModal.config = Modal.config
 XnModal.useModal = Modal.useModal

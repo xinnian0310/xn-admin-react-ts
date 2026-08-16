@@ -164,7 +164,7 @@ export default function XnUiPreferenceFab() {
     try {
       await save({
         layout: { mode: values.layoutMode },
-        dialog: { maxHeight: (values.dialogMaxHeight || '').trim() || '95vh' },
+        dialog: { maxHeight: (values.dialogMaxHeight || '').trim() || '80vh' },
         tagsView: { height: toPx(values.tagsViewHeight, 40) },
         fontSize: {
           sidebar: toPx(values.sidebar, 14),

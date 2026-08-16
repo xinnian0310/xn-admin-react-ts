@@ -261,9 +261,9 @@ XnPageLayout
 
 如果这个项目对你有帮助，欢迎请作者喝杯咖啡 ☕
 
-| 微信支付 | 支付宝 |
-| -------- | ------ |
-| ![微信支付](./docs/donation/wechat.jpg) | ![支付宝](./docs/donation/alipay.jpg) |
+<p align="center">
+  <img src="./docs/donation/donate.png" alt="支持捐赠（微信支付 / 支付宝）" width="480" />
+</p>
 
 ## 许可证
 

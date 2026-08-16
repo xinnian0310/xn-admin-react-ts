@@ -2,13 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
+import { gitChangelogPlugin } from './plugins/vite-plugin-git-changelog.js'
 
 const pkg = JSON.parse(
   readFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), 'utf-8'),
 )
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), gitChangelogPlugin(20)],
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
   },

@@ -74,3 +74,19 @@
 .system-config-page__tabs .ant-tabs-tabpane {
   outline: none;
 }
+
+.system-config-page__section-actions-wrap {
+  width: 100%;
+}
+
+.system-config-page__section-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  flex-shrink: 0;
+}
+
+.system-config-page__hint-inline {
+  color: #94a3b8;
+  font-size: 12px;
+}

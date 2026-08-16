@@ -1,5 +1,6 @@
 import request from '@/utils/request'
 import type { ApiResponse } from '@/types'
+import { APP_CLIENT_ID } from '@/config/client'
 
 export type TableInfo = {
   tableName: string
@@ -46,6 +47,7 @@ export type TableCodegenRequest = {
   menuTitle: string
   menuPath: string
   viewPath: string
+  clientId?: string
   persistPermissions?: boolean
   generatePageUi?: boolean
   createMenu?: boolean
@@ -86,5 +88,8 @@ export function listColumns(tableName: string) {
 }
 
 export function generate(data: TableCodegenRequest) {
-  return request.post<any, ApiResponse<TableCodegenResult>>('/codegen/generate', data)
+  return request.post<any, ApiResponse<TableCodegenResult>>('/codegen/generate', {
+    ...data,
+    clientId: data.clientId || APP_CLIENT_ID,
+  })
 }

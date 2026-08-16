@@ -37,7 +37,7 @@ function loadThemeId(): string {
   try {
     const id = localStorage.getItem(STORAGE_THEME_ID) || DEFAULT_THEME_ID
     if (id === 'custom') return DEFAULT_THEME_ID
-    // 归一旧 id（如 cyan → teal），保证选中态与预设列表一致
+    // 归一旧 id（如 indigo → geekblue），保证选中态与内置列表一致
     return findTheme(id).id
   } catch {
     return DEFAULT_THEME_ID
@@ -140,6 +140,7 @@ export const useThemeStore = create<ThemeState>((set, get) => {
       applyLayoutTheme(state.currentTheme.colors, {
         appearance: state.effectiveAppearance,
         mainBgImage: state.source === 'custom' ? state.mainBgImage : null,
+        source: state.source,
       })
     },
 

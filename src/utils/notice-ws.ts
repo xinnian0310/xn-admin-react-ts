@@ -1,4 +1,9 @@
 import { useUserStore } from '@/stores/user'
+import {
+  FORCE_LOGOUT_CLOSE_CODE,
+  FORCE_LOGOUT_MESSAGE_TYPE,
+  handleForceLogout,
+} from '@/utils/force-logout'
 
 type NoticeWsHandler = (data: Record<string, unknown>) => void
 
@@ -92,18 +97,30 @@ export function connectNoticeWs() {
 
   next.onmessage = (event) => {
     if (socket !== next) return
+    let data: Record<string, unknown>
     try {
-      const data = JSON.parse(String(event.data)) as Record<string, unknown>
-      handlers.forEach((handler) => handler(data))
+      data = JSON.parse(String(event.data)) as Record<string, unknown>
     } catch {
-      /* ignore */
+      return
     }
+    if (data.type === FORCE_LOGOUT_MESSAGE_TYPE) {
+      // 必须同步置位，否则紧随其后的 onclose 会把连接重连回来
+      manualClose = true
+      handleForceLogout(typeof data.message === 'string' ? data.message : undefined)
+      return
+    }
+    handlers.forEach((handler) => handler(data))
   }
 
-  next.onclose = () => {
+  next.onclose = (event) => {
     if (socket === next) {
       socket = null
       clearTimers()
+      if (event.code === FORCE_LOGOUT_CLOSE_CODE) {
+        manualClose = true
+        handleForceLogout()
+        return
+      }
       scheduleReconnect()
     }
   }

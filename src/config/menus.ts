@@ -189,6 +189,12 @@ export const menus: MenuItem[] = [
             permission: 'menu:system:config',
           },
           {
+            id: 'remote-storage',
+            title: '远程连接配置',
+            path: '/system/remote-storage',
+            permission: 'menu:system:remote-storage',
+          },
+          {
             id: 'site-contact',
             title: '联系与捐赠',
             path: '/system/site-contact',

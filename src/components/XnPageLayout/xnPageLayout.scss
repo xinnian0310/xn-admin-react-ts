@@ -23,8 +23,8 @@
   max-width: 42%;
   background: var(--app-card-bg, #fff);
   border-right: 1px solid var(--app-border-color, #f0f0f0);
-  overflow-x: hidden;
-  overflow-y: auto;
+  /* 外层不滚：标题/底栏固定，滚动交给 aside 内部（XnTreePanel 中间区） */
+  overflow: hidden;
 }
 
 .xn-page-layout__main {

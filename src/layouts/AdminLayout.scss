@@ -82,10 +82,16 @@
   overflow: hidden;
 }
 
+.admin-layout__page > .xn-global-spin {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
 .admin-layout__page
   > *:not(.xn-page-layout):not(.profile-page):not(.system-config-page):not(.site-contact-page):not(
     .iframe-page
-  ):not(.demo-page) {
+  ):not(.demo-page):not(.xn-global-spin) {
   flex: 0 0 auto;
   min-height: 100%;
   box-sizing: border-box;

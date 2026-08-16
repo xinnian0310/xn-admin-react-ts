@@ -168,28 +168,88 @@ a {
   padding-top: 0;
 }
 
-/* 全局弹窗限高（与 Vue .el-dialog 对齐；由 appConfig.ui.dialog.maxHeight 写入变量） */
+/* 全局弹窗：默认上下居中（对齐 Vue .el-overlay-dialog），外壳不滚动 */
+.ant-modal-wrap {
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 改用 flex 居中后，关掉 antd centered 的 ::before 占位，避免把弹窗顶偏 */
+.ant-modal-wrap::before {
+  display: none !important;
+  content: none !important;
+}
+
 .ant-modal {
-  max-height: var(--app-dialog-max-height);
+  top: 0 !important;
   padding-bottom: 0;
 }
 
-.ant-modal .ant-modal-content {
+.ant-modal.xn-modal,
+.ant-modal-render,
+.xn-modal-drag-root {
+  max-height: var(--app-dialog-max-height, 80vh);
+}
+
+.ant-modal-render,
+.xn-modal-drag-root {
   display: flex;
   flex-direction: column;
-  max-height: var(--app-dialog-max-height);
   overflow: hidden;
 }
 
-.ant-modal .ant-modal-header,
-.ant-modal .ant-modal-footer {
+.ant-modal-container {
+  display: flex;
+  flex-direction: column;
+  max-height: var(--app-dialog-max-height, 80vh);
+  overflow: hidden;
+}
+
+.ant-modal-header,
+.ant-modal-footer {
   flex-shrink: 0;
 }
 
-.ant-modal .ant-modal-body {
+.ant-modal-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-gutter: stable;
+}
+
+/* 全局加载：嵌套 Spin 指示器始终在容器正中，不被 flex 列布局顶到上方 */
+.ant-spin.ant-spin-spinning {
+  position: relative;
+}
+
+.ant-spin.ant-spin-spinning > .ant-spin-section {
+  position: absolute !important;
+  inset: 0 !important;
+  transform: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  height: auto !important;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* 路由 / 守卫 / 启动时的整页加载 */
+.xn-global-spin {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 100%;
+  height: 100%;
+}
+
+.xn-global-spin--viewport {
+  min-height: 100vh;
+  height: 100vh;
 }

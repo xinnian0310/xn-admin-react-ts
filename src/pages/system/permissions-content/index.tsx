@@ -1,29 +1,57 @@
-﻿import { useEffect, useMemo, useState, type Key } from 'react'
-import {
-  Alert,
-  Form,
-  Input,
-  InputNumber,
-  Radio,
-  Select,
-  Table,
-  Tag,
-  Tree,
-  message,
-} from 'antd'
-import type { DataNode } from 'antd/es/tree'
+﻿import { useEffect, useMemo, useState } from 'react'
+import { Alert, Button, Empty, Form, Input, InputNumber, Radio, Select, Tag, message } from 'antd'
+import XnAppIcon from '@/components/XnAppIcon'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnIconPicker from '@/components/XnIconPicker'
 import XnModal from '@/components/XnModal'
+import XnPageLayout from '@/components/XnPageLayout'
+import XnTable from '@/components/XnTable'
+import XnTreePanel from '@/components/XnTreePanel'
 import { usePageUi } from '@/hooks/usePageUi'
 import { create, list as listPermissions, remove, update } from '@/api/permission'
 import { list as listRoutes } from '@/api/route'
 import type { Permission, PermissionForm, SysRoute } from '@/types'
 import type { SearchForm } from '@/types/search'
 import type { SaveMode } from '@/types/save'
+import type { TableColumnItem } from '@/types/table'
 
 type ContentType = 'BUTTON' | 'TABLE_BUTTON' | 'API'
+
+const typeOptions: { label: string; value: ContentType }[] = [
+  { label: '按钮权限', value: 'BUTTON' },
+  { label: '表格按钮', value: 'TABLE_BUTTON' },
+  { label: '接口权限', value: 'API' },
+]
+
+function typeLabel(type: string) {
+  return typeOptions.find((t) => t.value === type)?.label ?? type
+}
+
+/** 与 XnButton 保持一致的按钮配色映射，用于表格内的按钮预览 */
+const BUTTON_COLOR_MAP: Record<string, 'primary' | 'default'> = {
+  primary: 'primary',
+  success: 'primary',
+  danger: 'primary',
+  warning: 'default',
+  info: 'default',
+  default: 'default',
+}
+
+function methodTagColor(method: string) {
+  switch (method) {
+    case 'GET':
+      return 'success'
+    case 'POST':
+      return 'processing'
+    case 'PUT':
+      return 'warning'
+    case 'DELETE':
+      return 'error'
+    default:
+      return 'default'
+  }
+}
 
 function sortBySort<T extends { sort?: number }>(list: T[]) {
   return [...list].sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
@@ -61,16 +89,12 @@ function remapTableAction(action: string) {
   return action
 }
 
-function collectTreeKeys(nodes: DataNode[]): Key[] {
-  const keys: Key[] = []
-  const walk = (list: DataNode[]) => {
-    for (const n of list) {
-      keys.push(n.key)
-      if (n.children?.length) walk(n.children)
-    }
-  }
-  walk(nodes)
-  return keys
+interface MenuNode extends Record<string, unknown> {
+  id: number
+  name: string
+  disabled: boolean
+  children: MenuNode[]
+  raw: SysRoute
 }
 
 export default function PermissionsContentPage() {
@@ -78,6 +102,7 @@ export default function PermissionsContentPage() {
   const [routes, setRoutes] = useState<SysRoute[]>([])
   const [permByCode, setPermByCode] = useState<Map<string, Permission>>(new Map())
   const [selectedRoute, setSelectedRoute] = useState<SysRoute | null>(null)
+  const [menuKeyword, setMenuKeyword] = useState('')
   const [selectedMenuPerm, setSelectedMenuPerm] = useState<Permission | null>(null)
   const [contentType, setContentType] = useState<ContentType>('BUTTON')
   const [queryForm, setQueryForm] = useState<SearchForm>({})
@@ -88,6 +113,8 @@ export default function PermissionsContentPage() {
   const [mode, setMode] = useState<SaveMode>('add')
   const [editing, setEditing] = useState<Permission | null>(null)
   const [form] = Form.useForm<PermissionForm>()
+  /** 新增时类型可在弹框内切换，决定展示动作字段还是接口字段 */
+  const formType = (Form.useWatch('type', form) || contentType) as ContentType
 
   async function loadAll() {
     setLoading(true)
@@ -109,24 +136,18 @@ export default function PermissionsContentPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const treeData: DataNode[] = useMemo(() => {
-    const map = (list: SysRoute[]): DataNode[] =>
+  /** 仅已开启权限控制的菜单可选，其余置灰 */
+  const menuNodes = useMemo(() => {
+    const map = (list: SysRoute[]): MenuNode[] =>
       sortBySort(list).map((r) => ({
-        key: String(r.id),
-        title: r.title,
+        id: r.id,
+        name: r.title,
         disabled: !(r.type === 'MENU' && r.permissionControl),
-        children: r.children?.length ? map(r.children) : undefined,
+        children: r.children?.length ? map(r.children) : [],
         raw: r,
       }))
     return map(routes)
   }, [routes])
-
-  const treeKeys = useMemo(() => collectTreeKeys(treeData), [treeData])
-  const treeKeysSig = treeKeys.join('|')
-  const [expandedKeys, setExpandedKeys] = useState<Key[]>([])
-  useEffect(() => {
-    setExpandedKeys(treeKeysSig ? treeKeysSig.split('|') : [])
-  }, [treeKeysSig])
 
   const children = useMemo(() => {
     const list = (selectedMenuPerm?.children || []).filter((c) => c.type === contentType)
@@ -168,6 +189,20 @@ export default function PermissionsContentPage() {
     [buttonItems],
   )
 
+  /** 当前菜单下指定类型的下一个排序（max + 1，至少为 1） */
+  function nextSort(type: ContentType) {
+    const list = (selectedMenuPerm?.children || []).filter((c) => c.type === type)
+    if (!list.length) return 1
+    return Math.max(...list.map((item) => item.sort ?? 0)) + 1
+  }
+
+  // 新增弹框内切换类型时，同步排序为该类型的下一个值
+  useEffect(() => {
+    if (!editOpen || mode !== 'add') return
+    form.setFieldValue('sort', nextSort(formType))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formType, editOpen, mode])
+
   function selectRoute(route: SysRoute) {
     setSelectedRoute(route)
     setSelectedMenuPerm(route.permission ? permByCode.get(route.permission) || null : null)
@@ -185,12 +220,11 @@ export default function PermissionsContentPage() {
     form.setFieldsValue({
       type: contentType,
       parentId: selectedMenuPerm.id,
-      sort: 0,
+      sort: nextSort(contentType),
       method: 'GET',
       path: '',
       name: '',
       action: '',
-      icon: '',
       iconAntd: '',
       buttonColor: 'primary',
     })
@@ -207,7 +241,7 @@ export default function PermissionsContentPage() {
   async function handleSubmit() {
     if (!selectedMenuPerm) return
     const values = await form.validateFields()
-    const type = (editing?.type || contentType) as ContentType
+    const type = (editing?.type || values.type || contentType) as ContentType
     const menuPrefix = selectedMenuPerm.code.split(':').pop() || selectedMenuPerm.code
     let payload: PermissionForm = {
       name: values.name,
@@ -238,7 +272,8 @@ export default function PermissionsContentPage() {
       payload = {
         ...payload,
         action,
-        icon: values.icon,
+        // 表单不再维护 Element 图标，编辑时保留原值避免清空 Vue 端
+        icon: editing?.icon,
         iconAntd: values.iconAntd,
         buttonColor: values.buttonColor || payload.buttonColor,
         code: mode === 'add' ? `${menuPrefix}:${action}` : editing!.code,
@@ -251,115 +286,134 @@ export default function PermissionsContentPage() {
     } else {
       await create(payload)
       message.success('创建成功')
+      setContentType(type)
+      setPage(1)
     }
     setEditOpen(false)
     await loadAll()
   }
 
-  const columns = [
-    { title: '名称', dataIndex: 'name', key: 'name' },
-    {
-      title: '编码',
-      dataIndex: 'code',
-      key: 'code',
-      render: (v: string) => <code>{v}</code>,
-    },
+  const columns: TableColumnItem[] = [
+    { prop: 'name', label: '名称', minWidth: 150 },
     ...(contentType !== 'API'
-      ? [
+      ? ([
+          { type: 'slot', slot: 'icon', prop: 'icon', label: '图标', width: 70 },
+          { type: 'slot', slot: 'action', prop: 'action', label: '动作', minWidth: 110 },
           {
-            title: '图标',
-            dataIndex: 'icon',
-            width: 70,
-            render: (v: string) => (v ? <span>{v}</span> : '—'),
+            type: 'slot',
+            slot: 'buttonColor',
+            prop: 'buttonColor',
+            label: '按钮颜色',
+            minWidth: 100,
           },
-          { title: '动作', dataIndex: 'action', width: 120 },
-          {
-            title: '颜色',
-            dataIndex: 'buttonColor',
-            width: 100,
-            render: (v: string) => (v ? <Tag>{v}</Tag> : '—'),
-          },
-        ]
-      : [
-          {
-            title: '方法',
-            dataIndex: 'method',
-            width: 90,
-            render: (v: string) => <Tag>{v}</Tag>,
-          },
-          {
-            title: '路径',
-            dataIndex: 'path',
-            render: (v: string) => <code>{v}</code>,
-          },
-        ]),
-    { title: '排序', dataIndex: 'sort', width: 70 },
-    {
-      title: '内置',
-      dataIndex: 'builtIn',
-      width: 70,
-      render: (v: boolean) => (v ? '是' : '否'),
-    },
-    {
-      title: '操作',
-      key: 'actions',
-      align: 'center' as const,
-      width: 160,
-      render: (_: unknown, row: Permission) => (
-        <XnTableActions
-          items={tableButtonItems}
-          row={row as unknown as Record<string, unknown>}
-          disabled={(action, r) => (action === 'delete' && r.builtIn ? '内置权限不可删除' : false)}
-          onActionClick={({ action, row: r }) => {
-            const p = r as unknown as Permission
-            if (action === 'delete') {
-              XnModal.confirm({
-                title: '确认删除',
-                content: `确定删除「${p.name}」吗？`,
-                okType: 'danger',
-                onOk: async () => {
-                  await remove(p.id)
-                  message.success('删除成功')
-                  await loadAll()
-                },
-              })
-            } else if (action === 'edit' || action === 'view') {
-              openEdit(p, action === 'view')
-            }
-          }}
-        />
-      ),
-    },
+        ] as TableColumnItem[])
+      : []),
+    { type: 'slot', slot: 'code', prop: 'code', label: '权限编码', minWidth: 240 },
+    ...(contentType === 'API'
+      ? ([
+          { type: 'slot', slot: 'method', prop: 'method', label: '方法', width: 90 },
+          { type: 'slot', slot: 'path', prop: 'path', label: '接口路径', minWidth: 220 },
+        ] as TableColumnItem[])
+      : []),
+    { prop: 'sort', label: '排序', width: 80 },
+    { type: 'slot', slot: 'builtIn', prop: 'builtIn', label: '内置', width: 80 },
+    { type: 'slot', slot: 'actions', label: '操作', width: 140, fixed: 'right' },
   ]
 
+  const tableSlots = {
+    icon: ({ row }: { row: Record<string, unknown> }) =>
+      row.iconAntd || row.icon ? (
+        <XnAppIcon name={String(row.iconAntd || row.icon)} />
+      ) : (
+        <span>-</span>
+      ),
+    action: ({ row }: { row: Record<string, unknown> }) =>
+      row.action ? <code>{String(row.action)}</code> : <span>-</span>,
+    code: ({ row }: { row: Record<string, unknown> }) => <code>{String(row.code ?? '')}</code>,
+    path: ({ row }: { row: Record<string, unknown> }) =>
+      row.path ? <code>{String(row.path)}</code> : <span>-</span>,
+    method: ({ row }: { row: Record<string, unknown> }) => (
+      <Tag color={methodTagColor(String(row.method ?? ''))}>{String(row.method || '-')}</Tag>
+    ),
+    buttonColor: ({ row }: { row: Record<string, unknown> }) =>
+      row.buttonColor ? (
+        <Button
+          size="small"
+          type={BUTTON_COLOR_MAP[String(row.buttonColor)] || 'default'}
+          danger={row.buttonColor === 'danger'}
+        >
+          {String(row.name || '示例')}
+        </Button>
+      ) : (
+        <span>-</span>
+      ),
+    builtIn: ({ row }: { row: Record<string, unknown> }) =>
+      row.builtIn ? <Tag color="warning">内置</Tag> : <span>-</span>,
+    actions: ({ row }: { row: Record<string, unknown> }) => (
+      <XnTableActions
+        items={tableButtonItems}
+        row={row}
+        disabled={(action, r) => (action === 'delete' && r.builtIn ? '内置权限不可删除' : false)}
+        onActionClick={({ action, row: r }) => {
+          const p = r as unknown as Permission
+          if (action === 'delete') {
+            XnModal.confirm({
+              title: '确认删除',
+              content: `确定删除「${p.name}」吗？`,
+              okType: 'danger',
+              onOk: async () => {
+                await remove(p.id)
+                message.success('删除成功')
+                await loadAll()
+              },
+            })
+          } else if (action === 'edit' || action === 'view') {
+            openEdit(p, action === 'view')
+          }
+        }}
+      />
+    ),
+  }
+
   return (
-    <div className="page-card" style={{ display: 'flex', gap: 12, minHeight: 560 }}>
-      <div style={{ width: 260, flexShrink: 0 }}>
-        <div style={{ fontWeight: 600, marginBottom: 8 }}>菜单</div>
-        <Tree
-          treeData={treeData}
-          expandedKeys={expandedKeys}
-          onExpand={(keys) => setExpandedKeys(keys)}
-          onSelect={(_keys, info) => {
-            const raw = (info.node as DataNode & { raw?: SysRoute; disabled?: boolean }).raw
-            if (!raw || info.node.disabled) return
-            selectRoute(raw)
-          }}
-        />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <XnSearch
-          searchItem={searchItems}
-          onQueryForm={(form) => {
-            setQueryForm(form)
-            setPage(1)
-          }}
-          onReset={(form) => {
-            setQueryForm(form)
-            setPage(1)
-          }}
-        />
-        <div style={{ margin: '12px 0', display: 'flex', justifyContent: 'space-between' }}>
+    <>
+      <XnPageLayout
+        showViewSwitch={false}
+        aside={
+          <XnTreePanel
+            title="菜单"
+            width={240}
+            filter={menuKeyword}
+            onFilterChange={setMenuKeyword}
+            filterPlaceholder="搜索菜单名称"
+            data={menuNodes}
+            treeProps={{ label: 'name', children: 'children', disabled: 'disabled' }}
+            currentKey={selectedRoute?.id}
+            onNodeClick={(node) => selectRoute(node.raw)}
+          />
+        }
+        search={
+          <XnSearch
+            searchItem={searchItems}
+            onQueryForm={(form) => {
+              setQueryForm(form)
+              setPage(1)
+            }}
+            onReset={(form) => {
+              setQueryForm(form)
+              setPage(1)
+            }}
+          />
+        }
+        toolbar={
+          <XnButton
+            listItem={toolbarButtons}
+            onButtonClick={(action) => {
+              if (action === 'add' || action === 'create') openCreate()
+            }}
+          />
+        }
+        toolbarExtra={
           <Radio.Group
             optionType="button"
             value={contentType}
@@ -373,38 +427,48 @@ export default function PermissionsContentPage() {
               { label: `接口权限 (${counts.API})`, value: 'API' },
             ]}
           />
-          <XnButton
-            listItem={toolbarButtons}
-            onButtonClick={(action) => {
-              if (action === 'add' || action === 'create') openCreate()
-            }}
-          />
-        </div>
-        {selectedRoute && !selectedMenuPerm ? (
-          <Alert
-            type="warning"
-            showIcon
-            style={{ marginBottom: 12 }}
-            message="该菜单路由未关联权限节点，请先在路由管理中开启权限控制并生成权限。"
-          />
-        ) : null}
-        <Table
-          rowKey="id"
-          loading={loading}
-          dataSource={pageData}
-          columns={columns}
-          pagination={{
-            current: page,
-            pageSize: size,
-            total: children.length,
-            showSizeChanger: true,
-            onChange: (p, s) => {
-              setPage(p)
-              setSize(s)
-            },
-          }}
-        />
-      </div>
+        }
+        table={
+          selectedRoute && !selectedMenuPerm ? (
+            <div style={{ padding: 16 }}>
+              <Alert
+                type="warning"
+                showIcon
+                message="该菜单路由未关联权限节点，请先在路由管理中开启权限控制并生成权限。"
+              />
+            </div>
+          ) : !selectedRoute ? (
+            <div
+              style={{
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Empty description="请从左侧选择一个菜单，管理其接口 / 按钮权限" />
+            </div>
+          ) : (
+            <XnTable
+              data={pageData as unknown as Record<string, unknown>[]}
+              total={children.length}
+              loading={loading}
+              page={page}
+              pageSize={size}
+              tableKey="system:permissions-content"
+              entityName="权限"
+              nameField="name"
+              columns={columns}
+              actionItems={tableButtonItems}
+              slots={tableSlots}
+              onPageChange={(p, s) => {
+                setPage(p)
+                setSize(s)
+              }}
+            />
+          )
+        }
+      />
 
       <XnModal
         title={mode === 'add' ? '新增权限' : mode === 'view' ? '查看权限' : '编辑权限'}
@@ -419,13 +483,19 @@ export default function PermissionsContentPage() {
           <Form.Item label="归属菜单">
             <span>{selectedRoute?.title}</span>
           </Form.Item>
-          <Form.Item label="权限类型">
-            <Tag>{editing?.type || contentType}</Tag>
-          </Form.Item>
+          {mode === 'add' ? (
+            <Form.Item name="type" label="权限类型">
+              <Radio.Group optionType="button" options={typeOptions} />
+            </Form.Item>
+          ) : (
+            <Form.Item label="权限类型">
+              <Tag>{typeLabel(editing?.type || contentType)}</Tag>
+            </Form.Item>
+          )}
           <Form.Item name="name" label="名称" rules={[{ required: true, message: '请输入名称' }]}>
             <Input />
           </Form.Item>
-          {(editing?.type || contentType) !== 'API' ? (
+          {(editing?.type || formType) !== 'API' ? (
             <>
               <Form.Item
                 name="action"
@@ -435,10 +505,7 @@ export default function PermissionsContentPage() {
               >
                 <Input />
               </Form.Item>
-              <Form.Item name="icon" label="图标(Element)" extra="Vue 端使用">
-                <Input allowClear placeholder="Plus / Edit" />
-              </Form.Item>
-              <Form.Item name="iconAntd" label="图标(Ant)" extra="React 端优先；Ant / Iconify / SVG">
+              <Form.Item name="iconAntd" label="图标" extra="React 端优先；Ant / Iconify / SVG">
                 <XnIconPicker placeholder="选择 Ant / Iconify / SVG 图标" />
               </Form.Item>
               <Form.Item name="buttonColor" label="颜色">
@@ -481,6 +548,6 @@ export default function PermissionsContentPage() {
           </Form.Item>
         </Form>
       </XnModal>
-    </div>
+    </>
   )
 }

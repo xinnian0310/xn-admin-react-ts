@@ -125,6 +125,26 @@
   height: 44px;
   font-weight: 600;
 }
+.login-switch {
+  text-align: center;
+  font-size: 13px;
+  color: #64748b;
+  margin: -4px 0 8px;
+}
+.login-switch-link {
+  border: none;
+  background: none;
+  padding: 0;
+  margin-left: 4px;
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.login-switch-link:hover {
+  color: #0d9488;
+  text-decoration: underline;
+}
 .login-foot {
   text-align: center;
   color: #94a3b8;

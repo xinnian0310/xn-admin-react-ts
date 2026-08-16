@@ -7,12 +7,11 @@
 .hero {
   padding: 18px 20px;
   border-radius: 10px;
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--app-color-primary) 10%, var(--app-card-bg, #fff)) 0%,
-      var(--app-card-bg, #fff) 55%
-    );
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--app-color-primary) 10%, var(--app-card-bg, #fff)) 0%,
+    var(--app-card-bg, #fff) 55%
+  );
   border: 1px solid var(--app-border-color, #f0f0f0);
 }
 
@@ -37,7 +36,9 @@
 
 .statRow,
 .chartRow,
-.contactRow {
+.contactRow,
+.techRow,
+.bottomRow {
   margin: 0 !important;
 }
 
@@ -408,6 +409,119 @@
 .donationQrLabel {
   font-size: 13px;
   color: var(--app-text-primary, rgba(0, 0, 0, 0.88));
+}
+
+/* 单张合图（微信 + 支付宝）按原比例铺满卡片 */
+.donationBodySingle .donationQr {
+  width: 100%;
+}
+
+.donationQrWrap {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+}
+
+.donationQrWrap img.donationQrImg {
+  width: 100%;
+  height: auto;
+}
+
+.techCard :global(.ant-card-body) {
+  padding: 8px 12px 12px;
+}
+
+.techScroll {
+  max-height: 360px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.techRowItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--app-border-color, #f0f0f0);
+}
+
+.techRowItem:last-child {
+  border-bottom: none;
+}
+
+.techMain {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.techName {
+  font-weight: 600;
+  color: var(--app-text-primary, rgba(0, 0, 0, 0.88));
+}
+
+.techSep {
+  color: var(--app-text-muted, rgba(0, 0, 0, 0.25));
+}
+
+.techDesc {
+  font-size: 12px;
+  color: var(--app-text-muted, rgba(0, 0, 0, 0.45));
+}
+
+.techCount {
+  margin-left: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--app-text-muted, rgba(0, 0, 0, 0.45));
+}
+
+.logCard :global(.ant-card-body) {
+  max-height: 520px;
+  overflow: auto;
+}
+
+.logSource {
+  margin-left: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--app-text-muted, rgba(0, 0, 0, 0.45));
+}
+
+.timeline {
+  margin: 8px 0 0;
+  padding-left: 4px;
+}
+
+.logLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+.logText {
+  flex: 1 1 160px;
+  min-width: 0;
+  color: var(--app-text-primary, rgba(0, 0, 0, 0.88));
+}
+
+.logMeta {
+  font-size: 12px;
+  color: var(--app-text-muted, rgba(0, 0, 0, 0.45));
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.asideStack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 @media (max-width: 576px) {

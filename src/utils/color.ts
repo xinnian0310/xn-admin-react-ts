@@ -1,4 +1,6 @@
-/** 颜色工具：由主色生成浅/深阶，供主题与业务组件共用 */
+/** 颜色工具：主色阶走 Ant Design generate，供主题与业务组件共用 */
+
+import { generate } from '@ant-design/colors'
 
 function clamp(n: number) {
   return Math.min(255, Math.max(0, Math.round(n)))
@@ -41,7 +43,7 @@ export function mixHex(hex: string, target: '#ffffff' | '#000000', weight: numbe
 
 export function hexToRgbCss(hex: string) {
   const rgb = parseHex(hex)
-  if (!rgb) return '64, 158, 255'
+  if (!rgb) return '22, 119, 255'
   return `${rgb[0]}, ${rgb[1]}, ${rgb[2]}`
 }
 
@@ -60,16 +62,37 @@ export function isLightColor(hex: string) {
   return relativeLuminance(hex) > 0.55
 }
 
-/** Element Plus primary 色阶 */
-export function buildPrimaryScale(primary: string) {
+export type PrimaryScale = {
+  primary: string
+  'light-3': string
+  'light-5': string
+  'light-7': string
+  'light-8': string
+  'light-9': string
+  'dark-2': string
+  rgb: string
+}
+
+function scaleFromPalette(palette: string[], fallback: string): PrimaryScale {
+  const primary = palette[5] || fallback
   return {
     primary,
-    'light-3': mixHex(primary, '#ffffff', 0.3),
-    'light-5': mixHex(primary, '#ffffff', 0.5),
-    'light-7': mixHex(primary, '#ffffff', 0.7),
-    'light-8': mixHex(primary, '#ffffff', 0.8),
-    'light-9': mixHex(primary, '#ffffff', 0.9),
-    'dark-2': mixHex(primary, '#000000', 0.2),
+    'light-3': palette[4] || mixHex(primary, '#ffffff', 0.3),
+    'light-5': palette[3] || mixHex(primary, '#ffffff', 0.5),
+    'light-7': palette[2] || mixHex(primary, '#ffffff', 0.7),
+    'light-8': palette[1] || mixHex(primary, '#ffffff', 0.8),
+    'light-9': palette[0] || mixHex(primary, '#ffffff', 0.9),
+    'dark-2': palette[6] || mixHex(primary, '#000000', 0.2),
     rgb: hexToRgbCss(primary),
+  }
+}
+
+/** 由主色生成 Ant Design 10 阶色板（color-1 ~ color-10） */
+export function buildPrimaryScale(primary: string, appearance: 'light' | 'dark' = 'light'): PrimaryScale {
+  try {
+    const palette = generate(primary, appearance === 'dark' ? { theme: 'dark' } : undefined)
+    return scaleFromPalette(palette, primary)
+  } catch {
+    return scaleFromPalette([], primary)
   }
 }

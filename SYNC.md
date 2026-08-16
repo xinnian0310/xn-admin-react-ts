@@ -66,10 +66,11 @@
 
 ## 剩余缺口（建议人工对照）
 
-- Dashboard：基准还有技术选型 / Git 更新日志 / 站点联系区，React 端尚未完全对齐
 - 表格列设置完整 UI、Keep-alive 等价缓存
 - 第 6 章逐页与基准点对点浏览器验收（同账号交叉操作）
 - api-docs UI 模式依赖网关转发 `/swagger-ui/**`、`/v3/api-docs/**` → xn-system
+
+Dashboard 已对齐：统计/图表（本栈增强）+ 技术选型 + Git 更新日志 + 站点联系/捐赠。
 
 ## 验收建议
 

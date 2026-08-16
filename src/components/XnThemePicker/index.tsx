@@ -75,7 +75,7 @@ export default function XnThemePicker() {
       open={visible}
       onCancel={closeDialog}
       footer={null}
-      width={640}
+      width={720}
       destroyOnHidden
       className="theme-picker-modal"
     >
@@ -85,57 +85,30 @@ export default function XnThemePicker() {
         className="theme-tabs"
         items={[
           {
-            key: 'preset',
-            label: '预设主题',
-            children: (
-              <>
-                <p className="theme-tab__hint">
-                  独立完整主题：一键切换侧栏、顶栏、主色与页面配色。
-                </p>
-                <div className="theme-dialog__grid">
-                  {themes.map((t) => {
-                    const active = source === 'preset' && themeId === t.id
-                    return (
-                      <button
-                        key={t.id}
-                        type="button"
-                        className={`theme-card${active ? ' is-active' : ''}`}
-                        onClick={() => setTheme(t.id)}
-                      >
-                        <div className="theme-card__swatches">
-                          <span
-                            className="theme-card__swatch"
-                            style={{ background: t.swatches[0] }}
-                          />
-                          <span
-                            className="theme-card__swatch"
-                            style={{ background: t.colors.primary }}
-                          />
-                        </div>
-                        <div className="theme-card__name">{t.name}</div>
-                        {active ? <CheckOutlined className="theme-card__check" /> : null}
-                      </button>
-                    )
-                  })}
-                </div>
-              </>
-            ),
-          },
-          {
             key: 'appearance',
             label: '外观模式',
             children: (
               <>
                 <p className="theme-tab__hint">
-                  独立完整主题：亮色 / 暗色整站切换（侧栏、顶栏、内容区一并修改）。
+                  基于 Ant Design 中性色板与拂晓蓝主色：亮色白底、暗色深底，侧栏 / 顶栏 / 内容区一并切换。
                 </p>
                 <div className="theme-mode">
                   {(
                     [
-                      { mode: 'light' as AppearanceMode, label: '亮色', Icon: SunOutlined },
-                      { mode: 'dark' as AppearanceMode, label: '暗色', Icon: MoonOutlined },
+                      {
+                        mode: 'light' as AppearanceMode,
+                        label: '亮色',
+                        tags: 'gray-1 · 拂晓蓝',
+                        Icon: SunOutlined,
+                      },
+                      {
+                        mode: 'dark' as AppearanceMode,
+                        label: '暗色',
+                        tags: 'gray-12 · 拂晓蓝',
+                        Icon: MoonOutlined,
+                      },
                     ] as const
-                  ).map(({ mode, label, Icon }) => {
+                  ).map(({ mode, label, tags, Icon }) => {
                     const active = source === 'appearance' && appearance === mode
                     return (
                       <button
@@ -148,12 +121,50 @@ export default function XnThemePicker() {
                           <span className="theme-mode__preview-side" />
                           <span className="theme-mode__preview-main">
                             <span className="theme-mode__preview-bar" />
-                            <span className="theme-mode__preview-body" />
+                            <span className="theme-mode__preview-body">
+                              <span className="theme-mode__preview-accent" />
+                            </span>
                           </span>
                         </div>
                         <div className="theme-mode__meta">
                           <Icon />
                           <span>{label}</span>
+                          <span className="theme-mode__tags">{tags}</span>
+                        </div>
+                        {active ? <CheckOutlined className="theme-card__check" /> : null}
+                      </button>
+                    )
+                  })}
+                </div>
+              </>
+            ),
+          },
+          {
+            key: 'preset',
+            label: '内置主题',
+            children: (
+              <>
+                <p className="theme-tab__hint">
+                  基于 Ant Design 官方色板：主色取 color-6，侧栏取同色系深色阶，顶栏比侧栏略淡。
+                </p>
+                <div className="theme-dialog__grid">
+                  {themes.map((t) => {
+                    const active = source === 'preset' && themeId === t.id
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        className={`theme-card${active ? ' is-active' : ''}`}
+                        onClick={() => setTheme(t.id)}
+                      >
+                        <div className="theme-card__ramp" aria-hidden>
+                          {t.palette.map((c) => (
+                            <span key={c} className="theme-card__ramp-stop" style={{ background: c }} />
+                          ))}
+                        </div>
+                        <div className="theme-card__meta">
+                          <div className="theme-card__name">{t.name}</div>
+                          {t.tags ? <div className="theme-card__tags">{t.tags}</div> : null}
                         </div>
                         {active ? <CheckOutlined className="theme-card__check" /> : null}
                       </button>

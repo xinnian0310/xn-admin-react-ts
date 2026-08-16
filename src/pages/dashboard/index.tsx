@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
-import { Card, Col, Empty, Image, Row, Statistic, Tag, Typography, message } from 'antd'
+import { Card, Col, Empty, Image, Row, Statistic, Tag, Timeline, Typography, message } from 'antd'
 import { Line, Pie } from '@ant-design/plots'
 import {
   TeamOutlined,
@@ -10,14 +10,18 @@ import {
   NotificationOutlined,
   PhoneOutlined,
   CoffeeOutlined,
+  DesktopOutlined,
+  CloudServerOutlined,
+  ClockCircleOutlined,
 } from '@ant-design/icons'
 import { appConfig } from '@/config/app'
-import { homeConfig } from '@/config/home'
+import { changelogTypeMeta, homeConfig } from '@/config/home'
 import { getDashboardStats } from '@/api/dashboard'
 import { getPublicSiteContact } from '@/api/site-contact'
-import { resolveContactType, type SiteContactItem, type SiteDonation } from '@/types/site-contact'
+import { resolveContactType, type SiteContactItem } from '@/types/site-contact'
 import XnAppIcon from '@/components/XnAppIcon'
 import type { DashboardStats } from '@/types'
+import { gitChangelog } from 'virtual:git-changelog'
 import styles from './dashboard.module.scss'
 
 const STAT_META = [
@@ -54,10 +58,8 @@ export default function DashboardPage() {
   const [contacts, setContacts] = useState<SiteContactItem[]>(() =>
     homeConfig.contacts.map((c) => ({ ...c, groups: c.groups?.map((g) => ({ ...g })) })),
   )
-  const [donation, setDonation] = useState<SiteDonation>(() => ({
-    tip: homeConfig.donation.tip,
-    qrcodes: homeConfig.donation.qrcodes.map((q) => ({ ...q })),
-  }))
+  /** 捐赠二维码固定用本地配置，不接受接口下发 */
+  const donation = homeConfig.donation
 
   useEffect(() => {
     void getDashboardStats()
@@ -71,14 +73,6 @@ export default function DashboardPage() {
         const data = res.data
         if (data?.contacts?.length) {
           setContacts(data.contacts)
-        }
-        if (data?.donation) {
-          setDonation({
-            tip: data.donation.tip || homeConfig.donation.tip,
-            qrcodes: data.donation.qrcodes?.length
-              ? data.donation.qrcodes
-              : homeConfig.donation.qrcodes.map((q) => ({ ...q })),
-          })
         }
       })
       .catch(() => {
@@ -97,6 +91,7 @@ export default function DashboardPage() {
   }
 
   const visibleQrcodes = donation.qrcodes.filter((q) => q.src)
+  const singleQrcode = visibleQrcodes.length === 1
 
   const trendConfig = useMemo(() => {
     const points = stats?.registerTrend || []
@@ -242,56 +237,28 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      <Row gutter={[14, 14]} className={styles.contactRow}>
+      <Row gutter={[14, 14]} className={styles.techRow}>
         <Col xs={24} lg={12}>
           <Card
             size="small"
-            className={styles.panel}
+            className={`${styles.panel} ${styles.techCard}`}
             title={
               <span className={styles.cardTitle}>
-                <PhoneOutlined />
-                联系信息
+                <DesktopOutlined />
+                前端技术选型
+                <span className={styles.techCount}>{homeConfig.frontendTech.length}</span>
               </span>
             }
           >
-            <div className={styles.contactList}>
-              {contacts.map((c, ci) => (
-                <div key={`${c.label}-${ci}`} className={styles.contactItem}>
-                  {c.icon ? (
-                    <span className={styles.contactIcon}>
-                      <XnAppIcon name={c.icon} size={16} />
-                    </span>
-                  ) : null}
-                  <span className={styles.contactLabel}>{c.label}</span>
-                  {resolveContactType(c) === 'qq' && c.groups?.length ? (
-                    <div className={styles.contactGroups}>
-                      {c.groups.map((g, gi) => (
-                        <button
-                          key={`${g.value}-${gi}`}
-                          type="button"
-                          className={`${styles.qqChip}${g.full ? ` ${styles.qqChipFull}` : ''}`}
-                          title={g.full ? '群已满' : '点击复制群号'}
-                          disabled={!!g.full}
-                          onClick={() => void copyQq(g.value, g.full)}
-                        >
-                          <XnAppIcon name="ri:qq-fill" size={14} className={styles.qqIcon} />
-                          <span className={styles.qqNum}>{g.value}</span>
-                          {g.full ? <span className={styles.qqBadge}>已满</span> : null}
-                        </button>
-                      ))}
-                    </div>
-                  ) : c.link ? (
-                    <a
-                      href={c.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`${styles.contactValue} ${styles.contactLink}`}
-                    >
-                      {c.value}
-                    </a>
-                  ) : (
-                    <span className={styles.contactValue}>{c.value}</span>
-                  )}
+            <div className={styles.techScroll}>
+              {homeConfig.frontendTech.map((t) => (
+                <div key={t.name} className={styles.techRowItem}>
+                  <div className={styles.techMain}>
+                    <span className={styles.techName}>{t.name}</span>
+                    <span className={styles.techSep}>·</span>
+                    <span className={styles.techDesc}>{t.desc}</span>
+                  </div>
+                  <Tag color="processing">{t.version}</Tag>
                 </div>
               ))}
             </div>
@@ -300,35 +267,168 @@ export default function DashboardPage() {
         <Col xs={24} lg={12}>
           <Card
             size="small"
-            className={styles.panel}
+            className={`${styles.panel} ${styles.techCard}`}
             title={
               <span className={styles.cardTitle}>
-                <CoffeeOutlined />
-                捐赠情况
+                <CloudServerOutlined />
+                后端技术选型
+                <span className={styles.techCount}>{homeConfig.backendTech.length}</span>
               </span>
             }
           >
-            {donation.tip ? <p className={styles.donationTip}>{donation.tip}</p> : null}
-            <div className={styles.donationBody}>
-              {visibleQrcodes.length ? (
-                visibleQrcodes.map((qr) => (
-                  <div key={`${qr.label}-${qr.src}`} className={styles.donationQr}>
-                    <Image
-                      src={qr.src}
-                      alt={qr.label}
-                      width={160}
-                      height={220}
-                      style={{ objectFit: 'contain', borderRadius: 10 }}
-                      className={styles.donationQrImg}
-                    />
-                    <span className={styles.donationQrLabel}>{qr.label}</span>
+            <div className={styles.techScroll}>
+              {homeConfig.backendTech.map((t) => (
+                <div key={t.name} className={styles.techRowItem}>
+                  <div className={styles.techMain}>
+                    <span className={styles.techName}>{t.name}</span>
+                    <span className={styles.techSep}>·</span>
+                    <span className={styles.techDesc}>{t.desc}</span>
                   </div>
-                ))
-              ) : (
-                <Empty description="暂未配置捐赠二维码" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-              )}
+                  <Tag color="success">{t.version}</Tag>
+                </div>
+              ))}
             </div>
           </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={[14, 14]} className={styles.bottomRow}>
+        <Col xs={24} lg={14}>
+          <Card
+            size="small"
+            className={`${styles.panel} ${styles.logCard}`}
+            title={
+              <span className={styles.cardTitle}>
+                <ClockCircleOutlined />
+                更新日志
+                <Tag color="processing">{homeConfig.intro.version}</Tag>
+                <Tag>当前</Tag>
+                <span className={styles.logSource}>同步自 Git</span>
+              </span>
+            }
+          >
+            {gitChangelog.length ? (
+              <Timeline
+                className={styles.timeline}
+                items={gitChangelog.map((item, idx) => ({
+                  color: idx === 0 ? 'blue' : 'gray',
+                  children: (
+                    <div className={styles.logLine}>
+                      <Tag
+                        color={
+                          ({ success: 'success', warning: 'warning', info: 'default' } as const)[
+                            changelogTypeMeta[item.type].tag
+                          ]
+                        }
+                      >
+                        {changelogTypeMeta[item.type].label}
+                      </Tag>
+                      <span className={styles.logText}>{item.text}</span>
+                      <span className={styles.logMeta}>
+                        {item.date} · {item.hash}
+                      </span>
+                    </div>
+                  ),
+                }))}
+              />
+            ) : (
+              <Empty description="暂无可用的 Git 提交记录" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            )}
+          </Card>
+        </Col>
+        <Col xs={24} lg={10}>
+          <div className={styles.asideStack}>
+            <Card
+              size="small"
+              className={styles.panel}
+              title={
+                <span className={styles.cardTitle}>
+                  <PhoneOutlined />
+                  联系信息
+                </span>
+              }
+            >
+              <div className={styles.contactList}>
+                {contacts.map((c, ci) => (
+                  <div key={`${c.label}-${ci}`} className={styles.contactItem}>
+                    {c.icon ? (
+                      <span className={styles.contactIcon}>
+                        <XnAppIcon name={c.icon} size={16} />
+                      </span>
+                    ) : null}
+                    <span className={styles.contactLabel}>{c.label}</span>
+                    {resolveContactType(c) === 'qq' && c.groups?.length ? (
+                      <div className={styles.contactGroups}>
+                        {c.groups.map((g, gi) => (
+                          <button
+                            key={`${g.value}-${gi}`}
+                            type="button"
+                            className={`${styles.qqChip}${g.full ? ` ${styles.qqChipFull}` : ''}`}
+                            title={g.full ? '群已满' : '点击复制群号'}
+                            disabled={!!g.full}
+                            onClick={() => void copyQq(g.value, g.full)}
+                          >
+                            <XnAppIcon name="ri:qq-fill" size={14} className={styles.qqIcon} />
+                            <span className={styles.qqNum}>{g.value}</span>
+                            {g.full ? <span className={styles.qqBadge}>已满</span> : null}
+                          </button>
+                        ))}
+                      </div>
+                    ) : c.link ? (
+                      <a
+                        href={c.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`${styles.contactValue} ${styles.contactLink}`}
+                      >
+                        {c.value}
+                      </a>
+                    ) : (
+                      <span className={styles.contactValue}>{c.value}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+            <Card
+              size="small"
+              className={styles.panel}
+              title={
+                <span className={styles.cardTitle}>
+                  <CoffeeOutlined />
+                  捐赠情况
+                </span>
+              }
+            >
+              {donation.tip ? <p className={styles.donationTip}>{donation.tip}</p> : null}
+              <div
+                className={
+                  singleQrcode
+                    ? `${styles.donationBody} ${styles.donationBodySingle}`
+                    : styles.donationBody
+                }
+              >
+                {visibleQrcodes.length ? (
+                  visibleQrcodes.map((qr) => (
+                    <div key={`${qr.label}-${qr.src}`} className={styles.donationQr}>
+                      <Image
+                        src={qr.src}
+                        alt={qr.label}
+                        width={singleQrcode ? undefined : 140}
+                        height={singleQrcode ? undefined : 190}
+                        rootClassName={singleQrcode ? styles.donationQrWrap : undefined}
+                        style={{ objectFit: 'contain', borderRadius: 10 }}
+                        className={styles.donationQrImg}
+                      />
+                      {qr.label ? <span className={styles.donationQrLabel}>{qr.label}</span> : null}
+                    </div>
+                  ))
+                ) : (
+                  <Empty description="暂未配置捐赠二维码" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                )}
+              </div>
+            </Card>
+          </div>
         </Col>
       </Row>
     </div>

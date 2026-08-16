@@ -1,3 +1,10 @@
+.xn-modal-drag-root {
+  display: flex;
+  flex-direction: column;
+  max-height: var(--app-dialog-max-height, 80vh);
+  overflow: hidden;
+}
+
 .xn-modal--draggable {
   .ant-modal-header {
     cursor: move;

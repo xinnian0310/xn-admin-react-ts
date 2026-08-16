@@ -58,30 +58,20 @@ export function AuthGuard({ meta, children }: { meta?: AppRouteMeta; children?: 
   const location = useLocation()
   const token = useUserStore((s) => s.token)
   const mustChangePassword = useUserStore((s) => !!s.user?.mustChangePassword)
-  const userRolesLength = useUserStore((s) => s.user?.roles?.length ?? 0)
-  const userPermissionsLength = useUserStore((s) => s.user?.permissions?.length ?? 0)
-  const fetchProfile = useUserStore((s) => s.fetchProfile)
-  const logout = useUserStore((s) => s.logout)
-  const routesRegistered = useMenuStore((s) => s.routesRegistered)
-  const hasPermission = usePermissionStore((s) => s.hasPermission)
-  const isSuperAdmin = usePermissionStore((s) => s.isSuperAdmin)
-  const permissionsLength = usePermissionStore((s) => s.permissions.length)
   const [ready, setReady] = useState(false)
   const [forbidden, setForbidden] = useState(false)
   const [toLogin, setToLogin] = useState(false)
   const [forcePwd, setForcePwd] = useState(false)
 
   useEffect(() => {
-    let cancelled = false
+    let alive = true
 
     async function run() {
-      setForbidden(false)
-      setToLogin(false)
-      setForcePwd(false)
-
       if (!meta?.public && !token) {
-        if (!cancelled) {
+        if (alive) {
           setReady(false)
+          setForbidden(false)
+          setForcePwd(false)
           setToLogin(true)
         }
         return
@@ -90,78 +80,81 @@ export function AuthGuard({ meta, children }: { meta?: AppRouteMeta; children?: 
       if (token && mustChangePassword) {
         const path = location.pathname
         if (path !== '/profile' && path !== '/login' && !ERROR_PATHS.has(path)) {
-          if (!cancelled) {
+          if (alive) {
             setReady(false)
+            setToLogin(false)
+            setForbidden(false)
             setForcePwd(true)
           }
           return
         }
       }
 
-      // 读最新值，避免 await 期间 routesRegistered 已翻转却仍走取消分支卡住 ready
       if (!meta?.public && token && !useMenuStore.getState().routesRegistered) {
-        if (!cancelled) setReady(false)
+        if (alive) setReady(false)
         await registerDynamicRoutes()
-        if (cancelled) return
+        if (!alive) return
       }
 
       if (ERROR_PATHS.has(location.pathname)) {
-        if (!cancelled) setReady(true)
+        if (alive) {
+          setToLogin(false)
+          setForbidden(false)
+          setForcePwd(false)
+          setReady(true)
+        }
         return
       }
 
       if (meta?.permission) {
-        try {
-          // 超管以角色兜底，空 permissions 不应反复拉 /auth/me
-          const needsRefresh =
-            !isSuperAdmin() &&
-            (!usePermissionStore.getState().permissions.length ||
-              !userRolesLength ||
-              !userPermissionsLength)
-          if (needsRefresh && token) {
-            if (!cancelled) setReady(false)
-            await fetchProfile()
-            if (cancelled) return
+        const permissionStore = usePermissionStore.getState()
+        const currentUser = useUserStore.getState().user
+        const needsRefresh =
+          !permissionStore.isSuperAdmin() &&
+          (!permissionStore.permissions.length ||
+            !currentUser?.roles?.length ||
+            !currentUser?.permissions?.length)
+        if (needsRefresh && token) {
+          try {
+            if (alive) setReady(false)
+            await useUserStore.getState().fetchProfile()
+            if (!alive) return
+          } catch {
+            // 401 由拦截器强制下线；其它错误不能清登录态，否则会闪回登录页
+            if (!useUserStore.getState().token) {
+              if (alive) {
+                setReady(false)
+                setToLogin(true)
+              }
+              return
+            }
           }
-        } catch {
-          await logout(false)
-          if (!cancelled) {
-            setReady(false)
-            setToLogin(true)
-          }
-          return
         }
-        if (!isSuperAdmin() && !hasPermission(meta.permission)) {
-          if (!cancelled) {
+        const latestPerms = usePermissionStore.getState()
+        if (!latestPerms.isSuperAdmin() && !latestPerms.hasPermission(meta.permission)) {
+          if (alive) {
             setReady(false)
+            setToLogin(false)
+            setForcePwd(false)
             setForbidden(true)
           }
           return
         }
       }
 
-      if (!cancelled) setReady(true)
+      if (alive) {
+        setToLogin(false)
+        setForbidden(false)
+        setForcePwd(false)
+        setReady(true)
+      }
     }
 
     void run()
     return () => {
-      cancelled = true
+      alive = false
     }
-  }, [
-    location.pathname,
-    meta?.public,
-    meta?.permission,
-    token,
-    mustChangePassword,
-    userRolesLength,
-    userPermissionsLength,
-    routesRegistered,
-    permissionsLength,
-    fetchProfile,
-    logout,
-    hasPermission,
-    isSuperAdmin,
-  ])
+  }, [location.pathname, meta?.public, meta?.permission, token, mustChangePassword])
 
   if (toLogin) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />
@@ -174,7 +167,7 @@ export function AuthGuard({ meta, children }: { meta?: AppRouteMeta; children?: 
   }
   if (!ready) {
     return (
-      <div style={{ display: 'grid', placeItems: 'center', height: '40vh' }}>
+      <div className="xn-global-spin">
         <Spin description="加载中..." />
       </div>
     )
@@ -198,12 +191,20 @@ export function AuthGuard({ meta, children }: { meta?: AppRouteMeta; children?: 
 /** 已登录访问 /login 时回跳 */
 export function LoginGuard({ children }: { children: ReactNode }) {
   const token = useUserStore((s) => s.token)
-  const user = useUserStore((s) => s.user)
+  const mustChangePassword = useUserStore((s) => !!s.user?.mustChangePassword)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!token) return
+    navigate(mustChangePassword ? '/profile?forcePwd=1' : '/dashboard', { replace: true })
+  }, [token, mustChangePassword, navigate])
+
   if (token) {
-    if (user?.mustChangePassword) {
-      return <Navigate to="/profile?forcePwd=1" replace />
-    }
-    return <Navigate to="/dashboard" replace />
+    return (
+      <div className="xn-global-spin xn-global-spin--viewport">
+        <Spin description="正在进入系统..." />
+      </div>
+    )
   }
   return <>{children}</>
 }

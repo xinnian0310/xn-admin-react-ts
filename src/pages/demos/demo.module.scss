@@ -121,3 +121,18 @@
   color: var(--ant-color-text-secondary, #64748b);
   font-size: 13px;
 }
+
+.uploadForm {
+  margin-bottom: 14px;
+}
+
+.uploadLogs {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--ant-color-fill-quaternary, #f5f5f5);
+  color: var(--ant-color-text-secondary, #64748b);
+  font-size: 12px;
+  line-height: 1.9;
+  word-break: break-all;
+}

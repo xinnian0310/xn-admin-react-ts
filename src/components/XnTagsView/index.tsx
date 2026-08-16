@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Dropdown } from 'antd'
+import { Dropdown, Tag } from 'antd'
 import type { MenuProps } from 'antd'
-import { LeftOutlined, RightOutlined, CloseOutlined } from '@ant-design/icons'
+import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTagsViewStore } from '@/stores/tagsView'
+import { useThemeStore } from '@/stores/theme'
 import type { TagView } from '@/types/menu'
 import './xnTagsView.scss'
 
@@ -17,6 +18,10 @@ export default function XnTagsView() {
   const delLeftViews = useTagsViewStore((s) => s.delLeftViews)
   const delRightViews = useTagsViewStore((s) => s.delRightViews)
   const toggleFullscreen = useTagsViewStore((s) => s.toggleFullscreen)
+  const source = useThemeStore((s) => s.source)
+  const sidebar = useThemeStore((s) => s.currentTheme.colors.sidebar)
+  const primary = useThemeStore((s) => s.currentTheme.colors.primary)
+  const isAppearance = source === 'appearance'
 
   const active = location.pathname
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -188,27 +193,34 @@ export default function XnTagsView() {
       ) : null}
 
       <div ref={scrollRef} className="xn-tags-view__scroll" onScroll={updateScrollState}>
-        {visitedViews.map((tag) => (
-          <Dropdown key={tag.path} menu={{ items: contextMenu(tag) }} trigger={['contextMenu']}>
-            <div
-              className={`xn-tags-view__item${active === tag.path ? ' is-active' : ''}`}
-              onClick={() => {
-                if (active !== tag.path) navigate(tag.path)
-              }}
-            >
-              <span className="xn-tags-view__title">{tag.title}</span>
-              {!tag.affix ? (
-                <CloseOutlined
-                  className="xn-tags-view__close"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    closeTag(tag)
-                  }}
-                />
-              ) : null}
-            </div>
-          </Dropdown>
-        ))}
+        {visitedViews.map((tag) => {
+          const isActive = active === tag.path
+          // 外观模式：选中态跟随侧栏强调色（亮色浅蓝、暗色深底）；预设 / 个性化仍用实心主色
+          const appearanceActiveStyle =
+            isActive && isAppearance
+              ? { background: sidebar.activeBg, color: sidebar.active, borderColor: 'transparent' }
+              : undefined
+          return (
+            <Dropdown key={tag.path} menu={{ items: contextMenu(tag) }} trigger={['contextMenu']}>
+              <Tag
+                className={`xn-tags-view__item${isActive ? ' is-active' : ''}`}
+                color={isActive && !isAppearance ? primary : undefined}
+                variant={isActive && !isAppearance ? 'solid' : 'filled'}
+                style={appearanceActiveStyle}
+                closable={!tag.affix}
+                onClick={() => {
+                  if (active !== tag.path) navigate(tag.path)
+                }}
+                onClose={(e) => {
+                  e.preventDefault()
+                  closeTag(tag)
+                }}
+              >
+                {tag.title}
+              </Tag>
+            </Dropdown>
+          )
+        })}
       </div>
 
       {showArrows ? (

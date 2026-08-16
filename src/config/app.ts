@@ -9,6 +9,8 @@
  */
 import type { AppearanceMode, ThemeColors, ThemeSource } from '@/config/themes'
 import {
+  ANTD_DARK_BORDER,
+  ANTD_GRAY,
   DEFAULT_CUSTOM_PARTS,
   DEFAULT_THEME_ID,
   DEFAULT_THEME_SOURCE,
@@ -44,7 +46,8 @@ export const defaultAppConfig = {
   },
   ui: {
     dialog: {
-      maxHeight: '85vh',
+      /** 弹窗整体限高；超出只滚 .ant-modal-body，不带动页面 */
+      maxHeight: '80vh',
     },
     layout: {
       mode: 'side' as LayoutMode,
@@ -90,15 +93,15 @@ export const defaultAppConfig = {
         centered: true,
         /** 声明式弹窗可拖拽（XnModal）；Modal.confirm 等命令式不受影响 */
         draggable: true,
+        /** 与 ui.dialog.maxHeight 同步，XnModal 限高后内部滚动 */
+        maxHeight: '80vh',
       },
     },
   },
   storage: {
-    minio: {
-      endpoint: '',
-      bucket: '',
-      region: '',
-    },
+    minio: 'http://127.0.0.1:9000/xn-admin/',
+    /** kkFileView 5.0 预览服务根地址 */
+    kkFileView: 'http://127.0.0.1:8012/',
   },
   logRetention: {
     loginDays: 90,
@@ -163,16 +166,11 @@ export type AppConfig = {
       prefixCls: string
       button: { autoInsertSpace: boolean }
       message: { maxCount: number }
-      modal: { centered: boolean; draggable: boolean }
+      modal: { centered: boolean; draggable: boolean; maxHeight: string }
     }
   }
-  storage: {
-    minio: {
-      endpoint: string
-      bucket: string
-      region: string
-    }
-  }
+  /** 对象存储访问前缀：key=名字，value=路径前缀 */
+  storage: Record<string, string>
   logRetention: {
     loginDays: number
     operDays: number
@@ -246,10 +244,19 @@ export function applyRemoteAppConfig(
   remote: Partial<AppConfig> | Record<string, unknown> | null | undefined,
 ) {
   if (!remote) return
-  deepMergeAppConfig(
-    appConfig as unknown as Record<string, unknown>,
-    remote as Record<string, unknown>,
-  )
+  const remoteObj = remote as Record<string, unknown>
+  const remoteStorage = remoteObj.storage
+  const { storage: _ignored, ...rest } = remoteObj
+  deepMergeAppConfig(appConfig as unknown as Record<string, unknown>, rest)
+  if (remoteStorage && typeof remoteStorage === 'object' && !Array.isArray(remoteStorage)) {
+    const entries = Object.entries(remoteStorage as Record<string, unknown>).filter(
+      ([k, v]) => !!k?.trim() && typeof v === 'string' && !!v.trim(),
+    )
+    if (entries.length > 0) {
+      for (const key of Object.keys(appConfig.storage)) delete appConfig.storage[key]
+      for (const [k, v] of entries) appConfig.storage[k.trim()] = String(v).trim()
+    }
+  }
   const app = (remote as Partial<AppConfig>).app
   if (app) {
     if ('logoWidth' in app) appConfig.app.logoWidth = app.logoWidth ?? null
@@ -260,6 +267,38 @@ export function applyRemoteAppConfig(
   // 公开配置可能带他栈字段，不进本工程运行时
   delete (appConfig.ui as Record<string, unknown>).elementPlus
   applyAppConfig(appConfig)
+}
+
+/** 拼接对象存储访问前缀；未配置时回落本地默认 */
+export function resolveStorageBase(name = 'minio'): string {
+  const fromRemote = appConfig.storage?.[name]?.trim()
+  if (fromRemote) {
+    return fromRemote.endsWith('/') ? fromRemote : `${fromRemote}/`
+  }
+  const fallback = (defaultAppConfig.storage as Record<string, string>)[name] || ''
+  if (!fallback) return ''
+  return fallback.endsWith('/') ? fallback : `${fallback}/`
+}
+
+/** 用相对对象路径拼完整访问 URL */
+export function resolveStorageUrl(objectPath: string, storageName = 'minio'): string {
+  const base = resolveStorageBase(storageName)
+  const rel = (objectPath || '').replace(/^\/+/, '')
+  if (!base) return rel
+  return `${base}${rel}`
+}
+
+/**
+ * 业务附件访问地址：优先远程连接配置 storage.minio；
+ * 已是绝对地址或 /uploads 路径时原样返回；再兜底本地 uploads。
+ */
+export function resolveAttachmentUrl(filePath: string, storageName = 'minio'): string {
+  const path = (filePath || '').trim()
+  if (!path) return ''
+  if (/^https?:\/\//i.test(path) || path.startsWith('/')) return path
+  const remote = resolveStorageUrl(path, storageName)
+  if (remote && /^https?:\/\//i.test(remote)) return remote
+  return `/uploads/${path.replace(/^\/+/, '')}`
 }
 
 let globalUiBaseline: {
@@ -345,7 +384,10 @@ export function applyAppConfig(config: AppConfig = appConfig) {
 
   const root = document.documentElement
   const { dialog, fontSize, tagsView } = config.ui
-  root.style.setProperty('--app-dialog-max-height', dialog.maxHeight)
+  const dialogMaxHeight = dialog.maxHeight || config.ui.antd.modal.maxHeight || '80vh'
+  dialog.maxHeight = dialogMaxHeight
+  config.ui.antd.modal.maxHeight = dialogMaxHeight
+  root.style.setProperty('--app-dialog-max-height', dialogMaxHeight)
   root.style.setProperty('--app-font-size-sidebar', fontSize.sidebar)
   root.style.setProperty('--app-font-size-header', fontSize.header)
   root.style.setProperty('--app-font-size-tags-view', fontSize.tagsView)
@@ -387,12 +429,15 @@ export function applyAppConfig(config: AppConfig = appConfig) {
   applyLayoutTheme(active.colors, {
     appearance: source === 'appearance' ? appearance : 'light',
     mainBgImage: source === 'custom' ? mainBgImage : null,
+    source,
   })
 }
 
 export interface ApplyLayoutThemeOptions {
   appearance?: AppearanceMode
   mainBgImage?: string | null
+  /** 当前主题来源；外观模式下页签选中态改用侧栏强调色 */
+  source?: ThemeSource
 }
 
 /** 应用侧栏 / 顶栏 / 主色主题到 CSS 变量（Ant Design；不写 Element --el-*） */
@@ -421,7 +466,7 @@ export function applyLayoutTheme(colors: ThemeColors, options: ApplyLayoutThemeO
   root.style.setProperty('--app-header-text', h.text)
   root.style.setProperty('--app-header-border', h.border)
 
-  const scale = buildPrimaryScale(colors.primary)
+  const scale = buildPrimaryScale(colors.primary, appearance)
   root.style.setProperty('--app-color-primary', scale.primary)
   root.style.setProperty('--app-color-primary-light-3', scale['light-3'])
   root.style.setProperty('--app-color-primary-light-5', scale['light-5'])
@@ -439,44 +484,52 @@ export function applyLayoutTheme(colors: ThemeColors, options: ApplyLayoutThemeO
   root.style.setProperty('--ant-color-primary-border', scale['light-5'])
 
   if (dark) {
-    root.style.setProperty('--app-page-bg', '#000000')
-    root.style.setProperty('--app-main-bg', '#141414')
-    root.style.setProperty('--app-card-bg', '#1f1f1f')
-    root.style.setProperty('--app-fill-color', '#141414')
-    root.style.setProperty('--app-tags-bg', '#141414')
-    root.style.setProperty('--app-tags-border', '#303030')
-    root.style.setProperty('--app-tags-item-bg', '#1f1f1f')
+    root.style.setProperty('--app-page-bg', ANTD_GRAY[13])
+    root.style.setProperty('--app-main-bg', ANTD_GRAY[12])
+    root.style.setProperty('--app-card-bg', ANTD_GRAY[11])
+    root.style.setProperty('--app-fill-color', ANTD_GRAY[12])
+    root.style.setProperty('--app-tags-bg', ANTD_GRAY[12])
+    root.style.setProperty('--app-tags-border', ANTD_DARK_BORDER)
+    root.style.setProperty('--app-tags-item-bg', ANTD_GRAY[11])
     root.style.setProperty('--app-tags-item-text', 'rgba(255, 255, 255, 0.65)')
     root.style.setProperty('--app-tags-item-hover-bg', mixHex(colors.primary, '#000000', 0.55))
     root.style.setProperty('--app-tags-item-active-bg', scale.primary)
     root.style.setProperty('--app-tags-item-active-text', '#ffffff')
-    root.style.setProperty('--app-tags-scrollbar', '#434343')
-    root.style.setProperty('--app-border-color', '#303030')
+    root.style.setProperty('--app-tags-scrollbar', ANTD_GRAY[9])
+    root.style.setProperty('--app-border-color', ANTD_DARK_BORDER)
     root.style.setProperty('--app-text-muted', 'rgba(255, 255, 255, 0.45)')
     root.style.setProperty('--app-text-primary', 'rgba(255, 255, 255, 0.85)')
     root.style.setProperty('--app-surface-soft', mixHex(colors.primary, '#000000', 0.75))
     root.style.setProperty('--app-surface-soft-border', mixHex(colors.primary, '#000000', 0.45))
     root.style.setProperty('--app-card-hover-border', mixHex(colors.primary, '#000000', 0.3))
   } else {
-    // Ant Design 默认浅色表面（#f5f5f5），与 Element 的 #f5f7fa / #303133 刻意区分
-    root.style.setProperty('--app-page-bg', '#f5f5f5')
-    root.style.setProperty('--app-main-bg', '#f5f5f5')
-    root.style.setProperty('--app-card-bg', '#ffffff')
-    root.style.setProperty('--app-fill-color', '#fafafa')
-    root.style.setProperty('--app-tags-bg', '#ffffff')
-    root.style.setProperty('--app-tags-border', '#f0f0f0')
-    root.style.setProperty('--app-tags-item-bg', '#fafafa')
+    root.style.setProperty('--app-page-bg', ANTD_GRAY[3])
+    root.style.setProperty('--app-main-bg', ANTD_GRAY[3])
+    root.style.setProperty('--app-card-bg', ANTD_GRAY[1])
+    root.style.setProperty('--app-fill-color', ANTD_GRAY[2])
+    root.style.setProperty('--app-tags-bg', ANTD_GRAY[1])
+    root.style.setProperty('--app-tags-border', ANTD_GRAY[4])
+    root.style.setProperty('--app-tags-item-bg', ANTD_GRAY[2])
     root.style.setProperty('--app-tags-item-text', 'rgba(0, 0, 0, 0.65)')
     root.style.setProperty('--app-tags-item-hover-bg', scale['light-9'])
     root.style.setProperty('--app-tags-item-active-bg', scale.primary)
     root.style.setProperty('--app-tags-item-active-text', '#ffffff')
-    root.style.setProperty('--app-tags-scrollbar', '#d9d9d9')
-    root.style.setProperty('--app-border-color', '#f0f0f0')
+    root.style.setProperty('--app-tags-scrollbar', ANTD_GRAY[5])
+    root.style.setProperty('--app-border-color', ANTD_GRAY[4])
     root.style.setProperty('--app-text-muted', 'rgba(0, 0, 0, 0.45)')
     root.style.setProperty('--app-text-primary', 'rgba(0, 0, 0, 0.88)')
     root.style.setProperty('--app-surface-soft', scale['light-9'])
     root.style.setProperty('--app-surface-soft-border', scale['light-5'])
     root.style.setProperty('--app-card-hover-border', mixHex(colors.primary, '#ffffff', 0.45))
+  }
+
+  // 页签选中态：预设 / 个性化用实心主色；外观模式跟随侧栏强调色（更贴合亮 / 暗观感）
+  if (options.source === 'appearance') {
+    root.style.setProperty('--app-tags-item-active-bg', colors.sidebar.activeBg)
+    root.style.setProperty('--app-tags-item-active-text', colors.sidebar.active)
+    root.style.setProperty('--app-tags-item-active-border', colors.sidebar.active)
+  } else {
+    root.style.setProperty('--app-tags-item-active-border', scale.primary)
   }
 
   if (mainBgImage) {

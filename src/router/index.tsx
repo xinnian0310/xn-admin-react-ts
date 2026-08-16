@@ -16,7 +16,7 @@ const RedirectPage = lazy(() => import('@/pages/redirect/index'))
 
 function PageFallback() {
   return (
-    <div style={{ display: 'grid', placeItems: 'center', height: '40vh' }}>
+    <div className="xn-global-spin xn-global-spin--viewport">
       <Spin description="页面加载中..." />
     </div>
   )
@@ -27,7 +27,7 @@ function CatchAll() {
   const menuLoadFailed = useMenuStore((s) => s.menuLoadFailed)
   if (!routesRegistered || !isCatchAllReady()) {
     return (
-      <div style={{ display: 'grid', placeItems: 'center', height: '40vh' }}>
+      <div className="xn-global-spin">
         <Spin description="注册路由中..." />
       </div>
     )

@@ -1,11 +1,12 @@
-import XnModal from '@/components/XnModal'
-﻿import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Checkbox, Form, Input, Select, Space, Steps, Table, message } from 'antd'
+import XnModal from '@/components/XnModal'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnTable from '@/components/XnTable'
 import { usePageUi } from '@/hooks/usePageUi'
+import { APP_CLIENT_ID } from '@/config/client'
 import {
   generate,
   listColumns,
@@ -541,7 +542,7 @@ export default function SystemCodegenPage() {
             <Alert
               type="info"
               showIcon
-              message="将生成后端 CRUD + 前端标准列表页（XnPageLayout / XnSearch / XnButton / XnTable），打包 ZIP 下载；请按包内 README 拷贝到工程后重启。"
+              message={`将生成后端 CRUD + 本工程前端（${APP_CLIENT_ID}：XnPageLayout / XnSearch / XnButton / XnTable），打包 ZIP 下载；请按包内 README 拷贝后重启。`}
             />
           </div>
         ) : null}

@@ -18,6 +18,18 @@ export function login(data: LoginPayload) {
   return request.post<any, ApiResponse<LoginResult>>('/auth/login', data)
 }
 
+export interface RegisterPayload {
+  username: string
+  password: string
+  nickname?: string
+  captchaId?: string
+  captchaCode?: string
+}
+
+export function register(data: RegisterPayload) {
+  return request.post<any, ApiResponse<null>>('/auth/register', data)
+}
+
 export function logout(token?: string) {
   return request.post<any, ApiResponse<null>>(
     '/auth/logout',

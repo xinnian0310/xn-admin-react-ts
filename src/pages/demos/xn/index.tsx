@@ -1,5 +1,16 @@
-import { useMemo, useState, type ReactNode } from 'react'
-import { Alert, Card, Space, Tabs, Tag, Typography, message } from 'antd'
+import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import {
+  Alert,
+  Card,
+  InputNumber,
+  Select,
+  Space,
+  Switch,
+  Tabs,
+  Tag,
+  Typography,
+  message,
+} from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton from '@/components/XnButton'
@@ -12,6 +23,9 @@ import XnLongText from '@/components/XnLongText'
 import XnAppIcon from '@/components/XnAppIcon'
 import XnAppBrandLogo from '@/components/XnAppBrandLogo'
 import XnAuth from '@/components/XnAuth'
+import XnUpload from '@/components/XnUpload'
+import type { FileInfo } from '@/types'
+import type { UploadTaskSnapshot } from '@/utils/upload/types'
 import type { SearchItem } from '@/types/search'
 import type { ButtonListItem } from '@/types/button'
 import type { TableColumnItem } from '@/types/table'
@@ -92,6 +106,37 @@ export default function DemoXnPage() {
   const [selected, setSelected] = useState<unknown[]>([])
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+
+  const [uploadChunkSize, setUploadChunkSize] = useState(8 * 1024 * 1024)
+  const [uploadConcurrency, setUploadConcurrency] = useState(3)
+  const [uploadMaxRetries, setUploadMaxRetries] = useState(3)
+  const [uploadHashAlgo, setUploadHashAlgo] = useState<'sha256-tree' | 'sha256'>('sha256-tree')
+  const [uploadInstant, setUploadInstant] = useState(true)
+  const [uploadResume, setUploadResume] = useState(true)
+  const [uploadHash, setUploadHash] = useState(true)
+  const [uploadLogs, setUploadLogs] = useState<string[]>([])
+
+  const pushUploadLog = useCallback((text: string) => {
+    setUploadLogs((logs) => [`${new Date().toLocaleTimeString()} · ${text}`, ...logs].slice(0, 8))
+  }, [])
+
+  const handleUploadSuccess = useCallback(
+    (file: FileInfo, task: UploadTaskSnapshot) => {
+      pushUploadLog(
+        `${task.instant ? '秒传命中' : '上传成功'}：${file.name} → ${file.url || file.path}`,
+      )
+      message.success(`${file.name} ${task.instant ? '秒传完成' : '上传完成'}`)
+    },
+    [pushUploadLog],
+  )
+
+  const handleUploadError = useCallback(
+    (text: string, task: UploadTaskSnapshot) => {
+      pushUploadLog(`失败：${task.name} — ${text}`)
+      message.error(`${task.name} 上传失败：${text}`)
+    },
+    [pushUploadLog],
+  )
 
   const searchItems: SearchItem[] = useMemo(
     () => [
@@ -317,7 +362,7 @@ export default function DemoXnPage() {
         <DemoBlock
           title="富文本编辑器"
           name="XnRichEditor"
-          intro="基于 wangEditor，输出 HTML 字符串，用于公告、站内信等内容编辑。"
+          intro="基于 wangEditor，图片/视频/附件走 XnUpload；支持公式、@提及、Markdown、链接卡片。"
         >
           <XnRichEditor value={richHtml} onChange={setRichHtml} height={220} />
         </DemoBlock>
@@ -337,6 +382,99 @@ export default function DemoXnPage() {
             maxLength={20}
             title="备注详情"
           />
+        </DemoBlock>
+      ),
+    },
+    {
+      key: 'upload',
+      label: '大文件上传',
+      children: (
+        <DemoBlock
+          title="大文件分片上传"
+          name="XnUpload"
+          intro="小文件单请求直传，大文件自动分片：Worker 算指纹 → 秒传探测 → 并发上传（失败指数退避重试）→ 服务端合并。可暂停 / 继续 / 取消；刷新页面后重新选择同一文件即可续传。"
+        >
+          <Space wrap size="middle" className={styles.uploadForm}>
+            <Space size={4}>
+              <Text type="secondary">分片大小</Text>
+              <Select
+                size="small"
+                style={{ width: 96 }}
+                value={uploadChunkSize}
+                onChange={setUploadChunkSize}
+                options={[5, 8, 10, 20].map((mb) => ({
+                  label: `${mb} MB`,
+                  value: mb * 1024 * 1024,
+                }))}
+              />
+            </Space>
+            <Space size={4}>
+              <Text type="secondary">并发数</Text>
+              <InputNumber
+                size="small"
+                min={1}
+                max={8}
+                style={{ width: 72 }}
+                value={uploadConcurrency}
+                onChange={(value) => setUploadConcurrency(value ?? 1)}
+              />
+            </Space>
+            <Space size={4}>
+              <Text type="secondary">重试次数</Text>
+              <InputNumber
+                size="small"
+                min={0}
+                max={6}
+                style={{ width: 72 }}
+                value={uploadMaxRetries}
+                onChange={(value) => setUploadMaxRetries(value ?? 0)}
+              />
+            </Space>
+            <Space size={4}>
+              <Text type="secondary">指纹算法</Text>
+              <Select
+                size="small"
+                style={{ width: 190 }}
+                value={uploadHashAlgo}
+                onChange={setUploadHashAlgo}
+                options={[
+                  { label: '分片树摘要（原生，快）', value: 'sha256-tree' },
+                  { label: '全量 SHA-256（较慢）', value: 'sha256' },
+                ]}
+              />
+            </Space>
+            <Space size={4}>
+              <Text type="secondary">秒传</Text>
+              <Switch size="small" checked={uploadInstant} onChange={setUploadInstant} />
+            </Space>
+            <Space size={4}>
+              <Text type="secondary">断点续传</Text>
+              <Switch size="small" checked={uploadResume} onChange={setUploadResume} />
+            </Space>
+            <Space size={4}>
+              <Text type="secondary">计算指纹</Text>
+              <Switch size="small" checked={uploadHash} onChange={setUploadHash} />
+            </Space>
+          </Space>
+          <XnUpload
+            chunkSize={uploadChunkSize}
+            concurrency={uploadConcurrency}
+            maxRetries={uploadMaxRetries}
+            hashAlgo={uploadHashAlgo}
+            enableInstant={uploadInstant}
+            enableResume={uploadResume}
+            enableHash={uploadHash}
+            maxSize={10 * 1024 * 1024 * 1024}
+            onSuccess={handleUploadSuccess}
+            onError={handleUploadError}
+          />
+          {uploadLogs.length > 0 && (
+            <div className={styles.uploadLogs}>
+              {uploadLogs.map((log, index) => (
+                <div key={index}>{log}</div>
+              ))}
+            </div>
+          )}
         </DemoBlock>
       ),
     },
@@ -395,7 +533,8 @@ export default function DemoXnPage() {
         >
           <ul className={styles.noteList}>
             <li>
-              <Text strong>XnImport</Text>：Excel 模板下载、预览与导入对话框，多用于用户/字典等批量导入。
+              <Text strong>XnImport</Text>：Excel
+              模板下载、预览与导入对话框，多用于用户/字典等批量导入。
             </li>
             <li>
               <Text strong>XnTagsView</Text>：多标签页访问记录，位于顶栏布局中。

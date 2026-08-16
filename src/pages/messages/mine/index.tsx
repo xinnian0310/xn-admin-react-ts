@@ -1,12 +1,16 @@
 import XnModal from '@/components/XnModal'
-﻿import { useEffect, useState } from 'react'
-import { Modal, Tag, message } from 'antd'
+import { useEffect, useState } from 'react'
+import { Modal, Tag, Typography, message } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnTable from '@/components/XnTable'
 import { usePageUi } from '@/hooks/usePageUi'
 import { batchRemoveMine, listMine, markRead, removeMine, unreadCount } from '@/api/message'
+import { resolveAttachmentUrl } from '@/config/app'
+import { openKkFileViewPreview } from '@/utils/kk-file-view'
+import { resolveAttachments } from '@/utils/attachment'
+import { decorateRichHtml } from '@/utils/rich-editor'
 import type { MyMessage } from '@/types'
 import type { SearchForm } from '@/types/search'
 import type { TableColumnItem } from '@/types/table'
@@ -240,9 +244,47 @@ export default function MessagesMinePage() {
               <span>发送人：{current.senderName || '—'}</span>
               <span>发送时间：{formatDateTime(current.sentAt)}</span>
             </div>
+            {resolveAttachments(current).length ? (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 8,
+                  marginBottom: 12,
+                  fontSize: 13,
+                }}
+              >
+                <span>附件：</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+                  {resolveAttachments(current).map((item) => (
+                    <div
+                      key={item.path}
+                      style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}
+                    >
+                      <Typography.Link
+                        href={resolveAttachmentUrl(item.path)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {item.name}
+                      </Typography.Link>
+                      <Typography.Link
+                        onClick={(e) => {
+                          e.preventDefault()
+                          openKkFileViewPreview(item.path, item.name)
+                        }}
+                      >
+                        查看
+                      </Typography.Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <div
+              className="xn-rich-html"
               style={{ lineHeight: 1.7, minHeight: 120 }}
-              dangerouslySetInnerHTML={{ __html: current.content || '' }}
+              dangerouslySetInnerHTML={{ __html: decorateRichHtml(current.content) }}
             />
           </div>
         ) : null}

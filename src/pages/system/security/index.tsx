@@ -3,6 +3,7 @@ import { Form, InputNumber, Modal, Switch, message } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnTable from '@/components/XnTable'
+import XnTreePanel from '@/components/XnTreePanel'
 import { usePageUi } from '@/hooks/usePageUi'
 import {
   getSecurityPolicy,
@@ -168,27 +169,25 @@ export default function SecurityPage() {
         applyLocalPage(p, s)
       }}
       aside={
-        <div
-          style={{
-            width: 380,
-            minWidth: 380,
-            maxWidth: '100%',
-            padding: 12,
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            overflowX: 'hidden',
-            overflowY: 'auto',
-            boxSizing: 'border-box',
-          }}
+        <XnTreePanel
+          title="安全策略"
+          width={380}
+          filterable={false}
+          footer={
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <XnButton
+                listItem={buttonItems}
+                selected={selected}
+                onButtonClick={(a) => void buttonClick(a)}
+              />
+            </div>
+          }
         >
-          <div style={{ fontWeight: 600 }}>安全策略</div>
           <Form
             layout="horizontal"
             labelCol={{ flex: '140px' }}
             wrapperCol={{ flex: 1 }}
-            style={{ flex: 1 }}
+            style={{ paddingRight: 4 }}
           >
             <div style={{ fontWeight: 600, margin: '4px 0 12px', fontSize: 13 }}>登录防护</div>
             <Form.Item label="失败锁定阈值">
@@ -322,14 +321,7 @@ export default function SecurityPage() {
               保存后立即生效。验证码开关请在「登录页设置」中配置；超级管理员不受强制改密/过期约束。
             </p>
           </Form>
-          <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
-            <XnButton
-              listItem={buttonItems}
-              selected={selected}
-              onButtonClick={(a) => void buttonClick(a)}
-            />
-          </div>
-        </div>
+        </XnTreePanel>
       }
       table={
         <XnTable

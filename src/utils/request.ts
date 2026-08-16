@@ -3,7 +3,18 @@ import { message } from 'antd'
 import type { ApiResponse } from '@/types'
 import { isApiRegistered, isRegistryLoaded, isWhitelisted } from '@/utils/api-guard'
 import { normalizeDateTimes } from '@/utils/datetime'
-import { navigateTo } from '@/utils/history'
+import { handleForceLogout } from '@/utils/force-logout'
+
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    /**
+     * 置 true 时不弹出错误提示，仅把错误抛给调用方自行处理。
+     * 用于分片上传这类「失败即自动重试」的请求，避免重试过程刷屏。
+     * 注意：401 强制下线仍会正常触发。
+     */
+    silentError?: boolean
+  }
+}
 
 const request = axios.create({
   baseURL: '/api',
@@ -144,7 +155,9 @@ request.interceptors.response.use(
   (response) => {
     const res = response.data as ApiResponse<unknown>
     if (res.code !== 200) {
-      showRequestError(res.message || '请求失败')
+      if (!response.config?.silentError) {
+        showRequestError(res.message || '请求失败')
+      }
       return Promise.reject(new Error(res.message || '请求失败'))
     }
     if (res.data !== undefined) {
@@ -160,13 +173,14 @@ request.interceptors.response.use(
     }
 
     if (status === 401) {
-      void import('@/stores/user').then(({ useUserStore }) => {
-        void useUserStore.getState().logout(false)
-      })
-      navigateTo('/login', { replace: true })
+      // 由强制下线弹窗接管清理与跳转，这里不再叠加一条 toast
+      handleForceLogout(errMessage)
+      return Promise.reject(error)
     }
 
-    showRequestError(errMessage)
+    if (!error.config?.silentError) {
+      showRequestError(errMessage)
+    }
     return Promise.reject(error)
   },
 )

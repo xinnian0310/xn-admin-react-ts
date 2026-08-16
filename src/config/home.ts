@@ -8,8 +8,7 @@
  * - 更新日志由 virtual:git-changelog 在构建时从 git log 同步（feat/fix/refactor）
  */
 
-import wechatQr from '@/assets/payment-qrcode/wechat.jpg'
-import alipayQr from '@/assets/payment-qrcode/alipay.jpg'
+import donateQr from '@/assets/payment-qrcode/donate.png'
 
 export interface HomeFeature {
   icon: string
@@ -152,10 +151,7 @@ export const homeConfig = {
   /** 本地兜底；线上优先走 GET /api/site-contact/public */
   donation: {
     tip: '如果这个项目对你有帮助，欢迎请作者喝杯咖啡 ☕',
-    qrcodes: [
-      { label: '微信支付', src: wechatQr },
-      { label: '支付宝', src: alipayQr },
-    ] as PaymentQrcode[],
+    qrcodes: [{ label: '', src: donateQr }] as PaymentQrcode[],
   },
 }
 

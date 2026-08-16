@@ -1,0 +1,188 @@
+.xn-upload {
+  width: 100%;
+
+  &.is-disabled .xn-upload__drop {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  // Ant Design 表单会给内部 input 加可见样式，单靠 display:none 会被盖掉
+  input[type='file'].xn-upload__input {
+    display: none !important;
+    position: absolute !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    pointer-events: none !important;
+  }
+
+  &__drop {
+    border: 1px dashed var(--ant-color-border, #d9d9d9);
+    border-radius: 8px;
+    background: var(--ant-color-bg-container, #fff);
+    padding: 28px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      background 0.2s;
+
+    &:hover,
+    &.is-over {
+      border-color: var(--app-color-primary, var(--ant-color-primary, #1677ff));
+      background: var(--ant-color-primary-bg, #e6f4ff);
+    }
+  }
+
+  &__drop-icon {
+    display: block;
+    margin: 0 auto 8px;
+    font-size: 38px;
+    color: var(--app-color-primary, var(--ant-color-primary, #1677ff));
+  }
+
+  &__drop-text {
+    font-size: var(--app-font-size-main, 14px);
+    color: var(--ant-color-text, rgb(0 0 0 / 88%));
+    line-height: 1.5;
+
+    em {
+      color: var(--app-color-primary, var(--ant-color-primary, #1677ff));
+      font-style: normal;
+    }
+  }
+
+  &__drop-hint {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--ant-color-text-secondary, rgb(0 0 0 / 45%));
+  }
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  &__summary {
+    font-size: 12px;
+    color: var(--ant-color-text-secondary, rgb(0 0 0 / 45%));
+  }
+
+  &__list {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__item {
+    border: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: var(--ant-color-bg-container, #fff);
+  }
+
+  &__item-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  &__item .ant-progress {
+    margin-bottom: 0;
+    line-height: 1;
+  }
+
+  &__item-title {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__item-name {
+    min-width: 0;
+    font-size: var(--app-font-size-main, 14px);
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__item-size,
+  &__item-time {
+    font-size: 12px;
+    color: var(--ant-color-text-secondary, rgb(0 0 0 / 45%));
+    flex-shrink: 0;
+  }
+
+  &__item-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &__item-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--ant-color-text-secondary, rgb(0 0 0 / 45%));
+  }
+
+  &__badge {
+    padding: 0 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 18px;
+    flex-shrink: 0;
+    background: var(--ant-color-primary-bg, #e6f4ff);
+    color: var(--app-color-primary, var(--ant-color-primary, #1677ff));
+  }
+
+  &__chunks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-top: 4px;
+  }
+
+  &__chunk {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--ant-color-fill-secondary, rgb(0 0 0 / 6%));
+
+    &.is-uploading {
+      background: var(--app-color-primary, var(--ant-color-primary, #1677ff));
+    }
+
+    &.is-success {
+      background: var(--ant-color-success, #52c41a);
+    }
+
+    &.is-error {
+      background: var(--ant-color-error, #ff4d4f);
+    }
+  }
+
+  &__item-error {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--ant-color-error, #ff4d4f);
+    word-break: break-all;
+  }
+}

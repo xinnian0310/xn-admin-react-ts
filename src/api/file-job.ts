@@ -30,12 +30,25 @@ export function fetchFileTree() {
   return request.get<any, ApiResponse<FileTreeNode>>('/files/tree')
 }
 
-export function uploadFile(file: File, prefix?: string) {
+export type UploadFileOptions = {
+  signal?: AbortSignal
+  onProgress?: (loaded: number) => void
+  timeout?: number
+  silentError?: boolean
+}
+
+export function uploadFile(file: File, prefix?: string, options?: UploadFileOptions) {
   const form = new FormData()
   form.append('file', file)
   if (prefix) form.append('prefix', prefix)
   return request.post<any, ApiResponse<FileInfo>>('/files/upload', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
+    signal: options?.signal,
+    timeout: options?.timeout,
+    silentError: options?.silentError,
+    onUploadProgress: options?.onProgress
+      ? (event) => options.onProgress?.(event.loaded)
+      : undefined,
   })
 }
 

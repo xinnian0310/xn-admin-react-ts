@@ -6,17 +6,21 @@ import { appConfig } from '@/config/app'
 import { homeConfig } from '@/config/home'
 import { useUserStore } from '@/stores/user'
 import { getActive } from '@/api/login-page'
-import { fetchCaptcha, verifySliderCaptcha } from '@/api/auth'
+import { fetchCaptcha, register as registerApi, verifySliderCaptcha } from '@/api/auth'
 import type { LoginCaptchaType } from '@/types'
 import XnAppIcon from '@/components/XnAppIcon'
 import './LoginView.scss'
+
+type AuthMode = 'login' | 'register'
 
 export default function LoginView() {
   const navigate = useNavigate()
   const login = useUserStore((s) => s.login)
   const [form] = Form.useForm()
+  const [mode, setMode] = useState<AuthMode>('login')
   const [loading, setLoading] = useState(false)
   const intro = homeConfig.intro
+  const isRegister = mode === 'register'
 
   const [captchaEnabled, setCaptchaEnabled] = useState(false)
   const [captchaType, setCaptchaType] = useState<LoginCaptchaType | null>(null)
@@ -60,6 +64,17 @@ export default function LoginView() {
     setSliderPercent(0)
     sliderPercentRef.current = 0
     setSliderOk(false)
+  }
+
+  function switchMode(next: AuthMode) {
+    setMode(next)
+    form.resetFields()
+    form.setFieldsValue(
+      next === 'login'
+        ? { username: 'admin', password: 'admin' }
+        : { username: '', password: '', nickname: '', confirmPassword: '', captcha: '' },
+    )
+    void refreshCaptcha()
   }
 
   useEffect(() => {
@@ -115,7 +130,8 @@ export default function LoginView() {
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
   }
-  async function handleLogin() {
+
+  async function handleSubmit() {
     try {
       const values = await form.validateFields()
       if (captchaEnabled && captchaType === 'SLIDER' && !sliderOk) {
@@ -123,10 +139,23 @@ export default function LoginView() {
         return
       }
       setLoading(true)
-      const data = await login(values.username, values.password, {
+      const captchaOpts = {
         captchaId: captchaEnabled ? captchaId : undefined,
         captchaCode: captchaEnabled && captchaType === 'IMAGE' ? values.captcha : undefined,
-      })
+      }
+      if (isRegister) {
+        await registerApi({
+          username: values.username,
+          password: values.password,
+          nickname: values.nickname || undefined,
+          ...captchaOpts,
+        })
+        message.success('注册成功，请登录')
+        switchMode('login')
+        form.setFieldsValue({ username: values.username, password: '' })
+        return
+      }
+      const data = await login(values.username, values.password, captchaOpts)
       if (data.user?.mustChangePassword) {
         message.warning('按安全策略要求，请先修改密码')
         navigate('/profile?forcePwd=1', { replace: true })
@@ -179,22 +208,56 @@ export default function LoginView() {
         <section className="login-panel">
           <div className="login-card">
             <header className="login-header">
-              <p className="welcome">欢迎回来</p>
+              <p className="welcome">{isRegister ? '创建账号' : '欢迎回来'}</p>
               <h1>{appConfig.app.name}</h1>
-              <p className="hint">登录以继续管理您的系统</p>
+              <p className="hint">
+                {isRegister ? '注册后将以游客身份使用系统' : '登录以继续管理您的系统'}
+              </p>
             </header>
             <Form
               form={form}
               size="large"
               initialValues={{ username: 'admin', password: 'admin' }}
-              onFinish={() => void handleLogin()}
+              onFinish={() => void handleSubmit()}
             >
-              <Form.Item name="username" rules={[{ required: true, message: '请输入用户名' }]}>
+              <Form.Item
+                name="username"
+                rules={[
+                  { required: true, message: '请输入用户名' },
+                  ...(isRegister
+                    ? [{ min: 2, max: 50, message: '用户名长度需在2-50之间' }]
+                    : []),
+                ]}
+              >
                 <Input prefix={<UserOutlined />} placeholder="请输入用户名" allowClear />
               </Form.Item>
+              {isRegister ? (
+                <Form.Item name="nickname" rules={[{ max: 50, message: '昵称长度不能超过50' }]}>
+                  <Input prefix={<UserOutlined />} placeholder="昵称（可选）" allowClear />
+                </Form.Item>
+              ) : null}
               <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
                 <Input.Password prefix={<LockOutlined />} placeholder="请输入密码" />
               </Form.Item>
+              {isRegister ? (
+                <Form.Item
+                  name="confirmPassword"
+                  dependencies={['password']}
+                  rules={[
+                    { required: true, message: '请再次输入密码' },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue('password') === value) {
+                          return Promise.resolve()
+                        }
+                        return Promise.reject(new Error('两次输入的密码不一致'))
+                      },
+                    }),
+                  ]}
+                >
+                  <Input.Password prefix={<LockOutlined />} placeholder="请确认密码" />
+                </Form.Item>
+              ) : null}
               {captchaEnabled && captchaType === 'IMAGE' ? (
                 <div className="captcha-row" style={{ marginBottom: 24 }}>
                   <Form.Item
@@ -249,10 +312,31 @@ export default function LoginView() {
                   loading={loading}
                   className="login-btn"
                 >
-                  登 录
+                  {isRegister ? '注 册' : '登 录'}
                 </Button>
               </Form.Item>
             </Form>
+            <div className="login-switch">
+              {isRegister ? (
+                <>
+                  已有账号？
+                  <button type="button" className="login-switch-link" onClick={() => switchMode('login')}>
+                    去登录
+                  </button>
+                </>
+              ) : (
+                <>
+                  没有账号？
+                  <button
+                    type="button"
+                    className="login-switch-link"
+                    onClick={() => switchMode('register')}
+                  >
+                    去注册
+                  </button>
+                </>
+              )}
+            </div>
             <footer className="login-foot">
               {appConfig.app.footer || `${intro.title} · Copyright © 2026`}
             </footer>
