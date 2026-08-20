@@ -1,5 +1,7 @@
 # xn-admin-react-ts
 
+[简体中文](README.md) | [English](README.en.md)
+
 心念后台管理系统前端：React 19 + TypeScript + Vite + Ant Design。
 
 xn-admin-react-ts 是「心念后台」的 React 管理端，基于 React 19、TypeScript 与 Ant Design，由基准前端 xn-admin-vue3-ts 移植而来，对接同一套微服务后端 xn-admin-cloud。业务能力与 Vue 端对齐（登录鉴权、动态菜单、RBAC、CRUD、主题布局、监控与文件任务等），视觉使用 Ant Design 原生风格。采用 Apache License 2.0 开源，**可商用、可自用**。
