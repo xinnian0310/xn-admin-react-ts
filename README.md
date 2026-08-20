@@ -37,8 +37,8 @@ xn-admin-react-ts 是「心念后台」的 React 管理端，基于 React 19、T
 
 1. Node.js 20+（建议 20 LTS）
 2. 后端 **xn-admin-cloud** 已启动，网关可访问：http://127.0.0.1:8088  
-   （按其仓库 README 启动 system / file / log / job / gateway）
-3. MySQL / Redis / Nacos / MinIO 等中间件已就绪（随后端）
+   （按其仓库 README 三步启动：`docker compose up -d` → `scripts/run-dev`）
+3. 中间件可由后端仓库 Docker Compose 拉起（也可本机自备 MySQL / Redis / Nacos / MinIO）
 
 ## 默认账号
 
@@ -206,14 +206,12 @@ XnPageLayout
 
 ### 日志管理
 
-后端 `xn-log` / `xn-job` 已提供登录 / 操作 / 异常 / 任务日志接口（查询、详情、删除、清空、导出），菜单与 page-ui 已种子。本仓库**尚未落地页面**（`view-loader` 会落到 404）：
-
-| 页面     | 路由                     | 前端现状                                     |
-| -------- | ------------------------ | -------------------------------------------- |
-| 登录日志 | `/system/logs/login`     | 有 `api/login-log`，无 `pages/.../index.tsx` |
-| 操作日志 | `/system/logs/oper`      | 有 `api/oper-log`，无页面                    |
-| 异常日志 | `/system/logs/exception` | 有 `api/exception-log`，无页面               |
-| 任务日志 | `/system/jobs/logs`      | 定时任务页会跳转至此，无页面                 |
+| 模块     | 截图                                          |
+| -------- | --------------------------------------------- |
+| 登录日志 | ![登录日志](./docs/images/logs-login.png)     |
+| 操作日志 | ![操作日志](./docs/images/logs-oper.png)      |
+| 异常日志 | ![异常日志](./docs/images/logs-exception.png) |
+| 任务日志 | ![任务日志](./docs/images/jobs-log.png)       |
 
 ### 组织与账号
 
@@ -271,7 +269,7 @@ XnPageLayout
 - 系统监控：在线用户 / 服务 / Redis / SQL
 - 文件管理、定时任务、回收站、代码生成、接口文档页（Swagger UI / API 切换）
 - 公告 WebSocket 推送（`/ws`）
-- 日志页面前端待补：登录 / 操作 / 异常 / 任务日志（后端接口与菜单已齐）
+- 日志管理：登录 / 操作 / 异常 / 任务日志（查询、详情、删除、清空、导出）
 
 ## 环境与约定
 

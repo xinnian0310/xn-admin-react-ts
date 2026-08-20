@@ -30,8 +30,9 @@ Version: `1.0.0` · License: [Apache-2.0](./LICENSE) · Copyright 2026 XinNian
 ## Prerequisites
 
 1. Node.js 20+ (20 LTS recommended)
-2. Backend **xn-admin-cloud** running, gateway at http://127.0.0.1:8088
-3. MySQL / Redis / Nacos / MinIO ready
+2. Backend **xn-admin-cloud** running, gateway at http://127.0.0.1:8088  
+   (three-step start in that repo: `docker compose up -d` then `scripts/run-dev`)
+3. Middleware can come from the backend Docker Compose (or your own MySQL / Redis / Nacos / MinIO)
 
 ## Default accounts
 
