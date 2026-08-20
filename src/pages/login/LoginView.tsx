@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } f
 import { Button, Form, Input, message } from 'antd'
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
-import { appConfig } from '@/config/app'
+import { appConfig, defaultAppConfig } from '@/config/app'
 import { homeConfig } from '@/config/home'
 import { useUserStore } from '@/stores/user'
 import { getActive } from '@/api/login-page'
@@ -21,6 +21,14 @@ export default function LoginView() {
   const [loading, setLoading] = useState(false)
   const intro = homeConfig.intro
   const isRegister = mode === 'register'
+  const localLogo = defaultAppConfig.app.logo
+  const configuredLogo = (appConfig.app.logo || '').trim() || localLogo
+  const [logoFailed, setLogoFailed] = useState(false)
+  const logoSrc = logoFailed ? localLogo : configuredLogo
+
+  useEffect(() => {
+    setLogoFailed(false)
+  }, [configuredLogo])
 
   const [captchaEnabled, setCaptchaEnabled] = useState(false)
   const [captchaType, setCaptchaType] = useState<LoginCaptchaType | null>(null)
@@ -181,7 +189,13 @@ export default function LoginView() {
         <aside className="login-brand">
           <div className="brand-inner">
             <div className="brand-logo-plate">
-              <img src={appConfig.app.logo || '/xinnian-tech-logo.png'} alt="心念科技" />
+              <img
+                src={logoSrc}
+                alt="心念科技"
+                onError={() => {
+                  if (logoSrc !== localLogo) setLogoFailed(true)
+                }}
+              />
             </div>
             <p className="brand-slogan">心有所念，码有所成</p>
             <p className="brand-desc">

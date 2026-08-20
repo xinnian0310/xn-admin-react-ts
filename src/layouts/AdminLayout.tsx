@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Layout, Button } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
 import { Outlet } from 'react-router-dom'
-import { appConfig, type LayoutMode } from '@/config/app'
+import { type LayoutMode } from '@/config/app'
+import { useAppConfig } from '@/hooks/useAppConfig'
 import { useNoticeStore } from '@/stores/notice'
 import { useTagsViewStore } from '@/stores/tagsView'
 import { useMenuStore } from '@/stores/menu'
@@ -27,17 +28,8 @@ export default function AdminLayout() {
   const startRealtime = useNoticeStore((s) => s.startRealtime)
   const stopRealtime = useNoticeStore((s) => s.stopRealtime)
   const menus = useMenuStore((s) => s.menus)
-  const [mode, setMode] = useState<LayoutMode>(appConfig.ui.layout.mode)
-
-  // 轮询 appConfig.layout.mode（个人偏好保存后会改 mutable 对象）
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      if (appConfig.ui.layout.mode !== mode) {
-        setMode(appConfig.ui.layout.mode)
-      }
-    }, 400)
-    return () => window.clearInterval(timer)
-  }, [mode])
+  const appConfig = useAppConfig()
+  const mode = appConfig.ui.layout.mode as LayoutMode
 
   useEffect(() => {
     // 延迟连接，避免 React Strict Mode 先挂再卸时在 CONNECTING 阶段被关掉

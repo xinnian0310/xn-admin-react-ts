@@ -14,7 +14,7 @@ import {
   CloudServerOutlined,
   ClockCircleOutlined,
 } from '@ant-design/icons'
-import { appConfig } from '@/config/app'
+import { useAppConfig } from '@/hooks/useAppConfig'
 import { changelogTypeMeta, homeConfig } from '@/config/home'
 import { getDashboardStats } from '@/api/dashboard'
 import { getPublicSiteContact } from '@/api/site-contact'
@@ -54,6 +54,7 @@ function formatAxisDate(value: unknown) {
 }
 
 export default function DashboardPage() {
+  const appConfig = useAppConfig()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [contacts, setContacts] = useState<SiteContactItem[]>(() =>
     homeConfig.contacts.map((c) => ({ ...c, groups: c.groups?.map((g) => ({ ...g })) })),

@@ -364,18 +364,16 @@ function applyFavicon(href: string) {
   const path = href.trim()
   if (!path) return
 
-  let link = document.querySelector<HTMLLinkElement>("link[rel='icon']")
-  if (!link) {
-    link = document.createElement('link')
-    link.rel = 'icon'
-    document.head.appendChild(link)
-  }
+  document.querySelectorAll<HTMLLinkElement>("link[rel='icon']").forEach((el) => el.remove())
+  const link = document.createElement('link')
+  link.rel = 'icon'
   link.type = path.endsWith('.svg')
     ? 'image/svg+xml'
     : path.endsWith('.png')
       ? 'image/png'
       : 'image/x-icon'
   link.href = path
+  document.head.appendChild(link)
 }
 
 /** 将可影响样式的配置写入 CSS 变量 */
@@ -404,6 +402,8 @@ export function applyAppConfig(config: AppConfig = appConfig) {
   } else {
     root.style.removeProperty('--app-logo-height')
   }
+
+  notifyAppConfigListeners()
 
   let source: ThemeSource = DEFAULT_THEME_SOURCE
   let themeId = DEFAULT_THEME_ID

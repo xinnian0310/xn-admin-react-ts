@@ -1,4 +1,8 @@
-import { appConfig } from '@/config/app'
+import { useEffect, useState } from 'react'
+import { defaultAppConfig } from '@/config/app'
+import { useAppConfig } from '@/hooks/useAppConfig'
+
+const LOCAL_LOGO = defaultAppConfig.app.logo
 
 interface XnAppBrandLogoProps {
   className?: string
@@ -13,8 +17,14 @@ export default function XnAppBrandLogo({
   showTitle = true,
   title,
 }: XnAppBrandLogoProps) {
+  const appConfig = useAppConfig()
   const name = title || appConfig.app.name
-  const logo = appConfig.app.logo || '/xinnian-tech-logo.png'
+  const configured = (appConfig.app.logo || '').trim() || LOCAL_LOGO
+  const [src, setSrc] = useState(configured)
+
+  useEffect(() => {
+    setSrc(configured)
+  }, [configured])
 
   return (
     <div
@@ -28,8 +38,11 @@ export default function XnAppBrandLogo({
       }}
     >
       <img
-        src={logo}
+        src={src}
         alt={name}
+        onError={() => {
+          setSrc((current) => (current === LOCAL_LOGO ? current : LOCAL_LOGO))
+        }}
         style={{
           width: 'var(--app-logo-width, 28px)',
           height: 'var(--app-logo-height, auto)',
