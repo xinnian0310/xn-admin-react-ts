@@ -27,7 +27,6 @@ import {
   Image,
   Input,
   InputNumber,
-  List,
   Mentions,
   Modal,
   Pagination,
@@ -117,7 +116,7 @@ const tableData = [
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <Card size="small" title={title} className={styles.section} bordered={false}>
+    <Card size="small" title={title} className={styles.section} variant="borderless">
       {children}
     </Card>
   )
@@ -143,7 +142,7 @@ export default function DemoUiPage() {
       key: 'general',
       label: '通用',
       children: (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Section title="Button 按钮">
             <Space wrap>
               <Button type="primary">Primary</Button>
@@ -190,7 +189,7 @@ export default function DemoUiPage() {
       key: 'layout',
       label: '布局',
       children: (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Section title="Grid 栅格">
             <Row gutter={[8, 8]}>
               {[6, 6, 6, 6, 8, 8, 8, 12, 12].map((span, i) => (
@@ -230,7 +229,7 @@ export default function DemoUiPage() {
       key: 'nav',
       label: '导航',
       children: (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Section title="Breadcrumb / Dropdown / Pagination">
             <Breadcrumb
               items={[
@@ -258,9 +257,9 @@ export default function DemoUiPage() {
             <Steps
               current={1}
               items={[
-                { title: '填写', description: '基本信息' },
-                { title: '确认', description: '核对内容' },
-                { title: '完成', description: '提交成功' },
+                { title: '填写', content: '基本信息' },
+                { title: '确认', content: '核对内容' },
+                { title: '完成', content: '提交成功' },
               ]}
             />
             <Divider />
@@ -291,7 +290,7 @@ export default function DemoUiPage() {
       label: '数据录入',
       children: (
         <div id="demo-ui-form">
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
             <Section title="表单控件">
               <Form layout="vertical" style={{ maxWidth: 640 }}>
                 <Row gutter={16}>
@@ -440,7 +439,7 @@ export default function DemoUiPage() {
       key: 'data',
       label: '数据展示',
       children: (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Section title="Table / Tag / Badge / Avatar">
             <Space wrap style={{ marginBottom: 12 }}>
               <Tag color="blue">blue</Tag>
@@ -477,13 +476,11 @@ export default function DemoUiPage() {
               </Descriptions.Item>
             </Descriptions>
             <Divider />
-            <List
-              size="small"
-              bordered
-              dataSource={['列表项一', '列表项二', '列表项三']}
-              renderItem={(item) => <List.Item>{item}</List.Item>}
-              style={{ maxWidth: 360 }}
-            />
+            <ul className={styles.plainList}>
+              {['列表项一', '列表项二', '列表项三'].map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
             <Divider />
             <Space align="start" size="large">
               <Empty description="空状态" image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -501,9 +498,9 @@ export default function DemoUiPage() {
               <Col span={8}>
                 <Timeline
                   items={[
-                    { children: '创建账号' },
-                    { children: '完善资料', color: 'green' },
-                    { children: '开始使用', color: 'gray' },
+                    { content: '创建账号' },
+                    { content: '完善资料', color: 'green' },
+                    { content: '开始使用', color: 'gray' },
                   ]}
                 />
               </Col>
@@ -550,13 +547,13 @@ export default function DemoUiPage() {
       key: 'feedback',
       label: '反馈',
       children: (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Section title="Alert / Progress / Spin / Skeleton">
-            <Space direction="vertical" style={{ width: '100%' }}>
-              <Alert message="成功提示" type="success" showIcon />
-              <Alert message="信息提示" type="info" showIcon />
-              <Alert message="警告提示" type="warning" showIcon closable />
-              <Alert message="错误提示" type="error" showIcon />
+            <Space orientation="vertical" style={{ width: '100%' }}>
+              <Alert title="成功提示" type="success" showIcon />
+              <Alert title="信息提示" type="info" showIcon />
+              <Alert title="警告提示" type="warning" showIcon closable />
+              <Alert title="错误提示" type="error" showIcon />
             </Space>
             <Divider />
             <Space wrap>
@@ -605,7 +602,7 @@ export default function DemoUiPage() {
       key: 'other',
       label: '其他',
       children: (
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Section title="Card">
             <Row gutter={16}>
               <Col span={8}>
@@ -645,7 +642,7 @@ export default function DemoUiPage() {
         </div>
         <Tag color="blue">antd</Tag>
       </div>
-      <Tabs items={items} tabPosition="left" className={styles.tabs} />
+      <Tabs items={items} tabPlacement="start" className={styles.tabs} />
       <Modal
         title="Modal 示例"
         open={modalOpen}

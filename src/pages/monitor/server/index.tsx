@@ -168,7 +168,7 @@ function UsageGauge({ value }: { value: number }) {
 }
 
 export default function MonitorServerPage() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [restarting, setRestarting] = useState('')
   const [data, setData] = useState<ServerMonitor>(emptyData)
@@ -231,7 +231,19 @@ export default function MonitorServerPage() {
   }
 
   useEffect(() => {
-    void load()
+    let cancelled = false
+    void Promise.all([getServerMonitor(), getInfraStatus()])
+      .then(([serverRes, infraRes]) => {
+        if (cancelled) return
+        setData(serverRes.data)
+        setInfra(infraRes.data)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   useEffect(() => {

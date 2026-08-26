@@ -246,7 +246,7 @@ const XnImport = forwardRef<XnImportHandle, XnImportProps>(function XnImport(
             <Alert
               type={result.failed > 0 ? 'warning' : 'success'}
               showIcon
-              message={`导入完成：成功 ${result.success} 条，失败 ${result.failed} 条`}
+              title={`导入完成：成功 ${result.success} 条，失败 ${result.failed} 条`}
             />
             {result.errors?.length ? (
               <Table

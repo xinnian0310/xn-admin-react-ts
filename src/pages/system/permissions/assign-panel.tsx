@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Form, Input, InputNumber, Select, Space, Table, Tabs, Tag, message } from 'antd'
 import XnAuth from '@/components/XnAuth'
 import XnIconPicker from '@/components/XnIconPicker'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
+import XnPopconfirm from '@/components/XnPopconfirm'
 import { create, getMenuGroups, remove, update } from '@/api/permission'
 import type { MenuPermissionGroup, Permission, PermissionForm } from '@/types'
 import type { SaveMode } from '@/types/save'
@@ -210,27 +211,20 @@ export default function PermissionAssignPanel({
                     </Button>
                   </XnAuth>
                   <XnAuth permission="permission-content:table-delete">
-                    <Button
-                      type="link"
-                      size="small"
-                      danger
+                    <XnPopconfirm
+                      title={`确定删除「${row.name}」吗？`}
                       disabled={row.builtIn}
-                      onClick={() => {
-                        XnModal.confirm({
-                          title: '确认删除',
-                          content: `确定删除「${row.name}」吗？`,
-                          okType: 'danger',
-                          onOk: async () => {
-                            await remove(row.id)
-                            message.success('删除成功')
-                            await load()
-                            onChanged?.()
-                          },
-                        })
+                      onConfirm={async () => {
+                        await remove(row.id)
+                        message.success('删除成功')
+                        await load()
+                        onChanged?.()
                       }}
                     >
-                      删除
-                    </Button>
+                      <Button type="link" size="small" danger disabled={row.builtIn}>
+                        删除
+                      </Button>
+                    </XnPopconfirm>
                   </XnAuth>
                 </Space>
               ),
@@ -243,13 +237,16 @@ export default function PermissionAssignPanel({
 
   return (
     <>
-      <XnModal
+      <XnDialog
         title={`分配权限 - ${menuName}`}
         open={open}
         onCancel={onClose}
         width={920}
-        footer={<Button onClick={onClose}>关闭</Button>}
-        destroyOnHidden
+        showFullscreen
+        showCancel={false}
+        confirmText="完成"
+        onConfirm={onClose}
+        destroyOnClose
       >
         <Tabs
           items={[
@@ -270,15 +267,16 @@ export default function PermissionAssignPanel({
             },
           ]}
         />
-      </XnModal>
+      </XnDialog>
 
-      <XnModal
+      <XnDialog
         title={mode === 'add' ? '新增权限' : mode === 'view' ? '查看权限' : '编辑权限'}
         open={editOpen}
         onCancel={() => setEditOpen(false)}
-        onOk={() => void handleSubmit()}
-        okButtonProps={{ style: mode === 'view' ? { display: 'none' } : undefined }}
-        destroyOnHidden
+        onConfirm={() => void handleSubmit()}
+        confirmText="保存"
+        showConfirm={mode !== 'view'}
+        destroyOnClose
         width={520}
       >
         <Form form={form} labelCol={{ span: 5 }} disabled={mode === 'view'}>
@@ -346,7 +344,7 @@ export default function PermissionAssignPanel({
             <InputNumber min={0} max={9999} style={{ width: '100%' }} />
           </Form.Item>
         </Form>
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

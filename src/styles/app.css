@@ -168,9 +168,10 @@ a {
   padding-top: 0;
 }
 
-/* 全局弹窗：默认上下居中（对齐 Vue .el-overlay-dialog），外壳不滚动 */
+/* 全局弹窗：默认上下居中（对齐 Vue .el-overlay-dialog）。
+   限高走弹窗本体 max-height；wrap 必须 overflow:visible，否则拖拽 translate 会被裁掉。 */
 .ant-modal-wrap {
-  overflow: hidden !important;
+  overflow: visible !important;
   display: flex !important;
   align-items: center;
   justify-content: center;
@@ -197,7 +198,12 @@ a {
 .xn-modal-drag-root {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  max-width: 100%;
+}
+
+/* 页面水印 inherit 会往弹窗里塞一层绝对定位层，拖拽后外框会和内容错位 */
+.ant-modal-render > div[style*='pointer-events: none'][style*='z-index: 999'] {
+  display: none !important;
 }
 
 .ant-modal-container {

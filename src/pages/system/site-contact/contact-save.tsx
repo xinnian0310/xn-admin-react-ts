@@ -9,7 +9,7 @@ import {
   type SiteContactItem,
   type SiteContactType,
 } from '@/types/site-contact'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 export interface ContactSaveHandle {
   open: (mode: SaveMode, row?: SiteContactItem, index?: number) => void
 }
@@ -132,16 +132,16 @@ const ContactSave = forwardRef<ContactSaveHandle, Props>(function ContactSave({ 
   const readonly = mode === 'view'
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '联系项')}
       open={visible}
       width={580}
-      destroyOnHidden
+      destroyOnClose
       onCancel={() => setVisible(false)}
-      onOk={() => void handleSubmit()}
-      okText="确定"
+      onConfirm={() => void handleSubmit()}
+      confirmText="确定"
       cancelText={readonly ? '关闭' : '取消'}
-      okButtonProps={{ style: readonly ? { display: 'none' } : undefined }}
+      showConfirm={!readonly}
     >
       <Form form={form} labelCol={{ span: 4 }} disabled={readonly} style={{ marginTop: 16 }}>
         <Form.Item label="图标">
@@ -266,7 +266,7 @@ const ContactSave = forwardRef<ContactSaveHandle, Props>(function ContactSave({ 
           </Form.Item>
         ) : null}
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

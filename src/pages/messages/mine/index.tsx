@@ -1,6 +1,6 @@
-import XnModal from '@/components/XnModal'
 import { useEffect, useState } from 'react'
 import { Modal, Tag, Typography, message } from 'antd'
+import XnDialog from '@/components/XnDialog'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
@@ -104,16 +104,9 @@ export default function MessagesMinePage() {
   }
 
   async function handleDelete(row: MyMessage) {
-    Modal.confirm({
-      title: '删除确认',
-      content: `确定删除消息「${row.title}」吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await removeMine(row.id)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await removeMine(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleBatchDelete() {
@@ -228,12 +221,12 @@ export default function MessagesMinePage() {
           />
         }
       />
-      <XnModal
+      <XnDialog
         title={current?.title || '消息详情'}
         open={detailVisible}
         width={720}
-        footer={null}
-        destroyOnHidden
+        showConfirm={false}
+        cancelText="关闭"
         onCancel={() => setDetailVisible(false)}
       >
         {current ? (
@@ -288,7 +281,7 @@ export default function MessagesMinePage() {
             />
           </div>
         ) : null}
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

@@ -766,7 +766,7 @@ export default function SystemConfigPage() {
               type="info"
               showIcon
               style={{ marginBottom: 16 }}
-              message="定时任务「日志保留清理」每天凌晨按此天数删除过期日志；设为 0 表示不自动清理该类日志。"
+              title="定时任务「日志保留清理」每天凌晨按此天数删除过期日志；设为 0 表示不自动清理该类日志。"
             />
             {(
               [
@@ -806,7 +806,7 @@ export default function SystemConfigPage() {
               type="info"
               showIcon
               style={{ marginBottom: 16 }}
-              message="无「查看敏感信息」权限的角色，在用户列表/详情/导出中会对勾选字段打码。授权：角色权限 → 用户管理 → 敏感信息。"
+              title="无「查看敏感信息」权限的角色，在用户列表/详情/导出中会对勾选字段打码。授权：角色权限 → 用户管理 → 敏感信息。"
             />
             <Form.Item label="启用脱敏">
               <Switch
@@ -858,7 +858,7 @@ export default function SystemConfigPage() {
 
         <Tabs
           className="system-config-page__tabs"
-          tabPosition="left"
+          tabPlacement="start"
           activeKey={activeTab}
           onChange={(key) => setActiveTab(key as ConfigEditableSection)}
           items={tabItems}
@@ -868,9 +868,9 @@ export default function SystemConfigPage() {
       <Image
         style={{ display: 'none' }}
         preview={{
-          visible: previewOpen,
+          open: previewOpen,
           src: previewUrl,
-          onVisibleChange: (v) => setPreviewOpen(v),
+          onOpenChange: (v) => setPreviewOpen(v),
         }}
       />
     </div>

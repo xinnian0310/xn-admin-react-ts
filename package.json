@@ -39,9 +39,9 @@
     "@wangeditor/plugin-md": "^1.0.0",
     "@wangeditor/plugin-mention": "^1.0.0",
     "@wangeditor/plugin-upload-attachment": "^1.1.0",
-    "antd": "^6.5.3",
+    "antd": "^6.6.1",
     "axios": "^1.19.0",
-    "dayjs": "^1.11.21",
+    "dayjs": "^1.11.23",
     "echarts": "^6.1.0",
     "exceljs": "^4.4.0",
     "katex": "^0.18.4",
@@ -50,21 +50,21 @@
     "react-router-dom": "^7.18.2",
     "tslib": "^2.8.1",
     "xlsx": "^0.18.5",
-    "zustand": "^5.0.14"
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.2.1",
-    "@commitlint/config-conventional": "^21.2.0",
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
     "@types/node": "^24.13.3",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.4",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "@vitejs/plugin-react": "^6.1.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "oxlint": "^1.75.0",
+    "oxlint": "^1.80.0",
     "prettier": "^3.9.6",
-    "sass": "^1.102.0",
+    "sass": "^1.103.1",
     "typescript": "~6.0.2",
-    "vite": "^8.2.0"
+    "vite": "^8.2.2"
   }
 }

@@ -4,7 +4,7 @@ import { assignRoles, get } from '@/api/unit'
 import { getOptions as getRoleOptions } from '@/api/role'
 import { usePermission } from '@/hooks/usePermission'
 import type { Role, SysUnit } from '@/types'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 
 export interface UnitAssignRolesHandle {
   open: (row: SysUnit) => Promise<void>
@@ -52,14 +52,15 @@ const UnitAssignRoles = forwardRef<UnitAssignRolesHandle, { onSuccess?: () => vo
     }
 
     return (
-      <XnModal
+      <XnDialog
         title={`分配角色 - ${unit?.name || ''}`}
         open={visible}
         onCancel={() => setVisible(false)}
-        destroyOnHidden
+        destroyOnClose
         width={480}
+        confirmText="保存"
         confirmLoading={submitting}
-        onOk={() => void handleSubmit()}
+        onConfirm={() => void handleSubmit()}
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -76,7 +77,7 @@ const UnitAssignRoles = forwardRef<UnitAssignRolesHandle, { onSuccess?: () => vo
             />
           </Form.Item>
         </Form>
-      </XnModal>
+      </XnDialog>
     )
   },
 )

@@ -4,7 +4,7 @@ import XnAppIcon from '@/components/XnAppIcon'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnIconPicker from '@/components/XnIconPicker'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnTable from '@/components/XnTable'
 import XnTreePanel from '@/components/XnTreePanel'
@@ -357,16 +357,11 @@ export default function PermissionsContentPage() {
         onActionClick={({ action, row: r }) => {
           const p = r as unknown as Permission
           if (action === 'delete') {
-            XnModal.confirm({
-              title: '确认删除',
-              content: `确定删除「${p.name}」吗？`,
-              okType: 'danger',
-              onOk: async () => {
-                await remove(p.id)
-                message.success('删除成功')
-                await loadAll()
-              },
-            })
+            void (async () => {
+              await remove(p.id)
+              message.success('删除成功')
+              await loadAll()
+            })()
           } else if (action === 'edit' || action === 'view') {
             openEdit(p, action === 'view')
           }
@@ -434,7 +429,7 @@ export default function PermissionsContentPage() {
               <Alert
                 type="warning"
                 showIcon
-                message="该菜单路由未关联权限节点，请先在路由管理中开启权限控制并生成权限。"
+                title="该菜单路由未关联权限节点，请先在路由管理中开启权限控制并生成权限。"
               />
             </div>
           ) : !selectedRoute ? (
@@ -470,13 +465,13 @@ export default function PermissionsContentPage() {
         }
       />
 
-      <XnModal
+      <XnDialog
         title={mode === 'add' ? '新增权限' : mode === 'view' ? '查看权限' : '编辑权限'}
         open={editOpen}
         onCancel={() => setEditOpen(false)}
-        onOk={() => void handleSubmit()}
-        okButtonProps={{ style: mode === 'view' ? { display: 'none' } : undefined }}
-        destroyOnHidden
+        onConfirm={() => void handleSubmit()}
+        showConfirm={mode !== 'view'}
+        cancelText={mode === 'view' ? '关闭' : '取消'}
         width={520}
       >
         <Form form={form} labelCol={{ span: 5 }} disabled={mode === 'view'}>
@@ -547,7 +542,7 @@ export default function PermissionsContentPage() {
             <InputNumber min={0} max={9999} style={{ width: '100%' }} />
           </Form.Item>
         </Form>
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

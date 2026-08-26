@@ -1,4 +1,4 @@
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, Radio, Select, Switch, message } from 'antd'
 import { create, get, update } from '@/api/login-page'
@@ -79,16 +79,16 @@ const LoginPageSave = forwardRef<LoginPageSaveHandle, Props>(function LoginPageS
   const readonly = mode === 'view'
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '登录页配置')}
       open={visible}
       width={560}
-      destroyOnHidden
+      destroyOnClose
       onCancel={() => setVisible(false)}
-      onOk={() => void handleSubmit()}
-      okText="保存"
+      onConfirm={() => void handleSubmit()}
+      confirmText="保存"
       cancelText={readonly ? '关闭' : '取消'}
-      okButtonProps={{ style: readonly ? { display: 'none' } : undefined }}
+      showConfirm={!readonly}
       confirmLoading={submitting}
     >
       <Form form={form} labelCol={{ span: 6 }} disabled={readonly} style={{ marginTop: 16 }}>
@@ -137,7 +137,7 @@ const LoginPageSave = forwardRef<LoginPageSaveHandle, Props>(function LoginPageS
           <Input.TextArea rows={2} maxLength={200} />
         </Form.Item>
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

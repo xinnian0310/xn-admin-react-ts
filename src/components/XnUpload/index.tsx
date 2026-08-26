@@ -190,7 +190,9 @@ export default function XnUpload({
 
   // 回调放进 ref，订阅只需建立一次，父组件每次渲染换新的箭头函数也不会反复重订阅
   const handlers = useRef({ onChange, onProgress, onSuccess, onError, onExceed, onInvalid })
-  handlers.current = { onChange, onProgress, onSuccess, onError, onExceed, onInvalid }
+  useEffect(() => {
+    handlers.current = { onChange, onProgress, onSuccess, onError, onExceed, onInvalid }
+  })
 
   const options: UploaderOptions = useMemo(
     () => ({
@@ -226,11 +228,7 @@ export default function XnUpload({
   )
 
   // manager 必须跨渲染保持同一实例，否则进行中的上传会在每次渲染时丢失
-  const managerRef = useRef<UploadManager>(null)
-  if (!managerRef.current) {
-    managerRef.current = new UploadManager(options)
-  }
-  const manager = managerRef.current
+  const [manager] = useState(() => new UploadManager(options))
 
   useEffect(() => {
     manager.setOptions(options)

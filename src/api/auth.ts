@@ -1,5 +1,7 @@
-import request from '@/utils/request'
+import axios from 'axios'
+import request, { formatRequestError } from '@/utils/request'
 import type { ApiResponse, LoginResult, User } from '@/types'
+import { encryptPasswordWithPem } from '@/utils/password-crypto'
 
 export interface CaptchaPayload {
   captchaId: string
@@ -14,8 +16,51 @@ export interface LoginPayload {
   captchaCode?: string
 }
 
-export function login(data: LoginPayload) {
-  return request.post<any, ApiResponse<LoginResult>>('/auth/login', data)
+export function getPasswordPublicKey() {
+  return axios
+    .get<ApiResponse<{ publicKey: string }>>('/api/auth/password-public-key', { timeout: 10000 })
+    .then((res) => {
+      const data = res.data
+      if (data.code !== 200 || !data.data?.publicKey) {
+        return Promise.reject(new Error(data.message || '获取密码公钥失败'))
+      }
+      return data
+    })
+    .catch((error) => {
+      return Promise.reject(new Error(formatRequestError(error, '获取密码公钥失败')))
+    })
+}
+
+async function encryptTransportPassword(plain: string) {
+  const res = await getPasswordPublicKey()
+  const pem = res.data?.publicKey
+  if (!pem) {
+    throw new Error('获取密码公钥失败')
+  }
+  return encryptPasswordWithPem(plain, pem)
+}
+
+export async function login(data: LoginPayload) {
+  return request.post<any, ApiResponse<LoginResult>>('/auth/login', {
+    ...data,
+    password: await encryptTransportPassword(data.password),
+  })
+}
+
+export type SmsScene = 'LOGIN' | 'BIND'
+
+export function sendSms(data: { phone: string; scene: SmsScene }, silentError = true) {
+  return request.post<any, ApiResponse<{ code?: string | null }>>('/auth/sms/send', data, {
+    silentError,
+  })
+}
+
+export function loginBySms(data: { phone: string; code: string }) {
+  return request.post<any, ApiResponse<LoginResult>>('/auth/sms/login', data)
+}
+
+export function bindPhone(data: { phone: string; code: string }) {
+  return request.post<any, ApiResponse<User>>('/auth/me/phone/bind', data)
 }
 
 export interface RegisterPayload {
@@ -26,8 +71,11 @@ export interface RegisterPayload {
   captchaCode?: string
 }
 
-export function register(data: RegisterPayload) {
-  return request.post<any, ApiResponse<null>>('/auth/register', data)
+export async function register(data: RegisterPayload) {
+  return request.post<any, ApiResponse<null>>('/auth/register', {
+    ...data,
+    password: await encryptTransportPassword(data.password),
+  })
 }
 
 export function logout(token?: string) {

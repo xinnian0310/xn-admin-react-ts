@@ -48,16 +48,33 @@ function useAppConfigTick() {
   useEffect(() => subscribeAppConfig(() => setTick((n) => n + 1)), [])
 }
 
+function resolveMask(
+  mask: ModalProps['mask'],
+  maskClosable: ModalProps['maskClosable'],
+): ModalProps['mask'] {
+  if (mask === false) return false
+  const closable =
+    typeof mask === 'object' && mask && 'closable' in mask ? mask.closable : maskClosable
+  if (typeof mask === 'object' && mask) {
+    return closable === undefined ? mask : { ...mask, closable }
+  }
+  if (closable === undefined) return mask
+  return { closable }
+}
+
 function XnModalInner({
   draggable: draggableProp,
   centered,
   open,
   modalRender,
   className,
+  style,
   styles: stylesProp,
   afterOpenChange,
   destroyOnClose,
   destroyOnHidden,
+  maskClosable,
+  mask,
   ...rest
 }: XnModalProps) {
   useAppConfigTick()
@@ -65,19 +82,17 @@ function XnModalInner({
   const draggable = draggableProp ?? appConfig.ui.antd.modal.draggable
   const resolvedCentered = centered ?? appConfig.ui.antd.modal.centered
   const resolvedDestroyOnHidden = destroyOnHidden ?? destroyOnClose
+  const resolvedMask = resolveMask(mask, maskClosable)
   const maxHeight = appConfig.ui.dialog.maxHeight || appConfig.ui.antd.modal.maxHeight || '80vh'
 
-  const [offset, setOffset] = useState({ x: 0, y: 0 })
-  const offsetRef = useRef(offset)
-  offsetRef.current = offset
+  const [offset, setOffsetState] = useState({ x: 0, y: 0 })
+  const offsetRef = useRef({ x: 0, y: 0 })
   const draggingRef = useRef(false)
 
-  useEffect(() => {
-    if (!open) {
-      setOffset({ x: 0, y: 0 })
-      offsetRef.current = { x: 0, y: 0 }
-    }
-  }, [open])
+  const setOffset = useCallback((next: { x: number; y: number }) => {
+    offsetRef.current = next
+    setOffsetState(next)
+  }, [])
 
   const onHeaderMouseDown = useCallback(
     (e: ReactMouseEvent) => {
@@ -106,7 +121,7 @@ function XnModalInner({
       document.addEventListener('mousemove', onMove)
       document.addEventListener('mouseup', onUp)
     },
-    [draggable],
+    [draggable, setOffset],
   )
 
   const renderModal = useCallback(
@@ -114,16 +129,12 @@ function XnModalInner({
       const inner = modalRender ? modalRender(node) : node
       if (!draggable) return inner
       return (
-        <div
-          className="xn-modal-drag-root"
-          style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
-          onMouseDown={onHeaderMouseDown}
-        >
+        <div className="xn-modal-drag-root" onMouseDown={onHeaderMouseDown}>
           {inner}
         </div>
       )
     },
-    [draggable, modalRender, offset.x, offset.y, onHeaderMouseDown],
+    [draggable, modalRender, onHeaderMouseDown],
   )
 
   return (
@@ -131,18 +142,23 @@ function XnModalInner({
       {...rest}
       open={open}
       centered={resolvedCentered}
+      mask={resolvedMask}
       destroyOnHidden={resolvedDestroyOnHidden}
       className={['xn-modal', draggable ? 'xn-modal--draggable' : '', className]
         .filter(Boolean)
         .join(' ')}
+      style={{
+        ...style,
+        ...(draggable ? { transform: `translate(${offset.x}px, ${offset.y}px)` } : {}),
+      }}
       styles={(info) => {
         const resolved = resolveModalStyles(stylesProp, info)
         return {
           ...resolved,
-          wrapper: { overflow: 'hidden', ...resolved.wrapper },
+          wrapper: { overflow: 'visible', ...resolved.wrapper },
           container: {
             ...resolved.container,
-            maxHeight,
+            maxHeight: resolved.container?.maxHeight ?? maxHeight,
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
@@ -171,11 +187,14 @@ function XnModalInner({
 }
 
 function withModalDefaults(fn: (props: ModalFuncProps) => ReturnType<typeof Modal.info>) {
-  return (props: ModalFuncProps) =>
-    fn({
+  return (props: ModalFuncProps) => {
+    const { maskClosable, mask, ...rest } = props
+    return fn({
       centered: appConfig.ui.antd.modal.centered,
-      ...props,
+      ...rest,
+      mask: resolveMask(mask, maskClosable),
     })
+  }
 }
 
 const XnModal = XnModalInner as XnModalComponent

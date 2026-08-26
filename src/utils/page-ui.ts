@@ -13,6 +13,8 @@ export function mapSearchItems(items: PageUiSearchItem[]): SearchItem[] {
     clearable: item.clearable,
     multiple: item.multiple,
     options: item.options,
+    dictType: item.dictType,
+    level: item.level,
   }))
 }
 

@@ -38,16 +38,21 @@ export default function XnIconPicker({
   const rootRef = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
   const [keyword, setKeyword] = useState('')
-  const [iconifyInput, setIconifyInput] = useState('')
-  const [activeTab, setActiveTab] = useState<PickerTab>('antd')
+  const [iconifyInput, setIconifyInput] = useState(() => {
+    const parsed = parseIcon(value)
+    return parsed?.type === 'iconify' ? parsed.name : ''
+  })
+  const [activeTab, setActiveTab] = useState<PickerTab>(() => toPickerTab(parseIcon(value)?.type))
+  const [prevValue, setPrevValue] = useState(value)
 
-  useEffect(() => {
+  if (value !== prevValue) {
+    setPrevValue(value)
     const parsed = parseIcon(value)
     if (parsed) {
       setActiveTab(toPickerTab(parsed.type))
       if (parsed.type === 'iconify') setIconifyInput(parsed.name)
     }
-  }, [value])
+  }
 
   useEffect(() => {
     if (!open) return

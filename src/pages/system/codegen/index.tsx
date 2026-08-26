@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Checkbox, Form, Input, Select, Space, Steps, Table, message } from 'antd'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
@@ -312,13 +312,13 @@ export default function SystemCodegenPage() {
         }
       />
 
-      <XnModal
+      <XnDialog
         title={`代码生成 — ${form.tableName || ''}`}
         open={wizardVisible}
         onCancel={() => setWizardVisible(false)}
         width={960}
-        destroyOnHidden
-        confirmLoading={wizardLoading}
+        showFullscreen
+        loading={wizardLoading}
         afterClose={() => {
           setStep(0)
           setForm((prev) => ({ ...prev, columns: [] }))
@@ -518,7 +518,7 @@ export default function SystemCodegenPage() {
 
         {step === 2 ? (
           <div>
-            <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
+            <Space orientation="vertical" style={{ width: '100%', marginBottom: 16 }}>
               <Checkbox
                 checked={form.persistPermissions}
                 onChange={(e) =>
@@ -543,11 +543,11 @@ export default function SystemCodegenPage() {
             <Alert
               type="info"
               showIcon
-              message={`将生成后端 CRUD + 本工程前端（${APP_CLIENT_ID}：XnPageLayout / XnSearch / XnButton / XnTable），打包 ZIP 下载；请按包内 README 拷贝后重启。`}
+              title={`将生成后端 CRUD + 本工程前端（${APP_CLIENT_ID}：XnPageLayout / XnSearch / XnButton / XnTable），打包 ZIP 下载；请按包内 README 拷贝后重启。`}
             />
           </div>
         ) : null}
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button, Input, InputNumber, Space, Switch } from 'antd'
 import { HolderOutlined } from '@ant-design/icons'
 import type { TableColumnSetting } from '@/api/table-column'
@@ -7,6 +7,20 @@ import XnModal from '@/components/XnModal'
 
 function isLocked(row: TableColumnSetting) {
   return !!row.locked || row.key === 'type:selection'
+}
+
+function mapSettingRows(columns: TableColumnSetting[]): TableColumnSetting[] {
+  return columns.map((col, index) => {
+    const locked = isLocked(col)
+    return {
+      ...col,
+      label: locked ? '选择框' : col.label,
+      visible: col.visible !== false,
+      sort: index,
+      width: col.width == null ? undefined : Number(col.width),
+      locked,
+    }
+  })
 }
 
 interface ColumnSettingDialogProps {
@@ -28,24 +42,18 @@ export default function ColumnSettingDialog({
 }: ColumnSettingDialogProps) {
   const [rows, setRows] = useState<TableColumnSetting[]>([])
   const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [snapshot, setSnapshot] = useState<{ open: boolean; columns: TableColumnSetting[] }>({
+    open: false,
+    columns,
+  })
 
-  useEffect(() => {
-    if (!open) return
-    setRows(
-      columns.map((col, index) => {
-        const locked = isLocked(col)
-        return {
-          ...col,
-          label: locked ? '选择框' : col.label,
-          visible: col.visible !== false,
-          sort: index,
-          width: col.width == null ? undefined : Number(col.width),
-          locked,
-        }
-      }),
-    )
+  if (open && (!snapshot.open || snapshot.columns !== columns)) {
+    setSnapshot({ open: true, columns })
+    setRows(mapSettingRows(columns))
     setDragIndex(null)
-  }, [open, columns])
+  } else if (!open && snapshot.open) {
+    setSnapshot({ open: false, columns: snapshot.columns })
+  }
 
   function updateRow(index: number, patch: Partial<TableColumnSetting>) {
     setRows((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)))

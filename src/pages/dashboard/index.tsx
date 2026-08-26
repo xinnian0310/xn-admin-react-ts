@@ -313,7 +313,7 @@ export default function DashboardPage() {
                 className={styles.timeline}
                 items={gitChangelog.map((item, idx) => ({
                   color: idx === 0 ? 'blue' : 'gray',
-                  children: (
+                  content: (
                     <div className={styles.logLine}>
                       <Tag
                         color={

@@ -36,16 +36,16 @@ import XnSidebarMenu from '@/components/XnSidebarMenu'
 
 ## 传参
 
-| 名称           | 类型                                     | 默认值 | 说明                 |
-| -------------- | ---------------------------------------- | ------ | -------------------- |
-| `menus`        | `MenuItem[]`                             | —      | 菜单树（必填）       |
-| `mode`         | `'inline' \| 'horizontal' \| 'vertical'` | —      | antd Menu 方向       |
-| `theme`        | `'light' \| 'dark'`                      | —      | 菜单主题             |
-| `collapsed`    | `boolean`                                | —      | 是否折叠（inline）   |
-| `showSearch`   | `boolean`                                | `true` | 竖向菜单是否显示搜索 |
-| `onSelectPath` | `(path: string) => void`                 | —      | 选中叶子后回调       |
-| `className`    | `string`                                 | —      | 类名                 |
-| `style`        | `CSSProperties`                          | —      | 样式                 |
+| 名称           | 类型                                     | 默认值     | 说明                 |
+| -------------- | ---------------------------------------- | ---------- | -------------------- |
+| `menus`        | `MenuItem[]`                             | —          | 菜单树（必填）       |
+| `mode`         | `'inline' \| 'horizontal' \| 'vertical'` | `'inline'` | antd Menu 方向       |
+| `theme`        | `'light' \| 'dark'`                      | `'dark'`   | 菜单主题             |
+| `collapsed`    | `boolean`                                | —          | 是否折叠（inline）   |
+| `showSearch`   | `boolean`                                | `true`     | 竖向菜单是否显示搜索 |
+| `onSelectPath` | `(path: string) => void`                 | —          | 选中叶子后回调       |
+| `className`    | `string`                                 | —          | 类名                 |
+| `style`        | `CSSProperties`                          | —          | 样式                 |
 
 ## 依赖
 

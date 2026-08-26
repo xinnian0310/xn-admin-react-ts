@@ -22,6 +22,7 @@ import type { SaveMode } from '@/types/save'
 import type { TableColumnItem } from '@/types/table'
 import { formatDateTime } from '@/utils/datetime'
 import NoticeSave, { type NoticeSaveHandle } from './save'
+import XnDialog from '@/components/XnDialog'
 import XnModal from '@/components/XnModal'
 
 function statusLabel(status: NoticeStatus) {
@@ -114,17 +115,9 @@ export default function NoticesPage() {
       message.warning('仅草稿可删除')
       return
     }
-    XnModal.confirm({
-      title: '删除确认',
-      content: `确定删除公告「${row.title}」吗？`,
-      okType: 'danger',
-      okText: '删除',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleBatchDelete() {
@@ -389,12 +382,12 @@ export default function NoticesPage() {
         }
       />
       <NoticeSave ref={saveRef} onSuccess={() => void loadData()} />
-      <XnModal
+      <XnDialog
         title="已读明细"
         open={readersVisible}
         width={640}
-        footer={null}
-        destroyOnHidden
+        showConfirm={false}
+        cancelText="关闭"
         onCancel={() => setReadersVisible(false)}
       >
         <Table
@@ -406,7 +399,7 @@ export default function NoticesPage() {
           scroll={{ y: 420 }}
           size="small"
         />
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

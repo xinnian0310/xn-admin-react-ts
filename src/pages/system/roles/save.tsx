@@ -1,4 +1,4 @@
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, Select, message } from 'antd'
 import { create, get, update } from '@/api/role'
@@ -82,17 +82,17 @@ const RoleSave = forwardRef<RoleSaveHandle, { onSuccess?: () => void }>(function
   const lockCore = mode === 'view' || editingBuiltIn
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '角色')}
       open={visible}
       onCancel={() => setVisible(false)}
-      destroyOnHidden
+      destroyOnClose
       width={560}
-      okText="保存"
+      confirmText="保存"
       cancelText={mode === 'view' ? '关闭' : '取消'}
-      okButtonProps={{ style: mode === 'view' ? { display: 'none' } : undefined }}
+      showConfirm={mode !== 'view'}
       confirmLoading={submitting}
-      onOk={() => void handleSubmit()}
+      onConfirm={() => void handleSubmit()}
     >
       <Form form={form} labelCol={{ span: 5 }} disabled={mode === 'view'}>
         <Form.Item name="name" label="名称" rules={[{ required: true, message: '请输入名称' }]}>
@@ -120,7 +120,7 @@ const RoleSave = forwardRef<RoleSaveHandle, { onSuccess?: () => void }>(function
           <Input.TextArea rows={3} />
         </Form.Item>
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

@@ -1,4 +1,4 @@
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
 import { Form, Input, InputNumber, Radio, Select, TreeSelect, message } from 'antd'
 import { create, get, list, update } from '@/api/unit'
@@ -115,17 +115,17 @@ const UnitSave = forwardRef<UnitSaveHandle, { onSuccess?: () => void }>(function
   const lockBuiltIn = builtIn && mode !== 'add'
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '单位')}
       open={visible}
       onCancel={() => setVisible(false)}
-      destroyOnHidden
+      destroyOnClose
       width={560}
-      okText="保存"
+      confirmText="保存"
       cancelText={mode === 'view' ? '关闭' : '取消'}
-      okButtonProps={{ style: mode === 'view' ? { display: 'none' } : undefined }}
+      showConfirm={mode !== 'view'}
       confirmLoading={submitting}
-      onOk={() => void handleSubmit()}
+      onConfirm={() => void handleSubmit()}
     >
       <Form form={form} labelCol={{ span: 5 }} disabled={mode === 'view'}>
         <Form.Item name="name" label="名称" rules={[{ required: true, message: '请输入名称' }]}>
@@ -168,7 +168,7 @@ const UnitSave = forwardRef<UnitSaveHandle, { onSuccess?: () => void }>(function
           <Input.TextArea rows={3} />
         </Form.Item>
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

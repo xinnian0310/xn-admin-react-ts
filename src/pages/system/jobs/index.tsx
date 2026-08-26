@@ -78,16 +78,9 @@ export default function SystemJobsPage() {
   }
 
   async function handleDelete(row: Job) {
-    Modal.confirm({
-      title: '删除确认',
-      content: `确定删除任务「${row.name}」吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await removeJob(row.id)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await removeJob(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleBatchDelete() {

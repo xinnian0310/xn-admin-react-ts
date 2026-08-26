@@ -6,10 +6,20 @@
   overflow: hidden;
 }
 
-.admin-layout > .layout-shell,
-.admin-layout > .ant-layout {
+.admin-layout > .xn-watermark,
+.admin-layout > .ant-watermark {
   flex: 1;
   min-height: 0;
+  height: 100%;
+}
+
+.admin-layout > .layout-shell,
+.admin-layout > .ant-layout,
+.admin-layout .xn-watermark > .layout-shell,
+.admin-layout .xn-watermark > .ant-layout {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
 }
 
 .admin-layout__content {

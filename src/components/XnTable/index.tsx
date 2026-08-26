@@ -10,7 +10,7 @@ import {
   type Key,
   type ReactNode,
 } from 'react'
-import { Button, Modal, Pagination, Space, Switch, Table, Tag, Tooltip, message } from 'antd'
+import { Button, Pagination, Space, Switch, Table, Tag, Tooltip, message } from 'antd'
 import type { ColumnsType, TableProps } from 'antd/es/table'
 import { ReloadOutlined, SettingOutlined } from '@ant-design/icons'
 import { CrudApiContext } from '@/hooks/useCrudApi'
@@ -23,6 +23,8 @@ import { formatDateTime, isIsoDateTimeLike } from '@/utils/datetime'
 import { estimateTableActionsWidth } from '@/utils/table-actions'
 import { getTableColumns, saveTableColumns, type TableColumnSetting } from '@/api/table-column'
 import XnAppIcon from '@/components/XnAppIcon'
+import { XnTableActions } from '@/components/XnButton'
+import XnEmpty, { type XnEmptyType } from '@/components/XnEmpty'
 import XnLongText from '@/components/XnLongText'
 import { usePermission } from '@/hooks/usePermission'
 import ColumnSettingDialog from './ColumnSettingDialog'
@@ -65,6 +67,8 @@ interface XnTableProps {
   onSwitchChange?: (payload: { row: Record<string, unknown>; prop: string; value: unknown }) => void
   onDataChange?: (rows: unknown[]) => void
   onSuccess?: () => void
+  emptyType?: XnEmptyType
+  emptyDescription?: string
   slots?: Record<string, (ctx: { row: Record<string, unknown>; index: number }) => ReactNode>
 }
 
@@ -162,8 +166,6 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
     api,
     queryParams,
     listFilter,
-    entityName = '数据',
-    nameField = 'name',
     idField = 'id',
     immediate = true,
     tableKey,
@@ -175,6 +177,8 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
     onSwitchChange,
     onDataChange,
     onSuccess,
+    emptyType = 'data',
+    emptyDescription,
     slots,
   } = props
 
@@ -426,22 +430,11 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
           className: 'xn-table-col-actions',
           onCell: () => ({ style: { whiteSpace: 'nowrap' } }),
           render: (_v, row) => (
-            <Space size={0} wrap={false}>
-              {visibleActionItems.map((item) => {
-                const action = item.action || item.name
-                return (
-                  <Button
-                    key={action}
-                    type="link"
-                    size="small"
-                    danger={item.typeColor === 'danger'}
-                    onClick={() => handleAction(action, row)}
-                  >
-                    {item.name}
-                  </Button>
-                )
-              })}
-            </Space>
+            <XnTableActions
+              items={visibleActionItems}
+              row={row}
+              onActionClick={({ action }) => handleAction(action, row)}
+            />
           ),
         })
         continue
@@ -477,18 +470,10 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
     const mod = apiModule || (api ? loadCrudApi(api) : null)
     if (!mod) return
     const id = row[idField]
-    const label = String(row[nameField] ?? id ?? '')
-    Modal.confirm({
-      title: '确认删除',
-      content: `确定删除${entityName}「${label}」吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await mod.remove(id as number)
-        message.success('删除成功')
-        onSuccess?.()
-        if (isApiMode) await loadData()
-      },
-    })
+    await mod.remove(id as number)
+    message.success('删除成功')
+    onSuccess?.()
+    if (isApiMode) await loadData()
   }
 
   function handleAction(action: string, row?: Record<string, unknown>) {
@@ -596,6 +581,9 @@ const XnTable = forwardRef<XnTableHandle, XnTableProps>(function XnTable(props, 
             pagination={false}
             rowSelection={rowSelection}
             scroll={{ x: 'max-content', y: scrollY }}
+            locale={{
+              emptyText: <XnEmpty type={emptyType} description={emptyDescription} size="small" />,
+            }}
           />
         </div>
         {showPagination ? (

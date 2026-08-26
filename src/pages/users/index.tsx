@@ -10,7 +10,6 @@ import XnAuth from '@/components/XnAuth'
 import UserSave, { type UserSaveHandle } from './save'
 import { usePageUi } from '@/hooks/usePageUi'
 import { list, batchRemove, remove, updateStatus, importUsers, exportUsers } from '@/api/user'
-import { showCaughtError } from '@/utils/request'
 import { getOptions as getRoleOptions } from '@/api/role'
 import { getTree as getUnitTree } from '@/api/unit'
 import { getOptions as getPostOptions } from '@/api/post'
@@ -193,16 +192,9 @@ export default function UsersPage() {
       message.warning('admin 用户不可删除')
       return
     }
-    Modal.confirm({
-      title: '确认删除',
-      content: `确定删除用户「${row.username}」吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleBatchDelete() {
@@ -239,19 +231,12 @@ export default function UsersPage() {
   }
 
   async function handleExport() {
-    try {
-      await exportUsers({
-        keyword: String(queryForm.FuzzyWord ?? '').trim() || undefined,
-        roleId:
-          queryForm.roleId === '' || queryForm.roleId == null
-            ? undefined
-            : Number(queryForm.roleId),
-        unitId: selectedUnitId ?? undefined,
-      })
-      message.success('导出成功')
-    } catch (e: unknown) {
-      showCaughtError(e, '导出失败')
-    }
+    await exportUsers({
+      keyword: String(queryForm.FuzzyWord ?? '').trim() || undefined,
+      roleId:
+        queryForm.roleId === '' || queryForm.roleId == null ? undefined : Number(queryForm.roleId),
+      unitId: selectedUnitId ?? undefined,
+    })
   }
 
   function buttonClick(action: string) {
@@ -261,10 +246,6 @@ export default function UsersPage() {
     }
     if (action === 'import') {
       importRef.current?.open()
-      return
-    }
-    if (action === 'export') {
-      void handleExport()
       return
     }
     if (action === 'edit' || action === 'view') {
@@ -327,7 +308,12 @@ export default function UsersPage() {
           />
         }
         toolbar={
-          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+          <XnButton
+            listItem={buttonItems}
+            selected={selected}
+            exportRequest={handleExport}
+            onButtonClick={buttonClick}
+          />
         }
         table={
           <XnTable

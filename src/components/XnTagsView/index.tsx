@@ -82,8 +82,20 @@ export default function XnTagsView() {
       observer = new ResizeObserver(() => updateScrollState())
       observer.observe(el)
     }
+    const onWheel = (event: WheelEvent) => {
+      if (!el || el.scrollWidth <= el.clientWidth + 1) return
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return
+      if (!event.deltaY) return
+      const max = el.scrollWidth - el.clientWidth
+      const next = Math.min(max, Math.max(0, el.scrollLeft + event.deltaY))
+      if (next === el.scrollLeft) return
+      event.preventDefault()
+      el.scrollLeft = next
+    }
+    el?.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('resize', updateScrollState)
     return () => {
+      el?.removeEventListener('wheel', onWheel)
       observer?.disconnect()
       window.removeEventListener('resize', updateScrollState)
     }

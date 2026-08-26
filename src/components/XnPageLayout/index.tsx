@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Pagination, Segmented, Spin } from 'antd'
 import { useLocation } from 'react-router-dom'
 import './xnPageLayout.scss'
@@ -25,6 +25,15 @@ interface XnPageLayoutProps {
   children?: ReactNode
 }
 
+function readViewMode(key: string): ViewMode {
+  try {
+    const saved = localStorage.getItem(key)
+    return saved === 'card' ? 'card' : 'table'
+  } catch {
+    return 'table'
+  }
+}
+
 export default function XnPageLayout({
   aside,
   search,
@@ -46,26 +55,15 @@ export default function XnPageLayout({
 }: XnPageLayoutProps) {
   const location = useLocation()
   const storageKey = `xn-view-mode:${location.pathname}`
-  const [innerMode, setInnerMode] = useState<ViewMode>(() => {
-    try {
-      const saved = localStorage.getItem(storageKey)
-      return saved === 'card' ? 'card' : 'table'
-    } catch {
-      return 'table'
-    }
-  })
+  const [innerMode, setInnerMode] = useState<ViewMode>(() => readViewMode(storageKey))
+  const [modeKey, setModeKey] = useState(storageKey)
+
+  if (viewModeProp == null && modeKey !== storageKey) {
+    setModeKey(storageKey)
+    setInnerMode(readViewMode(storageKey))
+  }
 
   const viewMode = viewModeProp ?? innerMode
-
-  useEffect(() => {
-    if (viewModeProp != null) return
-    try {
-      const saved = localStorage.getItem(storageKey)
-      if (saved === 'card' || saved === 'table') setInnerMode(saved)
-    } catch {
-      /* ignore */
-    }
-  }, [storageKey, viewModeProp])
 
   function changeMode(mode: ViewMode) {
     setInnerMode(mode)

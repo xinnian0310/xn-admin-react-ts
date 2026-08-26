@@ -49,7 +49,7 @@ const tableActions: ButtonListItem[] = [
 ]
 
 export default function SiteContactPage() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('contacts')
   const [donationTip, setDonationTip] = useState('')
   const [tipSnapshot, setTipSnapshot] = useState('')
@@ -200,7 +200,20 @@ export default function SiteContactPage() {
   }
 
   useEffect(() => {
-    void loadConfig()
+    let cancelled = false
+    void getSiteContact()
+      .then((res) => {
+        if (!cancelled) applyConfig(res.data)
+      })
+      .catch((e: unknown) => {
+        if (!cancelled) showCaughtError(e, '加载失败')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   async function saveDonationTip() {

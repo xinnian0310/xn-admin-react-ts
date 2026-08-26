@@ -42,7 +42,7 @@ export function handleForceLogout(message?: string) {
       content,
       okText: '重新登录',
       closable: true,
-      maskClosable: false,
+      mask: { closable: false },
       onOk: redirect,
       onCancel: redirect,
     })

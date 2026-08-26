@@ -152,16 +152,9 @@ export default function SystemFilesPage() {
       message.warning('不支持删除目录')
       return
     }
-    XnModal.confirm({
-      title: '删除确认',
-      content: `确定删除文件「${row.path}」吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await removeFile(row.path)
-        message.success('删除成功')
-        await refreshAll()
-      },
-    })
+    await removeFile(row.path)
+    message.success('删除成功')
+    await refreshAll()
   }
 
   async function handleBatchDelete() {

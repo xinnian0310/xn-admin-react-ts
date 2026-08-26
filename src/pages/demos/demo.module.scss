@@ -114,6 +114,25 @@
   background: linear-gradient(135deg, #1677ff 0%, #69b1ff 100%);
 }
 
+.plainList {
+  max-width: 360px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--ant-color-border, #e5e7eb);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.plainList li {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--ant-color-border, #e5e7eb);
+}
+
+.plainList li:last-child {
+  border-bottom: none;
+}
+
 .noteList {
   margin: 0;
   padding-left: 18px;
@@ -124,6 +143,16 @@
 
 .uploadForm {
   margin-bottom: 14px;
+}
+
+.watermarkBox {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--ant-color-border, #e5e7eb);
+  border-radius: 8px;
+  color: var(--ant-color-text-secondary, #64748b);
 }
 
 .uploadLogs {

@@ -1,0 +1,25 @@
+.xn-image-upload {
+  .ant-upload-select-picture-card,
+  .ant-upload-list-item-container {
+    width: 96px !important;
+    height: 96px !important;
+  }
+}
+
+.xn-image-upload__plus {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+}
+
+.xn-image-upload__tip {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45));
+  line-height: 1.5;
+}
+
+.xn-image-upload__preview {
+  display: none;
+}

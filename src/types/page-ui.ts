@@ -15,6 +15,8 @@ export interface PageUiSearchItem {
   clearable?: boolean
   multiple?: boolean
   options?: PageUiOption[]
+  dictType?: string
+  level?: 2 | 3
 }
 
 export interface PageUiButtonDropdown {

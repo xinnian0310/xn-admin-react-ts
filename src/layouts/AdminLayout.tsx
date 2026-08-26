@@ -9,6 +9,7 @@ import { useTagsViewStore } from '@/stores/tagsView'
 import { useMenuStore } from '@/stores/menu'
 import XnUiPreferenceFab from '@/components/XnUiPreferenceFab'
 import XnTagsView from '@/components/XnTagsView'
+import XnWatermark from '@/components/XnWatermark'
 import SideLayout from './modes/SideLayout'
 import TopLayout from './modes/TopLayout'
 import MixLayout from './modes/MixLayout'
@@ -54,14 +55,16 @@ export default function AdminLayout() {
 
   return (
     <div className={`admin-layout ${isFullscreen ? 'is-fullscreen' : ''}`}>
-      <LayoutComp menus={menus} isFullscreen={isFullscreen}>
-        {!isFullscreen ? <XnTagsView /> : null}
-        <Layout.Content className="admin-layout__content">
-          <div className="admin-layout__page">
-            <Outlet />
-          </div>
-        </Layout.Content>
-      </LayoutComp>
+      <XnWatermark>
+        <LayoutComp menus={menus} isFullscreen={isFullscreen}>
+          {!isFullscreen ? <XnTagsView /> : null}
+          <Layout.Content className="admin-layout__content">
+            <div className="admin-layout__page">
+              <Outlet />
+            </div>
+          </Layout.Content>
+        </LayoutComp>
+      </XnWatermark>
       <XnUiPreferenceFab />
       {isFullscreen ? (
         <Button

@@ -4,6 +4,7 @@ import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnTable from '@/components/XnTable'
+import XnDialog from '@/components/XnDialog'
 import XnModal from '@/components/XnModal'
 import { usePageUi } from '@/hooks/usePageUi'
 import { applyRemoteAppConfig, defaultAppConfig } from '@/config/app'
@@ -103,7 +104,7 @@ const DIALOG_TITLE: Record<DialogMode, string> = {
 
 export default function RemoteStoragePage() {
   const { searchItems, buttonItems, tableButtonItems } = usePageUi('/system/remote-storage')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [items, setItems] = useState<StorageRow[]>([])
   const [keyword, setKeyword] = useState('')
@@ -170,8 +171,21 @@ export default function RemoteStoragePage() {
   }, [applySection])
 
   useEffect(() => {
-    void loadData()
-  }, [loadData])
+    let cancelled = false
+    void getSystemConfigSection('storage')
+      .then((res) => {
+        if (!cancelled) applySection(res.data)
+      })
+      .catch((e: unknown) => {
+        if (!cancelled) showCaughtError(e, '加载失败')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [applySection])
 
   useEffect(() => {
     if (dialogOpen) form.setFieldsValue(draft)
@@ -244,23 +258,28 @@ export default function RemoteStoragePage() {
     if (ok) closeDialog()
   }
 
-  function confirmRemove(rows: StorageRow[]) {
+  function confirmRemove(rows: StorageRow[], skipConfirm = false) {
     if (!rows.length) {
       message.warning('请先选择要删除的数据')
       return
     }
     const label = rows.length === 1 ? rows[0].name || '该条' : `选中的 ${rows.length} 条`
+    const apply = async () => {
+      const keys = new Set(rows.map((row) => row.key))
+      await persist(
+        items.filter((item) => !keys.has(item.key)),
+        '删除成功',
+      )
+    }
+    if (skipConfirm) {
+      void apply()
+      return
+    }
     XnModal.confirm({
       title: '提示',
       content: `确认删除${label}远程连接配置？删除后即时生效`,
       okType: 'danger',
-      onOk: async () => {
-        const keys = new Set(rows.map((row) => row.key))
-        await persist(
-          items.filter((item) => !keys.has(item.key)),
-          '删除成功',
-        )
-      },
+      onOk: apply,
     })
   }
 
@@ -294,7 +313,7 @@ export default function RemoteStoragePage() {
               type="info"
               showIcon
               style={{ marginBottom: 12 }}
-              message="可新增多条「名字 / 路径」，新增 / 编辑 / 删除即时落库。保存结果覆盖前端 appConfig.storage。推荐同源相对路径（minio → /minio/，kkFileView → /kkFileView/），由 Vite / Nginx 反代，勿写 127.0.0.1。云端为空时使用本地 app.ts 兜底。密钥勿写入前端。"
+              title="可新增多条「名字 / 路径」，新增 / 编辑 / 删除即时落库。保存结果覆盖前端 appConfig.storage。推荐同源相对路径（minio → /minio/，kkFileView → /kkFileView/），由 Vite / Nginx 反代，勿写 127.0.0.1。云端为空时使用本地 app.ts 兜底。密钥勿写入前端。"
             />
             <XnSearch
               searchItem={resolvedSearchItems}
@@ -329,7 +348,7 @@ export default function RemoteStoragePage() {
                   onActionClick={({ action, row: r }) => {
                     const target = r as unknown as StorageRow
                     if (action === 'edit' || action === 'view') openDialog(action, target)
-                    else if (action === 'delete') confirmRemove([target])
+                    else if (action === 'delete') confirmRemove([target], true)
                   }}
                 />
               ),
@@ -338,16 +357,15 @@ export default function RemoteStoragePage() {
         }
       />
 
-      <XnModal
+      <XnDialog
         title={DIALOG_TITLE[dialogMode]}
         open={dialogOpen}
         width={520}
         confirmLoading={saving}
-        okText="确定"
+        confirmText="确定"
         cancelText={readonly ? '关闭' : '取消'}
-        okButtonProps={{ style: readonly ? { display: 'none' } : undefined }}
-        cancelButtonProps={{ disabled: saving }}
-        onOk={() => void submitDialog()}
+        showConfirm={!readonly}
+        onConfirm={() => void submitDialog()}
         onCancel={closeDialog}
       >
         <Form form={form} labelCol={{ span: 5 }} disabled={readonly} style={{ marginTop: 16 }}>
@@ -358,7 +376,7 @@ export default function RemoteStoragePage() {
             <Input maxLength={1000} placeholder="如 /minio/" />
           </Form.Item>
         </Form>
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

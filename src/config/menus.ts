@@ -106,6 +106,12 @@ export const menus: MenuItem[] = [
             path: '/system/units',
             permission: 'menu:system:unit',
           },
+          {
+            id: 'post',
+            title: '岗位管理',
+            path: '/system/posts',
+            permission: 'menu:system:post',
+          },
         ],
       },
       {
@@ -137,6 +143,12 @@ export const menus: MenuItem[] = [
             path: '/system/routes',
             permission: 'menu:system:route',
           },
+          {
+            id: 'security',
+            title: '安全策略',
+            path: '/system/security',
+            permission: 'menu:system:security',
+          },
         ],
       },
       {
@@ -155,6 +167,12 @@ export const menus: MenuItem[] = [
             title: '站内信',
             path: '/system/messages',
             permission: 'menu:system:message',
+          },
+          {
+            id: 'site-contact',
+            title: '联系与捐赠',
+            path: '/system/site-contact',
+            permission: 'menu:system:site-contact',
           },
         ],
       },
@@ -194,11 +212,6 @@ export const menus: MenuItem[] = [
             path: '/system/remote-storage',
             permission: 'menu:system:remote-storage',
           },
-          {
-            id: 'site-contact',
-            title: '联系与捐赠',
-            path: '/system/site-contact',
-          },
         ],
       },
       {
@@ -219,10 +232,28 @@ export const menus: MenuItem[] = [
             permission: 'menu:system:job',
           },
           {
+            id: 'job-logs',
+            title: '任务日志',
+            path: '/system/jobs/logs',
+            permission: 'menu:system:job-log',
+          },
+          {
             id: 'api-docs',
             title: '接口文档',
             path: '/system/api-docs',
             permission: 'menu:system:api-docs',
+          },
+          {
+            id: 'codegen',
+            title: '代码生成',
+            path: '/system/codegen',
+            permission: 'menu:system:codegen',
+          },
+          {
+            id: 'recycle',
+            title: '回收站',
+            path: '/system/recycle',
+            permission: 'menu:system:recycle',
           },
         ],
       },

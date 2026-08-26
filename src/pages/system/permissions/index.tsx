@@ -357,7 +357,7 @@ export default function RolePermissionsPage() {
       table={
         locked ? (
           <div className="role-perm__locked">
-            <Alert type="info" showIcon message="超级管理员默认拥有全部权限，无需配置。" />
+            <Alert type="info" showIcon title="超级管理员默认拥有全部权限，无需配置。" />
           </div>
         ) : (
           <div className="role-perm__body">

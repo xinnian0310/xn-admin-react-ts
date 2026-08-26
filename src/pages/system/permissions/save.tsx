@@ -1,4 +1,4 @@
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, InputNumber, TreeSelect, message } from 'antd'
 import { create, list, update } from '@/api/permission'
@@ -26,6 +26,17 @@ function toTree(nodes: Permission[]): TreeOption[] {
     value: n.id,
     children: n.children?.length ? toTree(n.children) : undefined,
   }))
+}
+
+function findById(nodes: Permission[], id: number): Permission | undefined {
+  for (const n of nodes) {
+    if (n.id === id) return n
+    if (n.children?.length) {
+      const found = findById(n.children, id)
+      if (found) return found
+    }
+  }
+  return undefined
 }
 
 const PermissionSave = forwardRef<PermissionSaveHandle, { onSuccess?: () => void }>(
@@ -69,17 +80,6 @@ const PermissionSave = forwardRef<PermissionSaveHandle, { onSuccess?: () => void
       },
     }))
 
-    function findById(nodes: Permission[], id: number): Permission | undefined {
-      for (const n of nodes) {
-        if (n.id === id) return n
-        if (n.children?.length) {
-          const f = findById(n.children, id)
-          if (f) return f
-        }
-      }
-      return undefined
-    }
-
     async function handleSubmit() {
       const values = await form.validateFields()
       setSubmitting(true)
@@ -100,17 +100,17 @@ const PermissionSave = forwardRef<PermissionSaveHandle, { onSuccess?: () => void
     }
 
     return (
-      <XnModal
+      <XnDialog
         title={saveDialogTitle(mode, '菜单权限')}
         open={visible}
         onCancel={() => setVisible(false)}
-        destroyOnHidden
+        destroyOnClose
         width={560}
-        okText="保存"
+        confirmText="保存"
         cancelText={mode === 'view' ? '关闭' : '取消'}
-        okButtonProps={{ style: mode === 'view' ? { display: 'none' } : undefined }}
+        showConfirm={mode !== 'view'}
         confirmLoading={submitting}
-        onOk={() => void handleSubmit()}
+        onConfirm={() => void handleSubmit()}
       >
         <Form form={form} labelCol={{ span: 5 }} disabled={mode === 'view'}>
           <Form.Item name="code" label="编码" rules={[{ required: true, message: '请输入编码' }]}>
@@ -140,7 +140,7 @@ const PermissionSave = forwardRef<PermissionSaveHandle, { onSuccess?: () => void
             <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
         </Form>
-      </XnModal>
+      </XnDialog>
     )
   },
 )

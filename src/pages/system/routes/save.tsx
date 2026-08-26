@@ -14,7 +14,7 @@ import {
 } from 'antd'
 import { create, get, list, update } from '@/api/route'
 import XnIconPicker from '@/components/XnIconPicker'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import { hasIndexView } from '@/utils/view-loader'
 import { autoViewPath, normalizeRoutePath } from '@/utils/route-path'
 import type { SysRoute, SysRouteForm } from '@/types'
@@ -237,23 +237,24 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
   }
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '路由')}
       open={visible}
       onCancel={() => setVisible(false)}
-      destroyOnHidden
+      destroyOnClose
       width={640}
-      okText="保存"
+      showFullscreen
+      confirmText="保存"
       cancelText={mode === 'view' ? '关闭' : '取消'}
-      okButtonProps={{ style: mode === 'view' ? { display: 'none' } : undefined }}
+      showConfirm={mode !== 'view'}
       confirmLoading={submitting}
-      onOk={() => void handleSubmit()}
+      onConfirm={() => void handleSubmit()}
     >
       <Alert
         type="info"
         showIcon
         style={{ marginBottom: 12 }}
-        message={tipTitle}
+        title={tipTitle}
         description={tipDescription}
       />
       <Form form={form} labelCol={{ span: 5 }} disabled={mode === 'view'}>
@@ -371,7 +372,7 @@ const RouteSave = forwardRef<RouteSaveHandle, { onSuccess?: () => void }>(functi
           ) : null}
         </Row>
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

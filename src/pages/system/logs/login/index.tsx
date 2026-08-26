@@ -60,16 +60,9 @@ export default function SystemLoginLogsPage() {
   }, [])
 
   async function handleDelete(row: LoginLog) {
-    Modal.confirm({
-      title: '删除确认',
-      content: `确定删除用户「${row.username}」的这条登录日志吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('已删除')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('已删除')
+    await loadData()
   }
 
   function buttonClick(action: string) {
@@ -101,11 +94,11 @@ export default function SystemLoginLogsPage() {
           await loadData()
         },
       })
-    } else if (action === 'export') {
-      void exportLoginLogs(listParams(page, size, queryForm)).then(() =>
-        message.success('导出成功'),
-      )
     }
+  }
+
+  async function handleExport() {
+    await exportLoginLogs(listParams(page, size, queryForm))
   }
 
   return (
@@ -126,7 +119,14 @@ export default function SystemLoginLogsPage() {
           }}
         />
       }
-      toolbar={<XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />}
+      toolbar={
+        <XnButton
+          listItem={buttonItems}
+          selected={selected}
+          exportRequest={handleExport}
+          onButtonClick={buttonClick}
+        />
+      }
       table={
         <XnTable
           data={tableData as unknown as Record<string, unknown>[]}

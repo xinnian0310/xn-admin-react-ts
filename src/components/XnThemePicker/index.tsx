@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ColorPicker, Tabs, Upload, Button, message, type UploadProps } from 'antd'
 import {
   CheckOutlined,
@@ -35,10 +35,13 @@ export default function XnThemePicker() {
   const applyCustom = useThemeStore((s) => s.applyCustom)
 
   const [activeTab, setActiveTab] = useState<string>(source)
+  const syncKey = `${visible}:${source}`
+  const [appliedSyncKey, setAppliedSyncKey] = useState(syncKey)
 
-  useEffect(() => {
+  if (appliedSyncKey !== syncKey) {
+    setAppliedSyncKey(syncKey)
     if (visible) setActiveTab(source)
-  }, [visible, source])
+  }
 
   const onBgFile: UploadProps['beforeUpload'] = (file) => {
     if (!file.type.startsWith('image/')) {

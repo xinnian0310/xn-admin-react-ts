@@ -1,5 +1,12 @@
+import { createElement } from 'react'
 import { Icon } from '@iconify/react'
 import { parseIcon, resolveAntdIcon, getSvgRaw, resolveIconifyName } from '@/utils/icons'
+
+function renderAntdIcon(name: string, className?: string, style?: React.CSSProperties) {
+  const icon = resolveAntdIcon(name)
+  if (!icon) return null
+  return createElement(icon, { className, style })
+}
 
 interface XnAppIconProps {
   name?: string | null
@@ -28,9 +35,7 @@ export default function XnAppIcon({ name, size = 16, className, style }: XnAppIc
   }
 
   if (parsed.type === 'antd') {
-    const Comp = resolveAntdIcon(parsed.name)
-    if (!Comp) return null
-    return <Comp className={className} style={merged} />
+    return renderAntdIcon(parsed.name, className, merged)
   }
 
   const iconify =
@@ -39,10 +44,15 @@ export default function XnAppIcon({ name, size = 16, className, style }: XnAppIc
     return <Icon icon={iconify} className={className} style={merged} width={dim} height={dim} />
   }
 
-  const Comp = resolveAntdIcon(parsed.name)
-  if (Comp) return <Comp className={className} style={merged} />
-
   return (
-    <Icon icon="mdi:circle-medium" className={className} style={merged} width={dim} height={dim} />
+    renderAntdIcon(parsed.name, className, merged) ?? (
+      <Icon
+        icon="mdi:circle-medium"
+        className={className}
+        style={merged}
+        width={dim}
+        height={dim}
+      />
+    )
   )
 }

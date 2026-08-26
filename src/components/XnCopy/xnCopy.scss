@@ -1,0 +1,18 @@
+.xn-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  vertical-align: middle;
+}
+
+.xn-copy.is-block {
+  display: flex;
+}
+
+.xn-copy__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

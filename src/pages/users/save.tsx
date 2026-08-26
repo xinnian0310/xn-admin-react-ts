@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
-import { Form, Input, Radio, Select, TreeSelect, message } from 'antd'
+import { Form, Input, Radio, message } from 'antd'
 import { getPasswordRules, type PasswordRules } from '@/api/auth'
 import { getOptions as getRoleOptions } from '@/api/role'
 import { getTree as getUnitTree } from '@/api/unit'
@@ -8,7 +8,8 @@ import { create, get, update } from '@/api/user'
 import { usePermission } from '@/hooks/usePermission'
 import type { Post, Role, SysUnit, UserForm } from '@/types'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
+import XnOrgSelect from '@/components/XnOrgSelect'
 
 export interface UserSaveHandle {
   open: (mode: SaveMode, id?: number) => Promise<void>
@@ -16,16 +17,6 @@ export interface UserSaveHandle {
 
 interface Props {
   onSuccess?: () => void
-}
-
-function toTreeData(
-  nodes: SysUnit[],
-): { title: string; value: number; children?: ReturnType<typeof toTreeData> }[] {
-  return nodes.map((n) => ({
-    title: n.name,
-    value: n.id,
-    children: n.children?.length ? toTreeData(n.children) : undefined,
-  }))
 }
 
 const UserSave = forwardRef<UserSaveHandle, Props>(function UserSave({ onSuccess }, ref) {
@@ -131,17 +122,16 @@ const UserSave = forwardRef<UserSaveHandle, Props>(function UserSave({ onSuccess
       ['admin', 'SuperAdmin'].includes(String(form.getFieldValue('username') || '')))
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '用户')}
       open={visible}
       onCancel={() => setVisible(false)}
-      destroyOnHidden
       width={560}
-      okText="保存"
+      confirmText="保存"
       cancelText={mode === 'view' ? '关闭' : '取消'}
-      okButtonProps={{ style: mode === 'view' ? { display: 'none' } : undefined }}
+      showConfirm={mode !== 'view'}
       confirmLoading={submitting}
-      onOk={() => void handleSubmit()}
+      onConfirm={() => void handleSubmit()}
     >
       <Form form={form} labelCol={{ span: 5 }} disabled={mode === 'view'}>
         <Form.Item
@@ -197,29 +187,20 @@ const UserSave = forwardRef<UserSaveHandle, Props>(function UserSave({ onSuccess
           <Input disabled={sensitiveFieldsLocked} />
         </Form.Item>
         <Form.Item name="roleIds" label="角色" extra="可与单位默认角色叠加；二者至少其一有角色即可">
-          <Select
-            mode="multiple"
-            allowClear
+          <XnOrgSelect
+            type="role"
+            multiple
+            options={availableRoles.map((r) => ({ id: r.id, label: r.name }))}
             placeholder="个人角色（可选，若单位已绑默认角色）"
-            options={availableRoles.map((r) => ({ label: r.name, value: r.id }))}
           />
         </Form.Item>
         <Form.Item name="unitId" label="单位">
-          <TreeSelect
-            allowClear
-            treeDefaultExpandAll
-            treeCheckStrictly={false}
-            placeholder="请选择单位"
-            treeData={toTreeData(unitOptions)}
-          />
+          <XnOrgSelect type="unit" treeData={unitOptions} />
         </Form.Item>
         <Form.Item name="postId" label="岗位">
-          <Select
-            allowClear
-            showSearch
-            optionFilterProp="label"
-            placeholder="请选择岗位"
-            options={postOptions.map((p) => ({ label: p.name, value: p.id }))}
+          <XnOrgSelect
+            type="post"
+            options={postOptions.map((p) => ({ id: p.id, label: p.name }))}
           />
         </Form.Item>
         <Form.Item name="status" label="状态">
@@ -231,7 +212,7 @@ const UserSave = forwardRef<UserSaveHandle, Props>(function UserSave({ onSuccess
           />
         </Form.Item>
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

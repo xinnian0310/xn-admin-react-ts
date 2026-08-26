@@ -11,7 +11,7 @@
 
 ## 介绍
 
-React 用 **props 插槽**（`aside` / `search` / `toolbar` / `table`…）而不是 Vue 具名 slot。有 `aside` 时左右分栏。同时提供 `table` 与 `card` 且 `showViewSwitch` 为真时才显示切换；模式写入 `localStorage`（键 `xn-view-mode:{pathname}`）。
+React 用 **props 插槽**（`aside` / `search` / `toolbar` / `table`…）而不是 Vue 具名 slot。有 `aside` 时左右分栏。有 `card` 且 `showViewSwitch` 为真时才显示表格 / 卡片切换；模式写入 `localStorage`（键 `xn-view-mode:{pathname}`）。`children` 始终接在当前视图后面，不是 table/card 的替代。
 
 ## 使用
 
@@ -38,22 +38,22 @@ import XnPageLayout from '@/components/XnPageLayout'
 
 ## 传参
 
-| 名称               | 类型                       | 默认值   | 说明                       |
-| ------------------ | -------------------------- | -------- | -------------------------- |
-| `aside`            | `ReactNode`                | —        | 左侧面板                   |
-| `search`           | `ReactNode`                | —        | 搜索区                     |
-| `toolbar`          | `ReactNode`                | —        | 工具栏左侧                 |
-| `toolbarExtra`     | `ReactNode`                | —        | 工具栏右侧（视图切换前）   |
-| `table`            | `ReactNode`                | —        | 表格视图                   |
-| `card`             | `ReactNode`                | —        | 卡片视图                   |
-| `pagination`       | `ReactNode`                | —        | 自定义分页                 |
-| `children`         | `ReactNode`                | —        | 未提供 table/card 时的内容 |
-| `viewMode`         | `'table' \| 'card'`        | 内部状态 | 受控视图模式               |
-| `onViewModeChange` | `(mode) => void`           | —        | 视图切换                   |
-| `showViewSwitch`   | `boolean`                  | `true`   | 是否显示表格/卡片切换      |
-| `showPagination`   | `boolean`                  | `false`  | 是否显示分页               |
-| `page`             | `number`                   | `1`      | 当前页                     |
-| `pageSize`         | `number`                   | `10`     | 每页条数                   |
-| `total`            | `number`                   | `0`      | 总条数                     |
-| `loading`          | `boolean`                  | `false`  | 加载态（Spin 包裹）        |
-| `onPageChange`     | `(page, pageSize) => void` | —        | 分页变化                   |
+| 名称               | 类型                       | 默认值   | 说明                         |
+| ------------------ | -------------------------- | -------- | ---------------------------- |
+| `aside`            | `ReactNode`                | —        | 左侧面板                     |
+| `search`           | `ReactNode`                | —        | 搜索区                       |
+| `toolbar`          | `ReactNode`                | —        | 工具栏左侧                   |
+| `toolbarExtra`     | `ReactNode`                | —        | 工具栏右侧（视图切换前）     |
+| `table`            | `ReactNode`                | —        | 表格视图                     |
+| `card`             | `ReactNode`                | —        | 卡片视图                     |
+| `pagination`       | `ReactNode`                | —        | 自定义分页                   |
+| `children`         | `ReactNode`                | —        | 接在 table/card 后的附加内容 |
+| `viewMode`         | `'table' \| 'card'`        | 内部状态 | 受控视图模式                 |
+| `onViewModeChange` | `(mode) => void`           | —        | 视图切换                     |
+| `showViewSwitch`   | `boolean`                  | `true`   | 是否显示表格/卡片切换        |
+| `showPagination`   | `boolean`                  | `false`  | 是否显示分页                 |
+| `page`             | `number`                   | `1`      | 当前页                       |
+| `pageSize`         | `number`                   | `10`     | 每页条数                     |
+| `total`            | `number`                   | `0`      | 总条数                       |
+| `loading`          | `boolean`                  | `false`  | 加载态（Spin 包裹）          |
+| `onPageChange`     | `(page, pageSize) => void` | —        | 分页变化                     |

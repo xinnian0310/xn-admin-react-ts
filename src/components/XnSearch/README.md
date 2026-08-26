@@ -45,6 +45,8 @@ import XnSearch from '@/components/XnSearch'
 
 ## 字段类型（`SearchItem.type`）
 
-`input` | `number` | `select` | `date` | `datetime` | `daterange`
+`input` | `number` | `select` | `date` | `datetime` | `daterange` | `dict` | `region`
 
-`SearchItem`（`@/types/search`）：`label`、`prop`、`type`，以及可选 `options` / `width` / `clearable` / `multiple`。
+`dict` 使用 `XnDictSelect`（`dictType` / `options`）；`region` 使用 `XnRegion`（`level`）。
+
+`SearchItem`（`@/types/search`）：`label`、`prop`、`type`，以及可选 `options` / `dictType` / `level` / `width` / `clearable` / `multiple`。

@@ -4,6 +4,8 @@ import type { ButtonListItem } from '@/types/button'
 import { resolveButtonAction } from '@/utils/page-ui'
 import { usePermission } from '@/hooks/usePermission'
 import XnAppIcon from '@/components/XnAppIcon'
+import XnExport from '@/components/XnExport'
+import XnPopconfirm from '@/components/XnPopconfirm'
 import './xnButton.scss'
 
 const COLOR_MAP: Record<string, 'primary' | 'default' | 'dashed' | 'link' | 'text'> = {
@@ -19,9 +21,16 @@ interface XnButtonProps {
   listItem?: ButtonListItem[]
   selected?: unknown[]
   onButtonClick?: (action: string, item: ButtonListItem) => void
+  /** 传入后工具栏「导出」直接走 XnExport，不再 onButtonClick */
+  exportRequest?: () => Promise<void>
 }
 
-export default function XnButton({ listItem = [], selected = [], onButtonClick }: XnButtonProps) {
+export default function XnButton({
+  listItem = [],
+  selected = [],
+  onButtonClick,
+  exportRequest,
+}: XnButtonProps) {
   const { hasPermission } = usePermission()
 
   const visible = listItem.filter((item) => !item.permission || hasPermission(item.permission))
@@ -88,6 +97,20 @@ export default function XnButton({ listItem = [], selected = [], onButtonClick }
           )
         }
 
+        if (item.action === 'export' && exportRequest) {
+          const tone = item.typeColor || 'default'
+          return (
+            <XnExport
+              key={item.name + (item.action || '')}
+              request={exportRequest}
+              text={item.name || '导出'}
+              type={tone && tone !== 'default' ? tone : 'primary'}
+              plain={tone !== 'success' && tone !== 'warning' && tone !== 'danger'}
+              disabled={isDisabled(item)}
+            />
+          )
+        }
+
         const tone = item.typeColor || 'default'
         const usePrimaryTone = tone === 'primary' || tone === 'success'
         return (
@@ -112,12 +135,30 @@ interface XnTableActionsProps {
   items?: ButtonListItem[]
   row: Record<string, unknown>
   disabled?: (action: string, row: Record<string, unknown>) => boolean | string
+  /** 需要气泡确认的动作，默认 delete */
+  confirmActions?: string[]
   onActionClick?: (payload: { action: string; row: Record<string, unknown> }) => void
 }
 
-export function XnTableActions({ items = [], row, disabled, onActionClick }: XnTableActionsProps) {
+function rowConfirmName(row: Record<string, unknown>) {
+  return row.name || row.title || row.username || row.label || row.path || row.key
+}
+
+export function XnTableActions({
+  items = [],
+  row,
+  disabled,
+  confirmActions = ['delete'],
+  onActionClick,
+}: XnTableActionsProps) {
   const { hasPermission } = usePermission()
   const visible = items.filter((item) => !item.permission || hasPermission(item.permission))
+
+  function confirmTitle(item: ButtonListItem) {
+    const name = rowConfirmName(row)
+    if (name) return `确定${item.name}「${name}」吗？`
+    return `确定${item.name}吗？`
+  }
 
   return (
     <Space size={4} wrap={false} className="xn-table-actions" style={{ flexWrap: 'nowrap' }}>
@@ -125,7 +166,8 @@ export function XnTableActions({ items = [], row, disabled, onActionClick }: XnT
         const action = resolveButtonAction(item)
         const reason = disabled?.(action, row)
         const isDisabled = Boolean(reason)
-        return (
+        const needConfirm = confirmActions.includes(action)
+        const button = (
           <Button
             key={action}
             type="link"
@@ -134,11 +176,24 @@ export function XnTableActions({ items = [], row, disabled, onActionClick }: XnT
             danger={item.typeColor === 'danger'}
             disabled={isDisabled}
             title={typeof reason === 'string' ? reason : undefined}
-            onClick={() => onActionClick?.({ action, row })}
+            onClick={needConfirm ? undefined : () => onActionClick?.({ action, row })}
           >
             {item.name}
           </Button>
         )
+        if (needConfirm) {
+          return (
+            <XnPopconfirm
+              key={action}
+              title={confirmTitle(item)}
+              disabled={isDisabled}
+              onConfirm={() => onActionClick?.({ action, row })}
+            >
+              {button}
+            </XnPopconfirm>
+          )
+        }
+        return button
       })}
     </Space>
   )

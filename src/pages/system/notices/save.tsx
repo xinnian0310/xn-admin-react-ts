@@ -1,4 +1,4 @@
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { Button, Form, Input, Typography, message } from 'antd'
 import XnRichEditor from '@/components/XnRichEditor'
@@ -43,6 +43,7 @@ const NoticeSave = forwardRef<NoticeSaveHandle, Props>(function NoticeSave({ onS
   const [mode, setMode] = useState<SaveMode>('add')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [detailLoading, setDetailLoading] = useState(false)
   const uploaderRef = useRef<XnUploadHandle>(null)
   const pathOrderRef = useRef(new Map<string, number>())
   const orderBaseRef = useRef(0)
@@ -65,14 +66,19 @@ const NoticeSave = forwardRef<NoticeSaveHandle, Props>(function NoticeSave({ onS
       resetOrders([])
       setVisible(true)
       if (id) {
-        const res = await get(id)
-        form.setFieldsValue({
-          title: res.data.title,
-          content: res.data.content,
-        })
-        const loaded = resolveAttachments(res.data)
-        setAttachments(loaded)
-        resetOrders(loaded)
+        setDetailLoading(true)
+        try {
+          const res = await get(id)
+          form.setFieldsValue({
+            title: res.data.title,
+            content: res.data.content,
+          })
+          const loaded = resolveAttachments(res.data)
+          setAttachments(loaded)
+          resetOrders(loaded)
+        } finally {
+          setDetailLoading(false)
+        }
       }
     },
   }))
@@ -120,16 +126,18 @@ const NoticeSave = forwardRef<NoticeSaveHandle, Props>(function NoticeSave({ onS
   const readonly = mode === 'view'
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '公告')}
       open={visible}
       width={820}
-      destroyOnHidden
+      showFullscreen
+      loading={detailLoading}
+      destroyOnClose
       onCancel={() => setVisible(false)}
-      onOk={() => void handleSubmit()}
-      okText="保存草稿"
+      onConfirm={() => void handleSubmit()}
+      confirmText="保存草稿"
       cancelText={readonly ? '关闭' : '取消'}
-      okButtonProps={{ style: readonly ? { display: 'none' } : undefined }}
+      showConfirm={!readonly}
       confirmLoading={submitting}
     >
       <Form form={form} labelCol={{ span: 3 }} disabled={readonly} style={{ marginTop: 16 }}>
@@ -216,7 +224,7 @@ const NoticeSave = forwardRef<NoticeSaveHandle, Props>(function NoticeSave({ onS
           </div>
         </Form.Item>
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

@@ -95,17 +95,9 @@ export default function DictsPage() {
       message.warning('内置字典不可删除')
       return
     }
-    Modal.confirm({
-      title: '删除确认',
-      content: `确定删除字典「${row.name}」吗？`,
-      okType: 'danger',
-      okText: '删除',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleBatchDelete() {

@@ -6,7 +6,7 @@ import { uploadDonationQrcode } from '@/api/site-contact'
 import { showCaughtError } from '@/utils/request'
 import { saveDialogTitle, type SaveMode } from '@/types/save'
 import type { SiteDonationQrcode } from '@/types/site-contact'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 
 export interface QrcodeSaveHandle {
   open: (mode: SaveMode, row?: SiteDonationQrcode, index?: number) => void
@@ -59,16 +59,16 @@ const QrcodeSave = forwardRef<QrcodeSaveHandle, Props>(function QrcodeSave({ onS
 
   return (
     <>
-      <XnModal
+      <XnDialog
         title={saveDialogTitle(mode, '捐赠二维码')}
         open={visible}
         width={480}
-        destroyOnHidden
+        destroyOnClose
         onCancel={() => setVisible(false)}
-        onOk={() => void handleSubmit()}
-        okText="确定"
+        onConfirm={() => void handleSubmit()}
+        confirmText="确定"
         cancelText={readonly ? '关闭' : '取消'}
-        okButtonProps={{ style: readonly ? { display: 'none' } : undefined }}
+        showConfirm={!readonly}
         confirmLoading={uploading}
       >
         <Form form={form} labelCol={{ span: 5 }} disabled={readonly} style={{ marginTop: 16 }}>
@@ -131,13 +131,13 @@ const QrcodeSave = forwardRef<QrcodeSaveHandle, Props>(function QrcodeSave({ onS
             </div>
           </div>
         </Form>
-      </XnModal>
+      </XnDialog>
       <Image
         style={{ display: 'none' }}
         preview={{
-          visible: previewOpen,
+          open: previewOpen,
           src: src || '',
-          onVisibleChange: (v) => setPreviewOpen(v),
+          onOpenChange: (v) => setPreviewOpen(v),
         }}
       />
     </>

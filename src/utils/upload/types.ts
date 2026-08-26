@@ -114,10 +114,10 @@ export type HashWorkerResponse =
 export const DEFAULT_MAX_FILE_SIZE = 10 * 1024 * 1024 * 1024
 
 export const DEFAULT_UPLOADER_OPTIONS: UploaderOptions = {
-  chunkSize: 8 * 1024 * 1024,
+  chunkSize: 50 * 1024 * 1024,
   concurrency: 3,
   fileConcurrency: 3,
-  maxRetries: 3,
+  maxRetries: 5,
   retryDelay: 1000,
   chunkTimeout: 300000,
   sliceThreshold: 50 * 1024 * 1024,

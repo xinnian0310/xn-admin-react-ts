@@ -30,4 +30,5 @@ useNoticeStore.getState().openDrawer()
 ## 依赖
 
 - `@/stores/notice`
-- `@/utils/datetime`（`formatDateTime`）
+- `@/utils/attachment`、`@/utils/kk-file-view`（详情附件）
+- `@/utils/rich-editor` 的 `decorateRichHtml`

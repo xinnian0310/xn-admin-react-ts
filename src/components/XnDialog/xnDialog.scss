@@ -1,0 +1,41 @@
+.xn-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 8px;
+  min-height: 24px;
+}
+
+.xn-dialog__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xn-dialog__full {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--app-text-secondary, rgba(0, 0, 0, 0.45));
+  cursor: pointer;
+}
+
+.xn-dialog__full:hover {
+  color: var(--app-color-primary, #1677ff);
+}
+
+.xn-dialog.is-full .ant-modal {
+  max-width: 100%;
+  max-height: 100vh;
+}

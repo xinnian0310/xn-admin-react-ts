@@ -110,16 +110,9 @@ export default function PostsPage() {
       message.warning('内置岗位不可删除')
       return
     }
-    Modal.confirm({
-      title: '确认删除',
-      content: `确定删除岗位「${row.name}」吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleBatchDelete() {
@@ -153,16 +146,6 @@ export default function PostsPage() {
       importRef.current?.open()
       return
     }
-    if (action === 'export') {
-      void exportPosts({
-        keyword: String(queryForm.FuzzyWord ?? '').trim() || undefined,
-        status:
-          queryForm.status === '' || queryForm.status == null
-            ? undefined
-            : Number(queryForm.status),
-      }).then(() => message.success('导出成功'))
-      return
-    }
     if (action === 'edit' || action === 'view') {
       if (selected.length !== 1) {
         message.warning('请选择一项操作')
@@ -172,6 +155,14 @@ export default function PostsPage() {
       return
     }
     if (action === 'delete') void handleBatchDelete()
+  }
+
+  async function handleExport() {
+    await exportPosts({
+      keyword: String(queryForm.FuzzyWord ?? '').trim() || undefined,
+      status:
+        queryForm.status === '' || queryForm.status == null ? undefined : Number(queryForm.status),
+    })
   }
 
   return (
@@ -205,7 +196,12 @@ export default function PostsPage() {
           />
         }
         toolbar={
-          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+          <XnButton
+            listItem={buttonItems}
+            selected={selected}
+            exportRequest={handleExport}
+            onButtonClick={buttonClick}
+          />
         }
         table={
           <XnTable

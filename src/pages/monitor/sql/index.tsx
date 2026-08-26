@@ -10,6 +10,7 @@ import { formatDateTime } from '@/utils/datetime'
 import type { SqlRecord } from '@/types'
 import type { SearchForm } from '@/types/search'
 import type { TableColumnItem } from '@/types/table'
+import XnDialog from '@/components/XnDialog'
 import XnModal from '@/components/XnModal'
 
 const columns: TableColumnItem[] = [
@@ -86,16 +87,9 @@ export default function MonitorSqlPage() {
       message.warning('无法删除该记录')
       return
     }
-    XnModal.confirm({
-      title: '删除确认',
-      content: '确定删除该条 SQL 记录吗？',
-      okType: 'danger',
-      onOk: async () => {
-        await removeSqlRecord(row.id!)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await removeSqlRecord(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleClean() {
@@ -202,16 +196,21 @@ export default function MonitorSqlPage() {
           />
         }
       />
-      <XnModal
+      <XnDialog
         title="SQL 详情"
         open={detailVisible}
         onCancel={() => setDetailVisible(false)}
-        footer={null}
         width={780}
-        destroyOnHidden
+        showConfirm={false}
+        cancelText="关闭"
       >
         {current ? (
-          <Descriptions column={1} bordered size="small">
+          <Descriptions
+            column={1}
+            bordered
+            size="small"
+            styles={{ label: { width: 'auto', maxWidth: 200, whiteSpace: 'nowrap' } }}
+          >
             <Descriptions.Item label="执行时间">
               {formatDateTime(current.executedAt)}
             </Descriptions.Item>
@@ -232,7 +231,7 @@ export default function MonitorSqlPage() {
             </Descriptions.Item>
           </Descriptions>
         ) : null}
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

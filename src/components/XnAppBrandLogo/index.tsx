@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { defaultAppConfig } from '@/config/app'
 import { useAppConfig } from '@/hooks/useAppConfig'
 
@@ -20,11 +20,8 @@ export default function XnAppBrandLogo({
   const appConfig = useAppConfig()
   const name = title || appConfig.app.name
   const configured = (appConfig.app.logo || '').trim() || LOCAL_LOGO
-  const [src, setSrc] = useState(configured)
-
-  useEffect(() => {
-    setSrc(configured)
-  }, [configured])
+  const [brokenSrc, setBrokenSrc] = useState<string | null>(null)
+  const src = brokenSrc === configured ? LOCAL_LOGO : configured
 
   return (
     <div
@@ -41,7 +38,7 @@ export default function XnAppBrandLogo({
         src={src}
         alt={name}
         onError={() => {
-          setSrc((current) => (current === LOCAL_LOGO ? current : LOCAL_LOGO))
+          setBrokenSrc(configured)
         }}
         style={{
           width: 'var(--app-logo-width, 28px)',

@@ -1,4 +1,4 @@
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, Radio, message } from 'antd'
 import { create, get, update } from '@/api/dict-type'
@@ -67,16 +67,16 @@ const DictTypeSave = forwardRef<DictTypeSaveHandle, Props>(function DictTypeSave
   const readonly = mode === 'view'
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '字典')}
       open={visible}
       width={520}
-      destroyOnHidden
+      destroyOnClose
       onCancel={() => setVisible(false)}
-      onOk={() => void handleSubmit()}
-      okText="保存"
+      onConfirm={() => void handleSubmit()}
+      confirmText="保存"
       cancelText={readonly ? '关闭' : '取消'}
-      okButtonProps={{ style: readonly ? { display: 'none' } : undefined }}
+      showConfirm={!readonly}
       confirmLoading={submitting}
     >
       <Form form={form} labelCol={{ span: 5 }} disabled={readonly} style={{ marginTop: 16 }}>
@@ -112,7 +112,7 @@ const DictTypeSave = forwardRef<DictTypeSaveHandle, Props>(function DictTypeSave
           <Input.TextArea rows={3} />
         </Form.Item>
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

@@ -85,17 +85,9 @@ export default function DictDataPage() {
   }, [dictType])
 
   async function handleDelete(row: DictData) {
-    Modal.confirm({
-      title: '删除确认',
-      content: `确定删除字典数据「${row.label}」吗？`,
-      okType: 'danger',
-      okText: '删除',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleBatchDelete() {

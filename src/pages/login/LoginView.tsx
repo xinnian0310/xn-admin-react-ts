@@ -1,148 +1,96 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
-import { Button, Form, Input, message } from 'antd'
-import { LockOutlined, UserOutlined } from '@ant-design/icons'
+import { useEffect, useRef, useState } from 'react'
+import { Button, Form, Input, Tabs, message } from 'antd'
+import { LockOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { appConfig, defaultAppConfig } from '@/config/app'
 import { homeConfig } from '@/config/home'
 import { useUserStore } from '@/stores/user'
 import { getActive } from '@/api/login-page'
-import { fetchCaptcha, register as registerApi, verifySliderCaptcha } from '@/api/auth'
+import { register as registerApi, sendSms } from '@/api/auth'
 import type { LoginCaptchaType } from '@/types'
 import XnAppIcon from '@/components/XnAppIcon'
+import XnCaptcha, { type XnCaptchaHandle } from '@/components/XnCaptcha'
+import XnSmsCode from '@/components/XnSmsCode'
 import './LoginView.scss'
 
 type AuthMode = 'login' | 'register'
+type LoginTab = 'account' | 'sms'
+
+const DEMO_PHONE = '18888888888'
 
 export default function LoginView() {
   const navigate = useNavigate()
   const login = useUserStore((s) => s.login)
+  const loginBySms = useUserStore((s) => s.loginBySms)
   const [form] = Form.useForm()
   const [mode, setMode] = useState<AuthMode>('login')
+  const [loginTab, setLoginTab] = useState<LoginTab>('account')
   const [loading, setLoading] = useState(false)
   const intro = homeConfig.intro
   const isRegister = mode === 'register'
+  const isSmsLogin = !isRegister && loginTab === 'sms'
+  const phone = Form.useWatch('phone', form) || ''
   const localLogo = defaultAppConfig.app.logo
   const configuredLogo = (appConfig.app.logo || '').trim() || localLogo
-  const [logoFailed, setLogoFailed] = useState(false)
-  const logoSrc = logoFailed ? localLogo : configuredLogo
-
-  useEffect(() => {
-    setLogoFailed(false)
-  }, [configuredLogo])
+  const [brokenLogo, setBrokenLogo] = useState<string | null>(null)
+  const logoSrc = brokenLogo === configuredLogo ? localLogo : configuredLogo
 
   const [captchaEnabled, setCaptchaEnabled] = useState(false)
   const [captchaType, setCaptchaType] = useState<LoginCaptchaType | null>(null)
   const [captchaId, setCaptchaId] = useState('')
-  const [captchaImage, setCaptchaImage] = useState('')
-  const [sliderPercent, setSliderPercent] = useState(0)
   const [sliderOk, setSliderOk] = useState(false)
-  const sliderPercentRef = useRef(0)
-  const captchaIdRef = useRef('')
-  const slideStartX = useRef(0)
-  const slideStartPercent = useRef(0)
+  const captchaRef = useRef<XnCaptchaHandle>(null)
 
-  useEffect(() => {
-    sliderPercentRef.current = sliderPercent
-  }, [sliderPercent])
-  useEffect(() => {
-    captchaIdRef.current = captchaId
-  }, [captchaId])
-
-  async function refreshCaptcha() {
+  function refreshCaptcha() {
     if (!captchaEnabled) return
     form.setFieldValue('captcha', '')
-    resetSlider()
-    try {
-      const res = await fetchCaptcha()
-      const data = res.data
-      if (!data) {
-        setCaptchaId('')
-        setCaptchaImage('')
-        return
-      }
-      setCaptchaId(data.captchaId)
-      setCaptchaType(data.captchaType)
-      setCaptchaImage(data.imageBase64 || '')
-    } catch {
-      message.error('获取验证码失败')
-    }
-  }
-
-  function resetSlider() {
-    setSliderPercent(0)
-    sliderPercentRef.current = 0
     setSliderOk(false)
+    void captchaRef.current?.refresh()
   }
 
   function switchMode(next: AuthMode) {
     setMode(next)
+    setLoginTab('account')
     form.resetFields()
     form.setFieldsValue(
       next === 'login'
-        ? { username: 'admin', password: 'admin' }
-        : { username: '', password: '', nickname: '', confirmPassword: '', captcha: '' },
+        ? { username: 'admin', password: 'admin', phone: DEMO_PHONE, smsCode: '' }
+        : {
+            username: '',
+            password: '',
+            nickname: '',
+            confirmPassword: '',
+            captcha: '',
+            phone: '',
+            smsCode: '',
+          },
     )
     void refreshCaptcha()
+  }
+
+  async function sendLoginSms(nextPhone: string) {
+    const res = await sendSms({ phone: nextPhone, scene: 'LOGIN' })
+    return res.data
   }
 
   useEffect(() => {
     void (async () => {
       try {
         const res = await getActive()
-        const enabled = Boolean(res.data?.captchaEnabled)
-        setCaptchaEnabled(enabled)
+        setCaptchaEnabled(Boolean(res.data?.captchaEnabled))
         setCaptchaType(res.data?.captchaType || null)
-        if (enabled) {
-          const cap = await fetchCaptcha()
-          if (cap.data) {
-            setCaptchaId(cap.data.captchaId)
-            setCaptchaType(cap.data.captchaType)
-            setCaptchaImage(cap.data.imageBase64 || '')
-          }
-        }
       } catch {
         /* 后端未启动时允许无验证码尝试 */
       }
     })()
   }, [])
 
-  function onSliderStart(e: ReactPointerEvent) {
-    if (sliderOk) return
-    slideStartX.current = e.clientX
-    slideStartPercent.current = sliderPercentRef.current
-    const onMove = (ev: PointerEvent) => {
-      const track = document.querySelector('.slider-wrap') as HTMLElement | null
-      const width = track?.clientWidth || 280
-      const delta = ((ev.clientX - slideStartX.current) / width) * 100
-      const next = Math.min(100, Math.max(0, slideStartPercent.current + delta))
-      sliderPercentRef.current = next
-      setSliderPercent(next)
-    }
-    const onUp = async () => {
-      window.removeEventListener('pointermove', onMove)
-      window.removeEventListener('pointerup', onUp)
-      if (sliderPercentRef.current >= 92 && captchaIdRef.current) {
-        setSliderPercent(100)
-        try {
-          await verifySliderCaptcha(captchaIdRef.current, 100)
-          setSliderOk(true)
-        } catch {
-          message.error('滑块验证失败')
-          resetSlider()
-          void refreshCaptcha()
-        }
-      } else {
-        resetSlider()
-      }
-    }
-    window.addEventListener('pointermove', onMove)
-    window.addEventListener('pointerup', onUp)
-  }
-
   async function handleSubmit() {
     try {
-      const values = await form.validateFields()
-      if (captchaEnabled && captchaType === 'SLIDER' && !sliderOk) {
+      const values = isSmsLogin
+        ? await form.validateFields(['phone', 'smsCode'])
+        : await form.validateFields()
+      if (!isSmsLogin && captchaEnabled && captchaType === 'SLIDER' && !sliderOk) {
         message.warning('请完成滑块验证')
         return
       }
@@ -161,6 +109,17 @@ export default function LoginView() {
         message.success('注册成功，请登录')
         switchMode('login')
         form.setFieldsValue({ username: values.username, password: '' })
+        return
+      }
+      if (isSmsLogin) {
+        const data = await loginBySms(values.phone, values.smsCode)
+        if (data.user?.mustChangePassword) {
+          message.warning('请先修改密码后再使用系统')
+          navigate('/profile?forcePwd=1', { replace: true })
+        } else {
+          message.success('登录成功')
+          navigate('/dashboard', { replace: true })
+        }
         return
       }
       const data = await login(values.username, values.password, captchaOpts)
@@ -193,7 +152,7 @@ export default function LoginView() {
                 src={logoSrc}
                 alt="心念科技"
                 onError={() => {
-                  if (logoSrc !== localLogo) setLogoFailed(true)
+                  setBrokenLogo(configuredLogo)
                 }}
               />
             </div>
@@ -228,94 +187,125 @@ export default function LoginView() {
                 {isRegister ? '注册后将以普通用户身份使用系统' : '登录以继续管理您的系统'}
               </p>
             </header>
+            {!isRegister ? (
+              <Tabs
+                className="login-tabs"
+                activeKey={loginTab}
+                onChange={(key) => setLoginTab(key as LoginTab)}
+                items={[
+                  { key: 'account', label: '账号登录' },
+                  { key: 'sms', label: '短信登录' },
+                ]}
+              />
+            ) : null}
             <Form
               form={form}
               size="large"
-              initialValues={{ username: 'admin', password: 'admin' }}
+              initialValues={{
+                username: 'admin',
+                password: 'admin',
+                phone: DEMO_PHONE,
+                smsCode: '',
+                captcha: '',
+              }}
               onFinish={() => void handleSubmit()}
             >
-              <Form.Item
-                name="username"
-                rules={[
-                  { required: true, message: '请输入用户名' },
-                  ...(isRegister ? [{ min: 2, max: 50, message: '用户名长度需在2-50之间' }] : []),
-                ]}
-              >
-                <Input prefix={<UserOutlined />} placeholder="请输入用户名" allowClear />
-              </Form.Item>
-              {isRegister ? (
-                <Form.Item name="nickname" rules={[{ max: 50, message: '昵称长度不能超过50' }]}>
-                  <Input prefix={<UserOutlined />} placeholder="昵称（可选）" allowClear />
-                </Form.Item>
-              ) : null}
-              <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
-                <Input.Password prefix={<LockOutlined />} placeholder="请输入密码" />
-              </Form.Item>
-              {isRegister ? (
-                <Form.Item
-                  name="confirmPassword"
-                  dependencies={['password']}
-                  rules={[
-                    { required: true, message: '请再次输入密码' },
-                    ({ getFieldValue }) => ({
-                      validator(_, value) {
-                        if (!value || getFieldValue('password') === value) {
-                          return Promise.resolve()
-                        }
-                        return Promise.reject(new Error('两次输入的密码不一致'))
-                      },
-                    }),
-                  ]}
-                >
-                  <Input.Password prefix={<LockOutlined />} placeholder="请确认密码" />
-                </Form.Item>
-              ) : null}
-              {captchaEnabled && captchaType === 'IMAGE' ? (
-                <div className="captcha-row" style={{ marginBottom: 24 }}>
+              {isSmsLogin ? (
+                <>
                   <Form.Item
-                    name="captcha"
-                    rules={[{ required: true, message: '请输入验证码' }]}
-                    style={{ flex: 1, marginBottom: 0 }}
+                    name="phone"
+                    rules={[
+                      { required: true, message: '请输入手机号' },
+                      { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' },
+                    ]}
                   >
-                    <Input placeholder="请输入验证码" maxLength={6} />
-                  </Form.Item>
-                  {captchaImage ? (
-                    <img
-                      src={captchaImage}
-                      className="captcha-canvas"
-                      alt="验证码"
-                      title="点击刷新"
-                      onClick={() => void refreshCaptcha()}
+                    <Input
+                      prefix={<MobileOutlined />}
+                      placeholder="请输入手机号"
+                      maxLength={11}
+                      allowClear
                     />
-                  ) : (
-                    <div
-                      className="captcha-canvas captcha-placeholder"
-                      onClick={() => void refreshCaptcha()}
+                  </Form.Item>
+                  <Form.Item
+                    name="smsCode"
+                    rules={[
+                      { required: true, message: '请输入短信验证码' },
+                      { pattern: /^\d{6}$/, message: '验证码为6位数字' },
+                    ]}
+                  >
+                    <XnSmsCode phone={phone} request={sendLoginSms} />
+                  </Form.Item>
+                  <p className="sms-hint">演示号 18888888888（admin），验证码将弹窗展示</p>
+                </>
+              ) : (
+                <>
+                  <Form.Item
+                    name="username"
+                    rules={[
+                      { required: true, message: '请输入用户名' },
+                      ...(isRegister
+                        ? [{ min: 2, max: 50, message: '用户名长度需在2-50之间' }]
+                        : []),
+                    ]}
+                  >
+                    <Input prefix={<UserOutlined />} placeholder="请输入用户名" allowClear />
+                  </Form.Item>
+                  {isRegister ? (
+                    <Form.Item name="nickname" rules={[{ max: 50, message: '昵称长度不能超过50' }]}>
+                      <Input prefix={<UserOutlined />} placeholder="昵称（可选）" allowClear />
+                    </Form.Item>
+                  ) : null}
+                  <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
+                    <Input.Password prefix={<LockOutlined />} placeholder="请输入密码" />
+                  </Form.Item>
+                  {isRegister ? (
+                    <Form.Item
+                      name="confirmPassword"
+                      dependencies={['password']}
+                      rules={[
+                        { required: true, message: '请再次输入密码' },
+                        ({ getFieldValue }) => ({
+                          validator(_, value) {
+                            if (!value || getFieldValue('password') === value) {
+                              return Promise.resolve()
+                            }
+                            return Promise.reject(new Error('两次输入的密码不一致'))
+                          },
+                        }),
+                      ]}
                     >
-                      刷新
-                    </div>
-                  )}
-                </div>
-              ) : null}
-              {captchaEnabled && captchaType === 'SLIDER' ? (
-                <Form.Item>
-                  <div className="slider-wrap">
-                    <div className="slider-track">
-                      <div className="slider-progress" style={{ width: `${sliderPercent}%` }} />
-                      <span className="slider-text">
-                        {sliderOk ? '验证通过' : '拖动滑块完成验证'}
-                      </span>
-                    </div>
-                    <div
-                      className="slider-thumb"
-                      style={{ left: `calc(${sliderPercent}% - 18px)` }}
-                      onPointerDown={onSliderStart}
+                      <Input.Password prefix={<LockOutlined />} placeholder="请确认密码" />
+                    </Form.Item>
+                  ) : null}
+                  {captchaEnabled && captchaType === 'IMAGE' ? (
+                    <Form.Item
+                      name="captcha"
+                      validateTrigger="onBlur"
+                      rules={[{ required: true, message: '请输入验证码' }]}
                     >
-                      {sliderOk ? '✓' : '»'}
-                    </div>
-                  </div>
-                </Form.Item>
-              ) : null}
+                      <XnCaptcha
+                        ref={captchaRef}
+                        mode="auto"
+                        type="IMAGE"
+                        captchaId={captchaId}
+                        onCaptchaIdChange={setCaptchaId}
+                      />
+                    </Form.Item>
+                  ) : null}
+                  {captchaEnabled && captchaType === 'SLIDER' ? (
+                    <Form.Item>
+                      <XnCaptcha
+                        ref={captchaRef}
+                        mode="auto"
+                        type="SLIDER"
+                        captchaId={captchaId}
+                        onCaptchaIdChange={setCaptchaId}
+                        onVerified={setSliderOk}
+                      />
+                    </Form.Item>
+                  ) : null}
+                </>
+              )}
               <Form.Item>
                 <Button
                   type="primary"

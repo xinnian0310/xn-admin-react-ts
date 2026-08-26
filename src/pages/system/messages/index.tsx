@@ -14,6 +14,7 @@ import type { SaveMode } from '@/types/save'
 import type { TableColumnItem } from '@/types/table'
 import { formatDateTime } from '@/utils/datetime'
 import MessageSave, { type MessageSaveHandle } from './save'
+import XnDialog from '@/components/XnDialog'
 import XnModal from '@/components/XnModal'
 
 export default function MessagesPage() {
@@ -92,16 +93,9 @@ export default function MessagesPage() {
   }, [])
 
   async function handleDelete(row: Message) {
-    XnModal.confirm({
-      title: '删除确认',
-      content: `确定删除「${row.title}」吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleBatchDelete() {
@@ -266,13 +260,13 @@ export default function MessagesPage() {
         }
       />
       <MessageSave ref={saveRef} onSuccess={() => void loadData()} />
-      <XnModal
+      <XnDialog
         title="发送站内信"
         open={sendVisible}
         confirmLoading={sendLoading}
         onCancel={() => setSendVisible(false)}
-        onOk={() => void confirmSend()}
-        okText="发送"
+        onConfirm={() => void confirmSend()}
+        confirmText="发送"
       >
         <Checkbox checked={sendToAll} onChange={(e) => setSendToAll(e.target.checked)}>
           发送给全部启用用户
@@ -291,13 +285,13 @@ export default function MessagesPage() {
             optionFilterProp="label"
           />
         ) : null}
-      </XnModal>
-      <XnModal
+      </XnDialog>
+      <XnDialog
         title="已读明细"
         open={readersVisible}
         width={640}
-        footer={null}
-        destroyOnHidden
+        showConfirm={false}
+        cancelText="关闭"
         onCancel={() => setReadersVisible(false)}
       >
         <Table
@@ -309,7 +303,7 @@ export default function MessagesPage() {
           scroll={{ y: 420 }}
           size="small"
         />
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

@@ -1,4 +1,4 @@
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, InputNumber, Radio, Select, Switch, Tag, message } from 'antd'
 import { create, get, update } from '@/api/dict-data'
@@ -90,16 +90,16 @@ const DictDataSave = forwardRef<DictDataSaveHandle, Props>(function DictDataSave
   const previewColor = TAG_COLORS[listClass || ''] || undefined
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '字典数据')}
       open={visible}
       width={560}
-      destroyOnHidden
+      destroyOnClose
       onCancel={() => setVisible(false)}
-      onOk={() => void handleSubmit()}
-      okText="保存"
+      onConfirm={() => void handleSubmit()}
+      confirmText="保存"
       cancelText={readonly ? '关闭' : '取消'}
-      okButtonProps={{ style: readonly ? { display: 'none' } : undefined }}
+      showConfirm={!readonly}
       confirmLoading={submitting}
     >
       <Form form={form} labelCol={{ span: 5 }} disabled={readonly} style={{ marginTop: 16 }}>
@@ -148,7 +148,7 @@ const DictDataSave = forwardRef<DictDataSaveHandle, Props>(function DictDataSave
           <Input.TextArea rows={3} />
         </Form.Item>
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

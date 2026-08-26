@@ -1,10 +1,12 @@
-﻿import { useEffect, useState } from 'react'
-import { Descriptions, Tag, message, Modal } from 'antd'
+﻿import { useEffect, useMemo, useState } from 'react'
+import { Tag, message, Modal } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnTable from '@/components/XnTable'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
+import XnDesc from '@/components/XnDesc'
+import XnCode from '@/components/XnCode'
 import { usePageUi } from '@/hooks/usePageUi'
 import { batchRemove, clean, exportOperLogs, get, list, remove } from '@/api/oper-log'
 import { rangeToBeginEnd } from '@/utils/download'
@@ -50,6 +52,22 @@ export default function SystemOperLogsPage() {
   const [detailVisible, setDetailVisible] = useState(false)
   const [current, setCurrent] = useState<OperLog | null>(null)
 
+  const detailItems = useMemo(() => {
+    if (!current) return []
+    const request = [current.requestMethod, current.requestUrl].filter(Boolean).join(' ')
+    return [
+      { label: '模块', value: current.title },
+      { label: '业务类型', value: businessTypeLabel(current.businessType) },
+      { label: '操作人', value: current.operatorName },
+      { label: '状态', value: current.status === 1 ? '成功' : '失败' },
+      { label: '请求', value: request, span: 2, type: 'copy' as const },
+      { label: '方法', value: current.method, span: 2, type: 'copy' as const },
+      { label: 'IP', value: current.ip, type: 'copy' as const },
+      { label: '耗时(ms)', value: current.costTime },
+      { label: '时间', value: current.operTime, span: 2 },
+    ]
+  }, [current])
+
   const columns: TableColumnItem[] = [
     { type: 'selection', width: 50, fixed: true },
     { prop: 'title', label: '模块', minWidth: 140 },
@@ -86,16 +104,9 @@ export default function SystemOperLogsPage() {
   }
 
   async function handleDelete(row: OperLog) {
-    Modal.confirm({
-      title: '删除确认',
-      content: `确定删除「${row.title}」这条操作日志吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('已删除')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('已删除')
+    await loadData()
   }
 
   function buttonClick(action: string) {
@@ -133,9 +144,11 @@ export default function SystemOperLogsPage() {
           await loadData()
         },
       })
-    } else if (action === 'export') {
-      void exportOperLogs(listParams(page, size, queryForm)).then(() => message.success('导出成功'))
     }
+  }
+
+  async function handleExport() {
+    await exportOperLogs(listParams(page, size, queryForm))
   }
 
   return (
@@ -158,7 +171,12 @@ export default function SystemOperLogsPage() {
           />
         }
         toolbar={
-          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+          <XnButton
+            listItem={buttonItems}
+            selected={selected}
+            exportRequest={handleExport}
+            onButtonClick={buttonClick}
+          />
         }
         table={
           <XnTable
@@ -201,46 +219,36 @@ export default function SystemOperLogsPage() {
           />
         }
       />
-      <XnModal
+      <XnDialog
         title="操作日志详情"
         open={detailVisible}
         onCancel={() => setDetailVisible(false)}
-        footer={null}
-        width={720}
-        destroyOnHidden
+        width={820}
+        showConfirm={false}
+        cancelText="关闭"
       >
         {current ? (
-          <Descriptions column={1} bordered size="small">
-            <Descriptions.Item label="模块">{current.title}</Descriptions.Item>
-            <Descriptions.Item label="业务类型">
-              {businessTypeLabel(current.businessType)}
-            </Descriptions.Item>
-            <Descriptions.Item label="操作人">{current.operatorName || '—'}</Descriptions.Item>
-            <Descriptions.Item label="请求">
-              {current.requestMethod || '—'} {current.requestUrl || ''}
-            </Descriptions.Item>
-            <Descriptions.Item label="方法">{current.method || '—'}</Descriptions.Item>
-            <Descriptions.Item label="IP">{current.ip || '—'}</Descriptions.Item>
-            <Descriptions.Item label="耗时(ms)">{current.costTime ?? '—'}</Descriptions.Item>
-            <Descriptions.Item label="状态">
-              {current.status === 1 ? '成功' : '失败'}
-            </Descriptions.Item>
-            <Descriptions.Item label="时间">{current.operTime}</Descriptions.Item>
-            <Descriptions.Item label="参数">
-              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                {current.params || '—'}
-              </pre>
-            </Descriptions.Item>
-            {current.errorMsg ? (
-              <Descriptions.Item label="错误">
-                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                  {current.errorMsg}
-                </pre>
-              </Descriptions.Item>
+          <>
+            <XnDesc column={2} items={detailItems} size="small" />
+            {current.params ? (
+              <XnCode
+                title="参数"
+                language="json"
+                value={current.params}
+                style={{ marginTop: 12 }}
+              />
             ) : null}
-          </Descriptions>
+            {current.errorMsg ? (
+              <XnCode
+                title="错误"
+                language="text"
+                value={current.errorMsg}
+                style={{ marginTop: 12 }}
+              />
+            ) : null}
+          </>
         ) : null}
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

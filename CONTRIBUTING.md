@@ -2,6 +2,8 @@
 
 感谢关注本仓库。本工程为独立开源前端（React + TypeScript + Ant Design）；功能对齐基准仓库 **xn-admin-vue3-ts**，配套后端为 **xn-admin-cloud**。同步进度见 [SYNC.md](./SYNC.md)。
 
+**在线演示：** https://react.xinniankeji.vip · 官网：https://xinniankeji.vip
+
 ## 如何贡献
 
 1. Fork 本仓库并创建功能分支

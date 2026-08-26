@@ -73,7 +73,7 @@ export default function XnUiPreferenceFab() {
   const [form] = Form.useForm<PrefForm>()
   const [topPx, setTopPx] = useState(loadTop)
   const [dragging, setDragging] = useState(false)
-  const [peek, setPeek] = useState(false)
+  const [hoverPeek, setHoverPeek] = useState(false)
   const [saving, setSaving] = useState(false)
   const [resetting, setResetting] = useState(false)
 
@@ -94,16 +94,18 @@ export default function XnUiPreferenceFab() {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
+  const peek = drawerVisible || hoverPeek
+
   // 靠近右边缘且靠近按钮垂直位置时自动露出
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (dragging || drawerVisible) {
-        setPeek(true)
+        setHoverPeek(true)
         return
       }
       const nearRight = window.innerWidth - e.clientX <= EDGE_PROXIMITY
       const nearY = e.clientY >= topPx - Y_PAD && e.clientY <= topPx + FAB_HEIGHT + Y_PAD
-      setPeek(nearRight && nearY)
+      setHoverPeek(nearRight && nearY)
     }
     window.addEventListener('mousemove', onMove, { passive: true })
     return () => window.removeEventListener('mousemove', onMove)
@@ -112,11 +114,10 @@ export default function XnUiPreferenceFab() {
   useEffect(() => {
     if (drawerVisible) {
       form.setFieldsValue(readFormFromApp())
-      setPeek(true)
     }
   }, [drawerVisible, form])
 
-  const onPointerMove = useCallback((e: PointerEvent) => {
+  const onWinMove = useCallback((e: PointerEvent) => {
     const d = dragRef.current
     if (d.pointerId !== e.pointerId) return
     const dy = e.clientY - d.startY
@@ -124,15 +125,20 @@ export default function XnUiPreferenceFab() {
     setTopPx(clampTop(d.startTop + dy))
   }, [])
 
-  const onPointerUp = useCallback(
-    (e: PointerEvent) => {
+  const upRef = useRef<(e: PointerEvent) => void>(() => {})
+  const onWinUp = useCallback((e: PointerEvent) => {
+    upRef.current(e)
+  }, [])
+
+  useEffect(() => {
+    upRef.current = (e: PointerEvent) => {
       const d = dragRef.current
       if (d.pointerId !== e.pointerId) return
       d.pointerId = null
       setDragging(false)
-      window.removeEventListener('pointermove', onPointerMove)
-      window.removeEventListener('pointerup', onPointerUp)
-      window.removeEventListener('pointercancel', onPointerUp)
+      window.removeEventListener('pointermove', onWinMove)
+      window.removeEventListener('pointerup', onWinUp)
+      window.removeEventListener('pointercancel', onWinUp)
       setTopPx((t) => {
         persistTop(t)
         return t
@@ -140,9 +146,8 @@ export default function XnUiPreferenceFab() {
       if (!d.moved) {
         openDrawer()
       }
-    },
-    [onPointerMove, openDrawer, persistTop],
-  )
+    }
+  }, [onWinMove, onWinUp, openDrawer, persistTop])
 
   function onPointerDown(e: React.PointerEvent<HTMLButtonElement>) {
     if (e.button !== 0) return
@@ -153,11 +158,11 @@ export default function XnUiPreferenceFab() {
       moved: false,
     }
     setDragging(true)
-    setPeek(true)
+    setHoverPeek(true)
     e.currentTarget.setPointerCapture(e.pointerId)
-    window.addEventListener('pointermove', onPointerMove)
-    window.addEventListener('pointerup', onPointerUp)
-    window.addEventListener('pointercancel', onPointerUp)
+    window.addEventListener('pointermove', onWinMove)
+    window.addEventListener('pointerup', onWinUp)
+    window.addEventListener('pointercancel', onWinUp)
   }
 
   async function onSave(values: PrefForm) {

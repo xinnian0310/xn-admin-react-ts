@@ -1,4 +1,5 @@
-import XnModal from '@/components/XnModal'
+import XnCron from '@/components/XnCron'
+import XnDialog from '@/components/XnDialog'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, Radio, Select, Switch, message } from 'antd'
 import { createJob, getJob, updateJob } from '@/api/file-job'
@@ -24,6 +25,7 @@ const JobSave = forwardRef<JobSaveHandle, { onSuccess?: () => void }>(function J
   const [mode, setMode] = useState<SaveMode>('add')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [detailLoading, setDetailLoading] = useState(false)
   const [form] = Form.useForm<JobForm>()
 
   useImperativeHandle(ref, () => ({
@@ -43,17 +45,22 @@ const JobSave = forwardRef<JobSaveHandle, { onSuccess?: () => void }>(function J
       })
       setVisible(true)
       if (openMode !== 'add' && id) {
-        const res = await getJob(id)
-        form.setFieldsValue({
-          name: res.data.name,
-          jobKey: res.data.jobKey,
-          cron: res.data.cron,
-          invokeTarget: res.data.invokeTarget,
-          status: res.data.status,
-          remark: res.data.remark || '',
-          concurrent: res.data.concurrent ?? false,
-          misfirePolicy: res.data.misfirePolicy || '0',
-        })
+        setDetailLoading(true)
+        try {
+          const res = await getJob(id)
+          form.setFieldsValue({
+            name: res.data.name,
+            jobKey: res.data.jobKey,
+            cron: res.data.cron,
+            invokeTarget: res.data.invokeTarget,
+            status: res.data.status,
+            remark: res.data.remark || '',
+            concurrent: res.data.concurrent ?? false,
+            misfirePolicy: res.data.misfirePolicy || '0',
+          })
+        } finally {
+          setDetailLoading(false)
+        }
       }
     },
   }))
@@ -77,17 +84,19 @@ const JobSave = forwardRef<JobSaveHandle, { onSuccess?: () => void }>(function J
   }
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '定时任务')}
       open={visible}
       onCancel={() => setVisible(false)}
-      destroyOnHidden
+      destroyOnClose
       width={640}
-      okText="保存"
+      showFullscreen
+      loading={detailLoading}
+      confirmText="保存"
       cancelText={mode === 'view' ? '关闭' : '取消'}
-      okButtonProps={{ style: mode === 'view' ? { display: 'none' } : undefined }}
+      showConfirm={mode !== 'view'}
       confirmLoading={submitting}
-      onOk={() => void handleSubmit()}
+      onConfirm={() => void handleSubmit()}
     >
       <Form form={form} labelCol={{ span: 5 }} disabled={mode === 'view'}>
         <Form.Item
@@ -109,7 +118,7 @@ const JobSave = forwardRef<JobSaveHandle, { onSuccess?: () => void }>(function J
           label="Cron"
           rules={[{ required: true, message: '请输入 Cron 表达式' }]}
         >
-          <Input placeholder="如 0 */5 * * * ?" />
+          <XnCron />
         </Form.Item>
         <Form.Item
           name="invokeTarget"
@@ -142,7 +151,7 @@ const JobSave = forwardRef<JobSaveHandle, { onSuccess?: () => void }>(function J
           <Input.TextArea rows={2} maxLength={500} />
         </Form.Item>
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

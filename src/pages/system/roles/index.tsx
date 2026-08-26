@@ -101,16 +101,9 @@ export default function RolesPage() {
       message.warning('内置角色不可删除')
       return
     }
-    Modal.confirm({
-      title: '确认删除',
-      content: `确定删除角色「${row.name}」吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleBatchDelete() {

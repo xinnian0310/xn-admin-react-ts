@@ -2,7 +2,7 @@ import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Alert, Button, Form, Input, Space, Switch, Tabs, Tag, message } from 'antd'
 import { generate, type RouteCodegenResult } from '@/api/route'
 import type { SysRoute } from '@/types'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 
 export interface RouteCodegenHandle {
   open: (row: SysRoute) => void
@@ -76,12 +76,12 @@ const RouteCodegen = forwardRef<RouteCodegenHandle, object>(function RouteCodege
   }
 
   return (
-    <XnModal
+    <XnDialog
       title={`代码生成 - ${route?.title || ''}`}
       open={visible}
       onCancel={() => setVisible(false)}
-      destroyOnHidden
       width={820}
+      showFullscreen
       footer={
         result ? (
           <Space>
@@ -110,7 +110,7 @@ const RouteCodegen = forwardRef<RouteCodegenHandle, object>(function RouteCodege
             type="info"
             showIcon
             style={{ marginBottom: 12 }}
-            message="生成结果为 ZIP 预览包；复制到工程后需重启 xn-system 并刷新菜单。权限可选择落库。"
+            title="生成结果为 ZIP 预览包；复制到工程后需重启 xn-system 并刷新菜单。权限可选择落库。"
           />
           <DescriptionsLike
             items={[
@@ -148,7 +148,7 @@ const RouteCodegen = forwardRef<RouteCodegenHandle, object>(function RouteCodege
             type="success"
             showIcon
             style={{ marginBottom: 12 }}
-            message={`已落库权限 ${result.persistedPermissionCount} 条${
+            title={`已落库权限 ${result.persistedPermissionCount} 条${
               result.pageUiPersisted ? '，PageUi 已写入' : ''
             }`}
           />
@@ -171,7 +171,7 @@ const RouteCodegen = forwardRef<RouteCodegenHandle, object>(function RouteCodege
           />
         </>
       )}
-    </XnModal>
+    </XnDialog>
   )
 })
 

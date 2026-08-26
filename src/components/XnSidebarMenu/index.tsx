@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Button, Input, Menu, Space } from 'antd'
 import type { MenuProps } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
@@ -42,6 +42,10 @@ function toAntdItems(items: MenuItem[], highlightIds: Set<string>): AntdItem[] {
   })
 }
 
+function sameKeys(a: string[], b: string[]) {
+  return a.length === b.length && a.every((key, index) => key === b[index])
+}
+
 function findSelectedKey(pathname: string, menus: MenuItem[]): string {
   const clean = pathname.replace(/\/save(\/.*)?$/, '')
   const walk = (items: MenuItem[]): string | null => {
@@ -79,16 +83,17 @@ export default function XnSidebarMenu({
   }, [visible, activePath, mode])
 
   const [openKeys, setOpenKeys] = useState<string[]>(routeOpenKeys)
+  const [appliedRouteKeys, setAppliedRouteKeys] = useState(routeOpenKeys)
   const [searchDraft, setSearchDraft] = useState('')
   const [highlightIds, setHighlightIds] = useState<Set<string>>(() => new Set())
 
+  if (mode !== 'horizontal' && !sameKeys(appliedRouteKeys, routeOpenKeys)) {
+    setAppliedRouteKeys(routeOpenKeys)
+    setOpenKeys((prev) => Array.from(new Set([...prev, ...routeOpenKeys])))
+  }
+
   const items = useMemo(() => toAntdItems(visible, highlightIds), [visible, highlightIds])
   const enableSearch = showSearch && mode === 'inline' && !collapsed
-
-  useEffect(() => {
-    if (mode === 'horizontal') return
-    setOpenKeys((prev) => Array.from(new Set([...prev, ...routeOpenKeys])))
-  }, [routeOpenKeys, mode])
 
   function clearSearch() {
     setSearchDraft('')

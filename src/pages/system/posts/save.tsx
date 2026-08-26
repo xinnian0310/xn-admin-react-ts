@@ -1,4 +1,4 @@
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import { Form, Input, InputNumber, Radio, message } from 'antd'
 import { create, get, update } from '@/api/post'
@@ -61,17 +61,17 @@ const PostSave = forwardRef<PostSaveHandle, { onSuccess?: () => void }>(function
   }
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '岗位')}
       open={visible}
       onCancel={() => setVisible(false)}
-      destroyOnHidden
+      destroyOnClose
       width={520}
-      okText="保存"
+      confirmText="保存"
       cancelText={mode === 'view' ? '关闭' : '取消'}
-      okButtonProps={{ style: mode === 'view' ? { display: 'none' } : undefined }}
+      showConfirm={mode !== 'view'}
       confirmLoading={submitting}
-      onOk={() => void handleSubmit()}
+      onConfirm={() => void handleSubmit()}
     >
       <Form form={form} labelCol={{ span: 5 }} disabled={mode === 'view'}>
         <Form.Item name="name" label="名称" rules={[{ required: true, message: '请输入名称' }]}>
@@ -102,7 +102,7 @@ const PostSave = forwardRef<PostSaveHandle, { onSuccess?: () => void }>(function
           <Input.TextArea rows={3} maxLength={200} />
         </Form.Item>
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

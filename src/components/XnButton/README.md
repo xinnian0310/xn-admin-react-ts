@@ -23,6 +23,7 @@ import XnButton, { XnTableActions } from '@/components/XnButton'
 <XnButton
   listItem={buttonItems}
   selected={selected}
+  exportRequest={handleExport}
   onButtonClick={(action) => {
     if (action === 'add') openSave('add')
   }}
@@ -38,27 +39,31 @@ import XnButton, { XnTableActions } from '@/components/XnButton'
 
 ## 传参（XnButton）
 
-| 名称            | 类型                                             | 默认值 | 说明             |
-| --------------- | ------------------------------------------------ | ------ | ---------------- |
-| `listItem`      | `ButtonListItem[]`                               | `[]`   | 传 `[]` 则不渲染 |
-| `selected`      | `unknown[]`                                      | `[]`   | 当前表格选中行   |
-| `onButtonClick` | `(action: string, item: ButtonListItem) => void` | —      | 点击回调         |
+| 名称            | 类型                                             | 默认值 | 说明                        |
+| --------------- | ------------------------------------------------ | ------ | --------------------------- |
+| `listItem`      | `ButtonListItem[]`                               | `[]`   | 传 `[]` 则不渲染            |
+| `selected`      | `unknown[]`                                      | `[]`   | 当前表格选中行              |
+| `onButtonClick` | `(action: string, item: ButtonListItem) => void` | —      | 点击回调                    |
+| `exportRequest` | `() => Promise<void>`                            | —      | 传入后「导出」走 `XnExport` |
 
 ## 传参（XnTableActions）
 
-| 名称            | 类型                                                          | 默认值 | 说明                     |
-| --------------- | ------------------------------------------------------------- | ------ | ------------------------ |
-| `items`         | `ButtonListItem[]`                                            | `[]`   | 行操作配置               |
-| `row`           | `Record<string, unknown>`                                     | —      | 当前行                   |
-| `disabled`      | `(action, row) => boolean \| string`                          | —      | 返回 `true`/字符串则禁用 |
-| `onActionClick` | `(payload: { action: string; row: Record<string, unknown> })` | —      | 行内点击                 |
+| 名称             | 类型                                                          | 默认值       | 说明                      |
+| ---------------- | ------------------------------------------------------------- | ------------ | ------------------------- |
+| `items`          | `ButtonListItem[]`                                            | `[]`         | 行操作配置                |
+| `row`            | `Record<string, unknown>`                                     | —            | 当前行                    |
+| `disabled`       | `(action, row) => boolean \| string`                          | —            | 返回 `true`/字符串则禁用  |
+| `confirmActions` | `string[]`                                                    | `['delete']` | 这些动作用 `XnPopconfirm` |
+| `onActionClick`  | `(payload: { action: string; row: Record<string, unknown> })` | —            | 行内点击                  |
 
 ## 行为说明
 
 - `index`：需要选中 `index + 1` 行才可点
 - `delete` / `publish` / `revoke`：至少选中 1 行
 - 下拉：`type: 'down'` + `searchItem` 子项
+- `action === 'export'` 且传入 `exportRequest` 时渲染 `XnExport`，不再走 `onButtonClick`
 - 禁用时点击会 `message.warning` 提示选中数量
+- `XnTableActions` 的 `delete` 默认包 `XnPopconfirm`，页面行删除不再弹 `Modal.confirm`。批量删除仍用 Modal。
 
 ## 相关类型
 

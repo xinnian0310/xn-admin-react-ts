@@ -99,17 +99,9 @@ export default function LoginSettingsPage() {
   }
 
   async function handleDelete(row: LoginPageConfig) {
-    Modal.confirm({
-      title: '删除确认',
-      content: `确定删除配置「${row.name}」吗？`,
-      okType: 'danger',
-      okText: '删除',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleBatchDelete() {

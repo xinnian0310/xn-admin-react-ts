@@ -44,7 +44,7 @@ function AntdThemeBridge({ children }: { children: ReactNode }) {
       modal={{
         centered: antd.modal.centered,
         styles: {
-          wrapper: { overflow: 'hidden' },
+          wrapper: { overflow: 'visible' },
           container: {
             maxHeight: appConfig.ui.dialog.maxHeight || antd.modal.maxHeight || '80vh',
             display: 'flex',

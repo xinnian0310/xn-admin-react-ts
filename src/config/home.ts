@@ -129,8 +129,8 @@ export const homeConfig = {
       icon: 'Message',
       label: '邮箱',
       type: 'email',
-      value: 'support@xinnian.com',
-      link: 'mailto:support@xinnian.com',
+      value: 'xn0310ning@gmail.com',
+      link: 'mailto:xn0310ning@gmail.com',
     },
     {
       icon: 'Link',

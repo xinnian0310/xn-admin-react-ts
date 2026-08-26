@@ -1,10 +1,12 @@
-﻿import { useEffect, useState } from 'react'
-import { Descriptions, message, Modal } from 'antd'
+﻿import { useEffect, useMemo, useState } from 'react'
+import { message, Modal } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnTable from '@/components/XnTable'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
+import XnDesc from '@/components/XnDesc'
+import XnCode from '@/components/XnCode'
 import { usePageUi } from '@/hooks/usePageUi'
 import { batchRemove, clean, exportExceptionLogs, get, list, remove } from '@/api/exception-log'
 import { rangeToBeginEnd } from '@/utils/download'
@@ -32,6 +34,20 @@ export default function SystemExceptionLogsPage() {
   const [selected, setSelected] = useState<ExceptionLog[]>([])
   const [detailVisible, setDetailVisible] = useState(false)
   const [current, setCurrent] = useState<ExceptionLog | null>(null)
+
+  const detailItems = useMemo(() => {
+    if (!current) return []
+    const request = [current.requestMethod, current.requestUrl].filter(Boolean).join(' ')
+    return [
+      { label: '请求', value: request, span: 2, type: 'copy' as const },
+      { label: '方法', value: current.method, span: 2, type: 'copy' as const },
+      { label: '类名', value: current.className, span: 2, type: 'copy' as const },
+      { label: '异常', value: current.exceptionName, type: 'copy' as const },
+      { label: '操作人', value: current.operatorName },
+      { label: 'IP', value: current.ip, type: 'copy' as const },
+      { label: '时间', value: current.createdAt },
+    ]
+  }, [current])
 
   const columns: TableColumnItem[] = [
     { type: 'selection', width: 50, fixed: true },
@@ -67,16 +83,9 @@ export default function SystemExceptionLogsPage() {
   }
 
   async function handleDelete(row: ExceptionLog) {
-    Modal.confirm({
-      title: '删除确认',
-      content: '确定删除这条异常日志吗？',
-      okType: 'danger',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('已删除')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('已删除')
+    await loadData()
   }
 
   function buttonClick(action: string) {
@@ -114,11 +123,11 @@ export default function SystemExceptionLogsPage() {
           await loadData()
         },
       })
-    } else if (action === 'export') {
-      void exportExceptionLogs(listParams(page, size, queryForm)).then(() =>
-        message.success('导出成功'),
-      )
     }
+  }
+
+  async function handleExport() {
+    await exportExceptionLogs(listParams(page, size, queryForm))
   }
 
   return (
@@ -141,7 +150,12 @@ export default function SystemExceptionLogsPage() {
           />
         }
         toolbar={
-          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+          <XnButton
+            listItem={buttonItems}
+            selected={selected}
+            exportRequest={handleExport}
+            onButtonClick={buttonClick}
+          />
         }
         table={
           <XnTable
@@ -178,47 +192,37 @@ export default function SystemExceptionLogsPage() {
           />
         }
       />
-      <XnModal
+      <XnDialog
         title="异常日志详情"
         open={detailVisible}
         onCancel={() => setDetailVisible(false)}
-        footer={null}
-        width={780}
-        destroyOnHidden
+        width={860}
+        showConfirm={false}
+        cancelText="关闭"
       >
         {current ? (
-          <Descriptions column={1} bordered size="small">
-            <Descriptions.Item label="请求">
-              {current.requestMethod || '—'} {current.requestUrl || ''}
-            </Descriptions.Item>
-            <Descriptions.Item label="方法">{current.method || '—'}</Descriptions.Item>
-            <Descriptions.Item label="类名">{current.className || '—'}</Descriptions.Item>
-            <Descriptions.Item label="异常">{current.exceptionName || '—'}</Descriptions.Item>
-            <Descriptions.Item label="操作人">{current.operatorName || '—'}</Descriptions.Item>
-            <Descriptions.Item label="IP">{current.ip || '—'}</Descriptions.Item>
-            <Descriptions.Item label="时间">{current.createdAt}</Descriptions.Item>
-            <Descriptions.Item label="信息">
-              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                {current.message || '—'}
-              </pre>
-            </Descriptions.Item>
-            <Descriptions.Item label="堆栈">
-              <pre
-                style={{
-                  margin: 0,
-                  maxHeight: 240,
-                  overflow: 'auto',
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-all',
-                  fontSize: 12,
-                }}
-              >
-                {current.stackTrace || '—'}
-              </pre>
-            </Descriptions.Item>
-          </Descriptions>
+          <>
+            <XnDesc column={2} items={detailItems} size="small" />
+            {current.message ? (
+              <XnCode
+                title="信息"
+                language="text"
+                value={current.message}
+                style={{ marginTop: 12 }}
+              />
+            ) : null}
+            {current.stackTrace ? (
+              <XnCode
+                title="堆栈"
+                language="text"
+                value={current.stackTrace}
+                maxHeight="320px"
+                style={{ marginTop: 12 }}
+              />
+            ) : null}
+          </>
         ) : null}
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

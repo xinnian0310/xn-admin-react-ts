@@ -2,6 +2,8 @@
 
 对照基准：独立仓库 **xn-admin-vue3-ts**（功能范围以其仓库为准）
 
+**在线演示：** https://react.xinniankeji.vip · 官网：https://xinniankeji.vip
+
 ## 已实现
 
 ### M0–M2 基础

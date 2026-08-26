@@ -19,13 +19,13 @@ Version: `1.0.0` · License: [Apache-2.0](./LICENSE) · Copyright 2026 XinNian
 
 ## Related repositories
 
-| Repository          | Gitee                                                | GitHub                                                     | Notes                                 |
-| ------------------- | ---------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------- |
-| `xn-admin-cloud`    | [Gitee](https://gitee.com/jenning/xn-admin-cloud)    | [GitHub](https://github.com/xinnian0310/xn-admin-cloud)    | Backend (required)                    |
-| `xn-admin-vue3-ts`  | [Gitee](https://gitee.com/jenning/xn-admin-vue3-ts)  | [GitHub](https://github.com/xinnian0310/xn-admin-vue3-ts)  | Feature baseline (Vue 3 + TypeScript) |
-| `xn-admin-vue3-js`  | [Gitee](https://gitee.com/jenning/xn-admin-vue3-js)  | [GitHub](https://github.com/xinnian0310/xn-admin-vue3-js)  | Vue 3 + JavaScript (Composition)      |
-| `xn-admin-vue2-js`  | [Gitee](https://gitee.com/jenning/xn-admin-vue2-js)  | [GitHub](https://github.com/xinnian0310/xn-admin-vue2-js)  | Vue 3 + JavaScript (Options API)      |
-| `xn-admin-react-ts` | [Gitee](https://gitee.com/jenning/xn-admin-react-ts) | [GitHub](https://github.com/xinnian0310/xn-admin-react-ts) | This repo                             |
+| Repository          | Live                                    | Gitee                                                | GitHub                                                     | Notes                                 |
+| ------------------- | --------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------- |
+| `xn-admin-cloud`    | [Site](https://xinniankeji.vip)         | [Gitee](https://gitee.com/jenning/xn-admin-cloud)    | [GitHub](https://github.com/xinnian0310/xn-admin-cloud)    | Backend (required)                    |
+| `xn-admin-vue3-ts`  | [Demo](https://vue3-ts.xinniankeji.vip) | [Gitee](https://gitee.com/jenning/xn-admin-vue3-ts)  | [GitHub](https://github.com/xinnian0310/xn-admin-vue3-ts)  | Feature baseline (Vue 3 + TypeScript) |
+| `xn-admin-vue3-js`  | [Demo](https://vue3-js.xinniankeji.vip) | [Gitee](https://gitee.com/jenning/xn-admin-vue3-js)  | [GitHub](https://github.com/xinnian0310/xn-admin-vue3-js)  | Vue 3 + JavaScript (Composition)      |
+| `xn-admin-vue2-js`  | [Demo](https://vue2.xinniankeji.vip)    | [Gitee](https://gitee.com/jenning/xn-admin-vue2-js)  | [GitHub](https://github.com/xinnian0310/xn-admin-vue2-js)  | Vue 3 + JavaScript (Options API)      |
+| `xn-admin-react-ts` | [Demo](https://react.xinniankeji.vip)   | [Gitee](https://gitee.com/jenning/xn-admin-react-ts) | [GitHub](https://github.com/xinnian0310/xn-admin-react-ts) | This repo                             |
 
 ## Prerequisites
 
@@ -38,7 +38,7 @@ Version: `1.0.0` · License: [Apache-2.0](./LICENSE) · Copyright 2026 XinNian
 
 | Username     | Initial password | Notes       |
 | ------------ | ---------------- | ----------- |
-| `SuperAdmin` | `SuperAdmin`     | Super admin |
+| `SuperAdmin` | `xinnian`        | Super admin |
 | `admin`      | `admin`          | Admin       |
 
 Local development only. Change passwords after login. See [SECURITY.md](./SECURITY.md).
@@ -99,7 +99,9 @@ src/
 └── utils/
 ```
 
-Typical list page: `XnPageLayout` → `XnSearch` → `XnButton` → `XnTable` (+ optional `XnTreePanel`).
+Typical list page: `XnPageLayout` → `XnSearch` → `XnButton` + `XnExport` → `XnTable` (+ optional `XnTreePanel`).
+
+Full catalog (including `XnDialog` / `XnModal`, captcha, SMS, dict/org/region, image upload, watermark, Cron): [`src/components/README.md`](./src/components/README.md).
 
 ## Screenshots
 

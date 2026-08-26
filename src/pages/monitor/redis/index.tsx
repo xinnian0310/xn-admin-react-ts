@@ -4,6 +4,7 @@ import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnTable from '@/components/XnTable'
+import XnDialog from '@/components/XnDialog'
 import XnModal from '@/components/XnModal'
 import { usePageUi } from '@/hooks/usePageUi'
 import { deleteRedisKey, flushRedis, getRedisMonitor } from '@/api/monitor'
@@ -102,16 +103,9 @@ export default function MonitorRedisPage() {
 
   async function handleDeleteKey(key: string) {
     if (!key) return
-    XnModal.confirm({
-      title: '删除确认',
-      content: `确定删除 Key「${key}」吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await deleteRedisKey(key)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await deleteRedisKey(key)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleFlush() {
@@ -226,15 +220,20 @@ export default function MonitorRedisPage() {
           />
         }
       />
-      <XnModal
+      <XnDialog
         title={detailTitle}
         open={detailVisible}
         onCancel={() => setDetailVisible(false)}
-        footer={null}
         width={640}
-        destroyOnHidden
+        showConfirm={false}
+        cancelText="关闭"
       >
-        <Descriptions column={1} bordered size="small">
+        <Descriptions
+          column={1}
+          bordered
+          size="small"
+          styles={{ label: { width: 'auto', maxWidth: 200, whiteSpace: 'nowrap' } }}
+        >
           <Descriptions.Item label="Key">
             <code style={{ wordBreak: 'break-all' }}>{currentKey}</code>
           </Descriptions.Item>
@@ -243,7 +242,7 @@ export default function MonitorRedisPage() {
             {monitor ? `${monitor.host}:${monitor.port}` : '—'}
           </Descriptions.Item>
         </Descriptions>
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

@@ -1,4 +1,4 @@
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { Button, Form, Input, Typography, message } from 'antd'
 import XnRichEditor from '@/components/XnRichEditor'
@@ -113,16 +113,17 @@ const MessageSave = forwardRef<MessageSaveHandle, Props>(function MessageSave({ 
   const readonly = mode === 'view'
 
   return (
-    <XnModal
+    <XnDialog
       title={saveDialogTitle(mode, '站内信')}
       open={visible}
       width={820}
-      destroyOnHidden
+      showFullscreen
+      destroyOnClose
       onCancel={() => setVisible(false)}
-      onOk={() => void handleSubmit()}
-      okText="保存草稿"
+      onConfirm={() => void handleSubmit()}
+      confirmText="保存草稿"
       cancelText={readonly ? '关闭' : '取消'}
-      okButtonProps={{ style: readonly ? { display: 'none' } : undefined }}
+      showConfirm={!readonly}
       confirmLoading={submitting}
     >
       <Form form={form} labelCol={{ span: 3 }} disabled={readonly} style={{ marginTop: 16 }}>
@@ -199,7 +200,7 @@ const MessageSave = forwardRef<MessageSaveHandle, Props>(function MessageSave({ 
           </div>
         </Form.Item>
       </Form>
-    </XnModal>
+    </XnDialog>
   )
 })
 

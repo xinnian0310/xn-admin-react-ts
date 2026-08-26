@@ -4,6 +4,7 @@ import {
   getApiRegistry,
   getCurrentUser,
   login as loginApi,
+  loginBySms as loginBySmsApi,
   logout as logoutApi,
   refreshToken as refreshTokenApi,
   updateCurrentUser,
@@ -26,6 +27,7 @@ interface UserState {
     password: string,
     captcha?: { captchaId?: string; captchaCode?: string },
   ) => Promise<{ token: string; user: User }>
+  loginBySms: (phone: string, code: string) => Promise<{ token: string; user: User }>
   refreshToken: () => Promise<{ token: string; user?: User }>
   fetchProfile: () => Promise<User>
   updateProfile: (payload: ProfileUpdatePayload) => Promise<User>
@@ -84,6 +86,29 @@ export const useUserStore = create<UserState>((set, get) => ({
       throw new Error('登录响应无效')
     }
     // 与 Vue 一致：接口成功后立刻发布登录态，避免 bootstrap 失败时卡在登录页
+    localStorage.setItem('token', token)
+    localStorage.setItem('user', JSON.stringify(user))
+    usePermissionStore.getState().setAuthData(user.roles || [], user.permissions || [])
+    set({ token, user })
+    try {
+      await get().loadRegistry()
+      startSessionGuard()
+      await useUiPreferenceStore.getState().load()
+    } catch (error) {
+      console.warn('[auth] 登录后初始化失败，已保留登录态', error)
+    }
+    return res.data
+  },
+
+  async loginBySms(phone, code) {
+    useTagsViewStore.getState().resetViews()
+    resetDynamicRoutes()
+    const res = await loginBySmsApi({ phone, code })
+    const token = res.data?.token
+    const user = res.data?.user
+    if (!token || !user) {
+      throw new Error('登录响应无效')
+    }
     localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(user))
     usePermissionStore.getState().setAuthData(user.roles || [], user.permissions || [])

@@ -1,4 +1,5 @@
-export type SearchItemType = 'input' | 'number' | 'select' | 'date' | 'daterange' | 'datetime'
+export type SearchItemType =
+  'input' | 'number' | 'select' | 'date' | 'daterange' | 'datetime' | 'dict' | 'region'
 
 export interface SearchItemOption {
   label: string
@@ -11,6 +12,10 @@ export interface SearchItem {
   type: SearchItemType
   placeholder?: string
   options?: SearchItemOption[]
+  /** type=dict 时的字典类型；传入 options 则不请求 */
+  dictType?: string
+  /** type=region：2=省市，3=省市区 */
+  level?: 2 | 3
   width?: string | number
   clearable?: boolean
   multiple?: boolean

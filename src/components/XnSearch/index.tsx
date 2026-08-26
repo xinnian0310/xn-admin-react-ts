@@ -1,10 +1,30 @@
-import { useMemo, useState } from 'react'
+import { cloneElement, useMemo, useState, type CSSProperties, type ReactElement } from 'react'
 import { Button, DatePicker, Form, Input, InputNumber, Select, Space } from 'antd'
 import dayjs from 'dayjs'
 import type { SearchForm, SearchItem } from '@/types/search'
 import { SEARCH_FIELD_DEFAULT_WIDTH } from '@/types/search'
 import { DownOutlined, UpOutlined } from '@ant-design/icons'
+import XnDictSelect from '@/components/XnDictSelect'
+import XnRegion from '@/components/XnRegion'
 import './xnSearch.scss'
+
+function SearchControl({
+  style,
+  value,
+  onChange,
+  children,
+}: {
+  style?: CSSProperties
+  value?: unknown
+  onChange?: (value: unknown) => void
+  children: ReactElement
+}) {
+  return (
+    <div className="xn-search__control" style={style}>
+      {cloneElement(children, { value, onChange } as Partial<typeof children.props>)}
+    </div>
+  )
+}
 
 interface XnSearchProps {
   searchItem?: SearchItem[]
@@ -55,12 +75,9 @@ export default function XnSearch({
         const controlWidth = typeof width === 'number' ? width : undefined
         return (
           <Form.Item key={item.prop} name={item.prop} label={item.label}>
-            <div
-              className="xn-search__control"
-              style={controlWidth ? { width: controlWidth } : undefined}
-            >
+            <SearchControl style={controlWidth ? { width: controlWidth } : undefined}>
               {renderField(item)}
-            </div>
+            </SearchControl>
           </Form.Item>
         )
       })}
@@ -102,6 +119,27 @@ function renderField(item: SearchItem) {
             value: o.value as string | number,
           }))}
           style={{ width: '100%' }}
+        />
+      )
+    case 'dict':
+      return (
+        <XnDictSelect
+          dictType={item.dictType}
+          options={item.options?.map((o) => ({
+            label: o.label,
+            value: o.value as string | number,
+          }))}
+          multiple={item.multiple}
+          allowClear={item.clearable !== false}
+          placeholder={item.placeholder || `请选择${item.label}`}
+        />
+      )
+    case 'region':
+      return (
+        <XnRegion
+          level={item.level || 3}
+          clearable={item.clearable !== false}
+          placeholder={item.placeholder || `请选择${item.label}`}
         />
       )
     case 'date':

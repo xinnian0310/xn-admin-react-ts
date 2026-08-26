@@ -1,11 +1,13 @@
-﻿import { useEffect, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Descriptions, Tag, message, Modal } from 'antd'
+import { Tag, message, Modal } from 'antd'
 import XnPageLayout from '@/components/XnPageLayout'
 import XnSearch from '@/components/XnSearch'
 import XnButton, { XnTableActions } from '@/components/XnButton'
 import XnTable from '@/components/XnTable'
-import XnModal from '@/components/XnModal'
+import XnDialog from '@/components/XnDialog'
+import XnDesc from '@/components/XnDesc'
+import XnCode from '@/components/XnCode'
 import { usePageUi } from '@/hooks/usePageUi'
 import {
   batchRemoveJobLogs,
@@ -63,6 +65,19 @@ export default function SystemJobLogsPage() {
   const [detailVisible, setDetailVisible] = useState(false)
   const [current, setCurrent] = useState<JobLog | null>(null)
 
+  const detailItems = useMemo(() => {
+    if (!current) return []
+    return [
+      { label: '任务', value: current.jobName },
+      { label: '状态', value: jobStatusLabel(current.status) },
+      { label: '标识', value: current.jobKey, type: 'copy' as const },
+      { label: '耗时(ms)', value: current.costMs },
+      { label: '调用目标', value: current.invokeTarget, span: 2, type: 'copy' as const },
+      { label: '开始', value: current.startTime },
+      { label: '结束', value: current.endTime },
+    ]
+  }, [current])
+
   const columns: TableColumnItem[] = [
     { type: 'selection', width: 50, fixed: true },
     { prop: 'jobName', label: '任务名称', minWidth: 140 },
@@ -103,16 +118,9 @@ export default function SystemJobLogsPage() {
   }
 
   async function handleDelete(row: JobLog) {
-    Modal.confirm({
-      title: '删除确认',
-      content: `确定删除任务「${row.jobName || row.id}」的这条日志吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await removeJobLog(row.id)
-        message.success('已删除')
-        await loadData()
-      },
-    })
+    await removeJobLog(row.id)
+    message.success('已删除')
+    await loadData()
   }
 
   function buttonClick(action: string) {
@@ -150,11 +158,11 @@ export default function SystemJobLogsPage() {
           await loadData()
         },
       })
-    } else if (action === 'export') {
-      void exportJobLogs(listParams(page, size, queryForm, jobId)).then(() =>
-        message.success('导出成功'),
-      )
     }
+  }
+
+  async function handleExport() {
+    await exportJobLogs(listParams(page, size, queryForm, jobId))
   }
 
   return (
@@ -177,7 +185,12 @@ export default function SystemJobLogsPage() {
           />
         }
         toolbar={
-          <XnButton listItem={buttonItems} selected={selected} onButtonClick={buttonClick} />
+          <XnButton
+            listItem={buttonItems}
+            selected={selected}
+            exportRequest={handleExport}
+            onButtonClick={buttonClick}
+          />
         }
         table={
           <XnTable
@@ -219,47 +232,37 @@ export default function SystemJobLogsPage() {
           />
         }
       />
-      <XnModal
+      <XnDialog
         title="任务日志详情"
         open={detailVisible}
         onCancel={() => setDetailVisible(false)}
-        footer={null}
-        width={720}
-        destroyOnHidden
+        width={820}
+        showConfirm={false}
+        cancelText="关闭"
       >
         {current ? (
-          <Descriptions column={1} bordered size="small">
-            <Descriptions.Item label="任务">{current.jobName || '—'}</Descriptions.Item>
-            <Descriptions.Item label="标识">{current.jobKey || '—'}</Descriptions.Item>
-            <Descriptions.Item label="调用目标">{current.invokeTarget || '—'}</Descriptions.Item>
-            <Descriptions.Item label="状态">{jobStatusLabel(current.status)}</Descriptions.Item>
-            <Descriptions.Item label="开始">{current.startTime || '—'}</Descriptions.Item>
-            <Descriptions.Item label="结束">{current.endTime || '—'}</Descriptions.Item>
-            <Descriptions.Item label="耗时(ms)">{current.costMs ?? '—'}</Descriptions.Item>
-            <Descriptions.Item label="信息">
-              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                {current.message || '—'}
-              </pre>
-            </Descriptions.Item>
-            {current.exceptionInfo ? (
-              <Descriptions.Item label="异常">
-                <pre
-                  style={{
-                    margin: 0,
-                    maxHeight: 240,
-                    overflow: 'auto',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-all',
-                    fontSize: 12,
-                  }}
-                >
-                  {current.exceptionInfo}
-                </pre>
-              </Descriptions.Item>
+          <>
+            <XnDesc column={2} items={detailItems} size="small" />
+            {current.message ? (
+              <XnCode
+                title="信息"
+                language="text"
+                value={current.message}
+                style={{ marginTop: 12 }}
+              />
             ) : null}
-          </Descriptions>
+            {current.exceptionInfo ? (
+              <XnCode
+                title="异常"
+                language="text"
+                value={current.exceptionInfo}
+                maxHeight="320px"
+                style={{ marginTop: 12 }}
+              />
+            ) : null}
+          </>
         ) : null}
-      </XnModal>
+      </XnDialog>
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type Key, type ReactNode } from 'react'
+import { useMemo, useState, type Key, type ReactNode } from 'react'
 import { Input, Tree } from 'antd'
 import type { DataNode } from 'antd/es/tree'
 
@@ -98,12 +98,13 @@ export default function XnTreePanel<T extends Record<string, unknown>>({
 
   const allKeys = useMemo(() => collectKeys(treeData), [treeData])
   const allKeysSig = allKeys.join('|')
-  const [expandedKeys, setExpandedKeys] = useState<Key[]>([])
+  const [expandedKeys, setExpandedKeys] = useState<Key[]>(allKeys)
+  const [prevKeysSig, setPrevKeysSig] = useState(allKeysSig)
 
-  // 异步数据到达后仍默认全部展开（antd defaultExpandAll 仅首挂载生效）
-  useEffect(() => {
+  if (prevKeysSig !== allKeysSig) {
+    setPrevKeysSig(allKeysSig)
     setExpandedKeys(allKeysSig ? allKeysSig.split('|') : [])
-  }, [allKeysSig])
+  }
 
   return (
     <div

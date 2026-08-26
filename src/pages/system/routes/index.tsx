@@ -88,16 +88,9 @@ export default function RoutesPage() {
       message.warning('内置路由不可删除')
       return
     }
-    Modal.confirm({
-      title: '确认删除',
-      content: `确定删除路由「${row.title}」吗？`,
-      okType: 'danger',
-      onOk: async () => {
-        await remove(row.id)
-        message.success('删除成功')
-        await loadData()
-      },
-    })
+    await remove(row.id)
+    message.success('删除成功')
+    await loadData()
   }
 
   async function handleBatchDelete() {

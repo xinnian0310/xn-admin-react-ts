@@ -1,7 +1,16 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
-import { Alert, Avatar, Button, Form, Input, Space, Tag, Upload, message } from 'antd'
+import { Alert, Button, Form, Input, Space, Tag, message } from 'antd'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { changePassword, getPasswordRules, uploadAvatar, type PasswordRules } from '@/api/auth'
+import {
+  bindPhone,
+  changePassword,
+  getPasswordRules,
+  sendSms,
+  uploadAvatar,
+  type PasswordRules,
+} from '@/api/auth'
+import XnAvatarCrop from '@/components/XnAvatarCrop'
+import XnSmsCode from '@/components/XnSmsCode'
 import { usePermissionStore } from '@/stores/permission'
 import { useUserStore } from '@/stores/user'
 import './profile.scss'
@@ -16,7 +25,6 @@ export default function ProfilePage() {
   const roles = usePermissionStore((s) => s.roles)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [avatarUploading, setAvatarUploading] = useState(false)
   const [editing, setEditing] = useState(false)
   const [pwdRules, setPwdRules] = useState<PasswordRules | null>(null)
   const [form] = Form.useForm()
@@ -30,6 +38,8 @@ export default function ProfilePage() {
     [user],
   )
   const avatarText = (user?.nickname || user?.username || '?').charAt(0).toUpperCase()
+  const phone = (Form.useWatch('phone', form) || '').trim()
+  const phoneNeedsBind = Boolean(phone) && phone !== (user?.phone || '').trim()
 
   function syncForm(data = user) {
     form.setFieldsValue({
@@ -37,7 +47,13 @@ export default function ProfilePage() {
       nickname: data?.nickname || '',
       email: data?.email || '',
       phone: data?.phone || '',
+      smsCode: '',
     })
+  }
+
+  async function sendBindSms(nextPhone: string) {
+    const res = await sendSms({ phone: nextPhone, scene: 'BIND' })
+    return res.data
   }
 
   async function loadProfile() {
@@ -91,10 +107,15 @@ export default function ProfilePage() {
     try {
       if (canEditProfile) {
         const values = form.getFieldsValue()
+        const nextPhone = String(values.phone || '').trim()
+        const needsBind = Boolean(nextPhone) && nextPhone !== (user?.phone || '').trim()
+        if (needsBind) {
+          await bindPhone({ phone: nextPhone, code: values.smsCode })
+        }
         await updateProfile({
           nickname: values.nickname,
           email: values.email,
-          phone: values.phone,
+          ...(needsBind ? {} : { phone: nextPhone }),
         })
       }
       if (forcePwd || hasPwdInput || !canEditProfile) {
@@ -122,15 +143,10 @@ export default function ProfilePage() {
     }
   }
 
-  async function handleAvatarUpload(file: File) {
-    setAvatarUploading(true)
-    try {
-      await uploadAvatar(file)
-      await fetchProfile()
-      message.success('头像已更新')
-    } finally {
-      setAvatarUploading(false)
-    }
+  async function uploadAvatarFile(file: File) {
+    const res = await uploadAvatar(file)
+    await fetchProfile()
+    return res.data?.avatar || ''
   }
 
   const profileFormDisabled = !canEditProfile || !editing
@@ -148,7 +164,7 @@ export default function ProfilePage() {
           type="warning"
           showIcon
           className="profile-page__alert"
-          message="按安全策略要求，请先修改密码后再继续使用系统"
+          title="按安全策略要求，请先修改密码后再继续使用系统"
         />
       ) : null}
       {!canEditProfile ? (
@@ -156,7 +172,7 @@ export default function ProfilePage() {
           type="warning"
           showIcon
           className="profile-page__alert"
-          message={
+          title={
             canEditPassword
               ? '超级管理员仅可修改密码，不可改用户名与基本资料'
               : '管理员不可修改个人信息与密码'
@@ -166,25 +182,14 @@ export default function ProfilePage() {
 
       <div className="profile-page__body">
         <aside className="profile-page__avatar">
-          <Avatar size={88} src={user?.avatar}>
-            {avatarText}
-          </Avatar>
+          <XnAvatarCrop
+            value={user?.avatar || ''}
+            fallback={avatarText}
+            disabled={!canEditProfile}
+            request={uploadAvatarFile}
+          />
           <div className="profile-page__name">{user?.nickname || user?.username}</div>
           <div className="profile-page__role">{roleText}</div>
-          {canEditProfile ? (
-            <Upload
-              showUploadList={false}
-              accept="image/jpeg,image/png,image/gif,image/webp"
-              beforeUpload={(file) => {
-                void handleAvatarUpload(file)
-                return false
-              }}
-            >
-              <Button size="small" loading={avatarUploading}>
-                更换头像
-              </Button>
-            </Upload>
-          ) : null}
         </aside>
 
         <div className="profile-page__main">
@@ -205,9 +210,32 @@ export default function ProfilePage() {
                 <Form.Item label="邮箱" name="email">
                   <Input maxLength={100} placeholder="请输入邮箱" />
                 </Form.Item>
-                <Form.Item label="手机" name="phone">
-                  <Input maxLength={20} placeholder="请输入手机号" />
+                <Form.Item
+                  label="手机"
+                  name="phone"
+                  rules={[{ pattern: /^$|^1[3-9]\d{9}$/, message: '请输入正确的手机号' }]}
+                >
+                  <Input maxLength={11} placeholder="请输入手机号" />
                 </Form.Item>
+                {editing && canEditProfile && phoneNeedsBind ? (
+                  <Form.Item
+                    name="smsCode"
+                    rules={[
+                      {
+                        validator: (_, value) => {
+                          if (!phoneNeedsBind) return Promise.resolve()
+                          if (!value) return Promise.reject(new Error('请输入短信验证码'))
+                          if (!/^\d{6}$/.test(String(value))) {
+                            return Promise.reject(new Error('验证码为6位数字'))
+                          }
+                          return Promise.resolve()
+                        },
+                      },
+                    ]}
+                  >
+                    <XnSmsCode phone={phone} request={sendBindSms} />
+                  </Form.Item>
+                ) : null}
                 <div className="profile-page__meta-grid">
                   <Form.Item label="单位">
                     <span>{user?.unitName || '—'}</span>
