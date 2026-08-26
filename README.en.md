@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./docs/preview-login.gif" alt="Login to dashboard" width="880" />
+</p>
+
 # xn-admin-react-ts
 
 [English](README.en.md) | [简体中文](README.md)
@@ -13,7 +17,7 @@ Ported from the Vue baseline **xn-admin-vue3-ts**, talking to the same backend *
 
 Sync status: [`SYNC.md`](./SYNC.md).
 
-Version: `1.0.0` · License: [Apache-2.0](./LICENSE) · Copyright 2026 XinNian
+Version: `1.1.0` · License: [Apache-2.0](./LICENSE) · Copyright 2026 XinNian
 
 **Live demo:** https://react.xinniankeji.vip · Website: https://xinniankeji.vip
 

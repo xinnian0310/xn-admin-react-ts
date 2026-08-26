@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./docs/preview-login.gif" alt="登录到工作台" width="880" />
+</p>
+
 # xn-admin-react-ts
 
 [简体中文](README.md) | [English](README.en.md)
@@ -17,7 +21,7 @@ xn-admin-react-ts 是「心念后台」的 React 管理端，基于 React 19、T
 
 **视觉刻意与 Element Plus 端区分**：使用 Ant Design 原生主色（`#1677ff`）、浅色侧栏与白顶栏（主题可切换），不做「壳层仿 Element」。业务能力以基准为准。
 
-版本：`1.0.0` · 许可证：[Apache-2.0](./LICENSE) · **可商用 / 可自用** · Copyright 2026 心念
+版本：`1.1.0` · 许可证：[Apache-2.0](./LICENSE) · **可商用 / 可自用** · Copyright 2026 心念
 
 **在线演示：** https://react.xinniankeji.vip · 官网：https://xinniankeji.vip
 
