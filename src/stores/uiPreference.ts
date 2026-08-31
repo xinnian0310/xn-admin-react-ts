@@ -16,6 +16,7 @@ interface UiPreferenceState {
   load: () => Promise<void>
   save: (data: UserUiConfig) => Promise<UserUiConfig>
   reset: () => Promise<void>
+  restoreDefaults: () => Promise<void>
   clearLocal: () => void
 }
 
@@ -55,6 +56,16 @@ export const useUiPreferenceStore = create<UiPreferenceState>((set) => ({
     await resetUserUiConfig()
     set({ preference: null })
     applyUserUiPreference(null)
+  },
+
+  async restoreDefaults() {
+    set({ preference: null, loaded: true })
+    applyUserUiPreference(null)
+    try {
+      await resetUserUiConfig()
+    } catch {
+      /* 本机已恢复默认，云端清偏好失败不影响展示 */
+    }
   },
 
   clearLocal() {

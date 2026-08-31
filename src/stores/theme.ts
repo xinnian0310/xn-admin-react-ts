@@ -96,6 +96,7 @@ interface ThemeState {
   setCustomParts: (partial: Partial<CustomThemeParts>) => void
   setMainBgImage: (dataUrl: string | null) => void
   applyCustom: () => void
+  resetToDefault: () => void
   openDialog: () => void
   closeDialog: () => void
 }
@@ -188,6 +189,35 @@ export const useThemeStore = create<ThemeState>((set, get) => {
 
     applyCustom() {
       persistSource('custom')
+      get().applyCurrent()
+    },
+
+    resetToDefault() {
+      const appearance: AppearanceMode = 'light'
+      const customParts = { ...DEFAULT_CUSTOM_PARTS }
+      const nextDerived = computeDerived(
+        DEFAULT_THEME_SOURCE,
+        DEFAULT_THEME_ID,
+        appearance,
+        customParts,
+      )
+      try {
+        localStorage.removeItem(STORAGE_SOURCE)
+        localStorage.removeItem(STORAGE_THEME_ID)
+        localStorage.removeItem(STORAGE_APPEARANCE)
+        localStorage.removeItem(STORAGE_CUSTOM)
+        localStorage.removeItem(STORAGE_MAIN_BG)
+      } catch {
+        /* ignore */
+      }
+      set({
+        source: DEFAULT_THEME_SOURCE,
+        themeId: DEFAULT_THEME_ID,
+        appearance,
+        customParts,
+        mainBgImage: null,
+        ...nextDerived,
+      })
       get().applyCurrent()
     },
 

@@ -18,6 +18,7 @@ import { normalizeDateTimes } from '@/utils/datetime'
 import { useNoticeStore } from '@/stores/notice'
 import { startSessionGuard, stopSessionGuard } from '@/utils/session-guard'
 import { useUiPreferenceStore } from '@/stores/uiPreference'
+import { useThemeStore } from '@/stores/theme'
 
 interface UserState {
   token: string
@@ -48,6 +49,16 @@ function getStoredUser(): User | null {
   } catch {
     return null
   }
+}
+
+/** admin 为共用演示账号：每次登录恢复默认主题色与布局字号 */
+async function applyUiAfterAuth(username?: string | null) {
+  if (username === 'admin') {
+    useThemeStore.getState().resetToDefault()
+    await useUiPreferenceStore.getState().restoreDefaults()
+    return
+  }
+  await useUiPreferenceStore.getState().load()
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -93,7 +104,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     try {
       await get().loadRegistry()
       startSessionGuard()
-      await useUiPreferenceStore.getState().load()
+      await applyUiAfterAuth(user.username)
     } catch (error) {
       console.warn('[auth] 登录后初始化失败，已保留登录态', error)
     }
@@ -116,7 +127,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     try {
       await get().loadRegistry()
       startSessionGuard()
-      await useUiPreferenceStore.getState().load()
+      await applyUiAfterAuth(user.username)
     } catch (error) {
       console.warn('[auth] 登录后初始化失败，已保留登录态', error)
     }
