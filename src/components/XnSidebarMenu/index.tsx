@@ -23,6 +23,8 @@ interface XnSidebarMenuProps {
   className?: string
   style?: React.CSSProperties
   onSelectPath?: (path: string) => void
+  /** 覆盖默认选中项（混合布局顶栏按一级菜单高亮） */
+  selectedKeys?: string[]
   /** 左侧竖向菜单是否显示搜索框，默认 true */
   showSearch?: boolean
 }
@@ -69,6 +71,7 @@ export default function XnSidebarMenu({
   className,
   style,
   onSelectPath,
+  selectedKeys: selectedKeysProp,
   showSearch = true,
 }: XnSidebarMenuProps) {
   const navigate = useNavigate()
@@ -128,7 +131,7 @@ export default function XnSidebarMenu({
       theme={theme}
       mode={mode}
       inlineCollapsed={collapsed}
-      selectedKeys={[selectedKey]}
+      selectedKeys={selectedKeysProp ?? [selectedKey]}
       openKeys={mode === 'horizontal' ? undefined : openKeys}
       onOpenChange={(keys) => setOpenKeys(keys as string[])}
       items={items}

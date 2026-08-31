@@ -129,14 +129,49 @@
   height: 100%;
 }
 
-.layout-shell > .ant-layout {
+/* 无侧栏的内层：顶栏 + 内容，纵向排列（经典侧栏 / 顶栏布局） */
+.layout-shell > .ant-layout:not(.ant-layout-has-sider) {
   min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: transparent !important;
+}
+
+/* 有侧栏的内层：混合 / 双列必须横向，否则侧栏会叠在顶栏工具上面 */
+.layout-shell > .ant-layout.ant-layout-has-sider,
+.layout-mix__body.ant-layout-has-sider,
+.layout-columns__body.ant-layout-has-sider {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: row !important;
+  background: transparent !important;
+}
+
+.layout-columns.ant-layout-has-sider {
+  flex-direction: row !important;
+}
+
+.layout-mix__body,
+.layout-columns__body {
+  min-height: 0;
+  flex: 1;
+  background: transparent !important;
+}
+
+.layout-main-col.ant-layout {
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
   display: flex;
   flex-direction: column;
   background: transparent !important;
 }
 
 .layout-aside {
+  align-self: stretch;
+  overflow: hidden;
   background: var(--app-sidebar-bg, #001529) !important;
   border-right: 1px solid var(--app-sidebar-border, transparent) !important;
   transition: background 0.2s ease;
@@ -147,6 +182,18 @@
   flex-direction: column;
   height: 100%;
   background: inherit;
+}
+
+.layout-aside__subtitle {
+  flex-shrink: 0;
+  height: 48px;
+  margin: 4px 10px 0;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  color: var(--app-sidebar-text-active);
+  font-size: var(--app-font-size-main, 14px);
+  font-weight: 600;
 }
 
 .layout-aside .xn-sidebar-menu-wrap {
@@ -231,6 +278,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
   padding: 0 20px !important;
   background: var(--app-header-bg, #fff) !important;
   color: var(--app-header-text, rgba(0, 0, 0, 0.88)) !important;
@@ -242,6 +290,126 @@
   transition:
     background 0.2s ease,
     color 0.2s ease;
+}
+
+.layout-header-bar .layout-header-tools {
+  flex-shrink: 0;
+}
+
+.layout-header-bar .ant-menu-horizontal {
+  flex: 1;
+  min-width: 0;
+  line-height: 54px;
+  border-bottom: none !important;
+  background: transparent !important;
+}
+
+.layout-header-bar .ant-menu-horizontal .ant-menu-item,
+.layout-header-bar .ant-menu-horizontal .ant-menu-submenu-title {
+  color: var(--app-header-text, rgba(0, 0, 0, 0.88));
+}
+
+.layout-header-bar .ant-menu-horizontal .ant-menu-item-selected,
+.layout-header-bar .ant-menu-horizontal .ant-menu-item-selected:hover {
+  color: var(--ant-color-primary, var(--app-color-primary, #1677ff)) !important;
+}
+
+.layout-mix__header,
+.layout-top__header {
+  gap: 16px;
+  padding-inline: 16px !important;
+}
+
+.layout-mix__brand,
+.layout-top__brand {
+  flex-shrink: 0;
+}
+
+.layout-mix__top-menu,
+.layout-top__menu {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.layout-columns-rail {
+  align-self: stretch;
+  overflow: hidden;
+  background: var(--app-sidebar-rail-bg, #000c17) !important;
+  border-right: 1px solid var(--app-sidebar-border, transparent) !important;
+}
+
+.layout-columns-rail .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.layout-columns-rail__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 100%;
+  height: 50px;
+  margin-bottom: 8px;
+  color: var(--app-sidebar-active);
+}
+
+.layout-columns-rail__items {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 0 12px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--app-sidebar-text) 45%, transparent) transparent;
+}
+
+.layout-columns-rail__items::-webkit-scrollbar {
+  width: 4px;
+}
+
+.layout-columns-rail__items::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--app-sidebar-text) 42%, transparent);
+}
+
+.layout-columns-rail__items::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.layout-columns-rail__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--app-sidebar-text);
+  cursor: pointer;
+}
+
+.layout-columns-rail__item:hover {
+  color: var(--app-sidebar-text-active);
+  background: var(--app-sidebar-hover-bg);
+}
+
+.layout-columns-rail__item.is-active {
+  color: var(--app-sidebar-text-active);
+  background: var(--app-sidebar-active-bg);
+}
+
+.layout-columns-rail__text {
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .layout-header-tools {

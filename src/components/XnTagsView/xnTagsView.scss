@@ -1,6 +1,7 @@
 .xn-tags-view {
   display: flex;
   align-items: stretch;
+  flex-shrink: 0;
   height: var(--app-tags-view-height, 40px);
   background: var(--app-tags-bg, #fff);
   border-bottom: 1px solid var(--app-tags-border, #f0f0f0);

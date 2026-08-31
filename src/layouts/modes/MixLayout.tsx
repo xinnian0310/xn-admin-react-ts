@@ -3,7 +3,12 @@ import { Layout } from 'antd'
 import { useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import type { MenuItem } from '@/types/menu'
-import { findTopLevelMenu } from '@/utils/menu'
+import {
+  filterHiddenMenus,
+  findFirstNavigablePath,
+  findTopLevelMenu,
+  menuNodeKey,
+} from '@/utils/menu'
 import { isLightColor } from '@/utils/color'
 import { useThemeStore } from '@/stores/theme'
 import XnAppBrandLogo from '@/components/XnAppBrandLogo'
@@ -25,33 +30,49 @@ export default function MixLayout({ menus, isFullscreen, children }: Props) {
   const sidebarBg = useThemeStore((s) => s.currentTheme.colors.sidebar.bg)
   const headerMenuTheme = isLightColor(headerBg) ? 'light' : 'dark'
   const sideMenuTheme = isLightColor(sidebarBg) ? 'light' : 'dark'
-  const top = useMemo(() => findTopLevelMenu(menus, location.pathname), [menus, location.pathname])
-  const sideMenus = top?.children?.length ? top.children : menus
-  const topMenus = menus.map((m) => ({ ...m, children: undefined }))
+  const rootMenus = useMemo(() => filterHiddenMenus(menus), [menus])
+  const top = useMemo(
+    () => findTopLevelMenu(rootMenus, location.pathname) ?? rootMenus[0],
+    [rootMenus, location.pathname],
+  )
+  const sideMenus = top?.children?.length ? top.children : []
+  const topMenus = useMemo(
+    () =>
+      rootMenus.map((m) => ({
+        ...m,
+        path: findFirstNavigablePath(m),
+        children: undefined,
+      })),
+    [rootMenus],
+  )
+  const selectedTopKey = top ? findFirstNavigablePath(top) || menuNodeKey(top) : ''
 
   return (
-    <Layout className="layout-shell">
+    <Layout className="layout-shell layout-mix">
       {!isFullscreen ? (
-        <Header className="layout-header-bar" style={{ display: 'flex', gap: 16 }}>
-          <XnAppBrandLogo style={{ color: 'inherit', minWidth: 160 }} />
-          <div style={{ flex: 1, minWidth: 0 }}>
+        <Header className="layout-header-bar layout-mix__header">
+          <XnAppBrandLogo className="layout-mix__brand" style={{ color: 'inherit' }} />
+          <div className="layout-mix__top-menu">
             <XnSidebarMenu
               menus={topMenus}
               mode="horizontal"
               theme={headerMenuTheme}
+              selectedKeys={selectedTopKey ? [selectedTopKey] : []}
+              showSearch={false}
               style={{ background: 'transparent' }}
             />
           </div>
           <LayoutHeaderTools />
         </Header>
       ) : null}
-      <Layout>
-        {!isFullscreen ? (
+      <Layout className="layout-mix__body">
+        {!isFullscreen && sideMenus.length ? (
           <Sider width={200} className="layout-aside" theme={sideMenuTheme}>
+            {top?.title ? <div className="layout-aside__subtitle">{top.title}</div> : null}
             <XnSidebarMenu menus={sideMenus} mode="inline" theme={sideMenuTheme} />
           </Sider>
         ) : null}
-        <Layout>{children}</Layout>
+        <Layout className="layout-main-col">{children}</Layout>
       </Layout>
     </Layout>
   )

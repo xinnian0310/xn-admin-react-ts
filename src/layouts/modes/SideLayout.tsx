@@ -29,7 +29,7 @@ export default function SideLayout({ menus, isFullscreen, children }: Props) {
           <XnSidebarMenu menus={menus} mode="inline" theme={menuTheme} />
         </Sider>
       ) : null}
-      <Layout>
+      <Layout className="layout-main-col">
         {!isFullscreen ? (
           <Header className="layout-header-bar">
             <div />

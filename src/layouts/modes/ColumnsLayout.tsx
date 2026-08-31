@@ -27,43 +27,35 @@ export default function ColumnsLayout({ menus, isFullscreen, children }: Props) 
   const sideMenuTheme = isLightColor(sidebarBg) ? 'light' : 'dark'
   const visible = useMemo(() => filterHiddenMenus(menus), [menus])
   const top = useMemo(
-    () => findTopLevelMenu(visible, location.pathname),
+    () => findTopLevelMenu(visible, location.pathname) ?? visible[0],
     [visible, location.pathname],
   )
   const sideMenus = top?.children?.length ? top.children : []
 
   return (
-    <Layout className="layout-shell">
+    <Layout className="layout-shell layout-columns">
       {!isFullscreen ? (
-        <Sider
-          width={64}
-          className="layout-aside"
-          theme={sideMenuTheme}
-          style={{ background: 'var(--app-sidebar-rail-bg)' }}
-        >
-          <div style={{ padding: 12, textAlign: 'center' }}>
+        <Sider width={64} className="layout-columns-rail" theme={sideMenuTheme}>
+          <div className="layout-columns-rail__brand">
             <XnAppBrandLogo showTitle={false} />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div className="layout-columns-rail__items">
             {visible.map((item) => {
               const path = findFirstNavigablePath(item)
               const active = top?.id === item.id
+              const iconName = item.iconAntd || item.icon
               return (
                 <Tooltip key={item.id} title={item.title} placement="right">
                   <button
                     type="button"
+                    className={`layout-columns-rail__item${active ? ' is-active' : ''}`}
                     onClick={() => path && navigate(path)}
-                    style={{
-                      width: 40,
-                      height: 40,
-                      border: 'none',
-                      borderRadius: 8,
-                      cursor: 'pointer',
-                      background: active ? 'var(--app-sidebar-active-bg)' : 'transparent',
-                      color: 'var(--app-sidebar-text)',
-                    }}
                   >
-                    <XnAppIcon name={item.iconAntd || item.icon || 'mdi:menu'} size={20} />
+                    {iconName ? (
+                      <XnAppIcon name={iconName} size={20} />
+                    ) : (
+                      <span className="layout-columns-rail__text">{item.title.charAt(0)}</span>
+                    )}
                   </button>
                 </Tooltip>
               )
@@ -71,16 +63,17 @@ export default function ColumnsLayout({ menus, isFullscreen, children }: Props) 
           </div>
         </Sider>
       ) : null}
-      <Layout>
+      <Layout className="layout-columns__body">
         {!isFullscreen && sideMenus.length ? (
-          <Sider width={180} className="layout-aside" theme={sideMenuTheme}>
+          <Sider width={200} className="layout-aside" theme={sideMenuTheme}>
+            {top?.title ? <div className="layout-aside__subtitle">{top.title}</div> : null}
             <XnSidebarMenu menus={sideMenus} mode="inline" theme={sideMenuTheme} />
           </Sider>
         ) : null}
-        <Layout>
+        <Layout className="layout-main-col">
           {!isFullscreen ? (
             <Header className="layout-header-bar">
-              <XnAppBrandLogo style={{ color: 'inherit' }} />
+              <div />
               <LayoutHeaderTools />
             </Header>
           ) : null}

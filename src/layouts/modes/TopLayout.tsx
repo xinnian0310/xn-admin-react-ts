@@ -23,20 +23,21 @@ export default function TopLayout({ menus, isFullscreen, children }: Props) {
   return (
     <Layout className="layout-shell">
       {!isFullscreen ? (
-        <Header className="layout-header-bar" style={{ display: 'flex', gap: 16 }}>
-          <XnAppBrandLogo style={{ color: 'inherit', minWidth: 160 }} />
-          <div style={{ flex: 1, minWidth: 0 }}>
+        <Header className="layout-header-bar layout-top__header">
+          <XnAppBrandLogo className="layout-top__brand" style={{ color: 'inherit' }} />
+          <div className="layout-top__menu">
             <XnSidebarMenu
               menus={menus}
               mode="horizontal"
               theme={menuTheme}
-              style={{ background: 'transparent', lineHeight: '56px', flex: 1 }}
+              showSearch={false}
+              style={{ background: 'transparent' }}
             />
           </div>
           <LayoutHeaderTools />
         </Header>
       ) : null}
-      <Layout>{children}</Layout>
+      <Layout className="layout-main-col">{children}</Layout>
     </Layout>
   )
 }
