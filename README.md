@@ -8,7 +8,7 @@
 
 心念后台管理系统前端：React 19 + TypeScript + Vite + Ant Design。
 
-xn-admin-react-ts 是「心念后台」的 React 管理端，基于 React 19、TypeScript 与 Ant Design，由基准前端 xn-admin-vue3-ts 移植而来，对接同一套微服务后端 xn-admin-cloud。业务能力与 Vue 端对齐（登录鉴权、动态菜单、RBAC、CRUD、主题布局、监控与文件任务等），视觉使用 Ant Design 原生风格。采用 Apache License 2.0 开源，**可商用、可自用**。
+xn-admin-react-ts 是「心念后台」的 React 管理端，基于 React 19、TypeScript 与 Ant Design，由基准前端 xn-admin-vue3-ts 移植而来，对接同一套微服务后端 xn-admin-cloud。业务能力与 Vue 端对齐（登录鉴权、动态菜单、RBAC、CRUD、主题布局、智能对话、监控与文件任务等），视觉使用 Ant Design 原生风格。采用 Apache License 2.0 开源，**可商用、可自用**。
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 [![开源](https://img.shields.io/badge/开源-免费-success.svg)](./LICENSE)
@@ -209,6 +209,15 @@ XnPageLayout
 | 登录页 | ![登录页](./docs/images/login.png)   |
 | 首页   | ![首页](./docs/images/dashboard.png) |
 
+### 智能对话
+
+| 模块     | 截图                                        |
+| -------- | ------------------------------------------- |
+| 智能对话 | ![智能对话](./docs/images/ai-chat.png)      |
+| 厂商目录 | ![厂商目录](./docs/images/ai-providers.png) |
+| 我的模型 | ![我的模型](./docs/images/ai-models.png)    |
+| 配额管理 | ![配额管理](./docs/images/ai-quota.png)     |
+
 ### 个人中心
 
 | 模块     | 截图                                         |
@@ -290,6 +299,7 @@ XnPageLayout
 - 通用组件：验证码、短信码、字典/组织/省市区、图片上传、文件选择、水印、Cron、`XnDialog` / `XnModal` 等（见 [`src/components/README.md`](./src/components/README.md)）
 - 系统监控：在线用户 / 服务 / Redis / SQL
 - 文件管理、定时任务、回收站、代码生成、接口文档页（Swagger UI / API 切换）
+- 智能对话：厂商目录、我的模型、流式会话、试用配额
 - 公告 WebSocket 推送（`/ws`）
 - 日志管理：登录 / 操作 / 异常 / 任务日志（查询、详情、删除、清空、导出）
 

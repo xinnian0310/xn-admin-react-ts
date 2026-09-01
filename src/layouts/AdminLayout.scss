@@ -76,6 +76,22 @@
   overflow: hidden;
 }
 
+/* 智能对话：整页占满，会话列表与消息区内部滚动 */
+.admin-layout__page > .ai-chat {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 配额：整页占满，左侧标签 + 内容区滚动 */
+.admin-layout__page > .quota-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
 /* 组件演示：整页占满，左侧分类固定，右侧内容区滚动 */
 .admin-layout__page > .demo-page {
   flex: 1 1 auto;
@@ -101,10 +117,20 @@
 .admin-layout__page
   > *:not(.xn-page-layout):not(.profile-page):not(.system-config-page):not(.site-contact-page):not(
     .iframe-page
-  ):not(.demo-page):not(.xn-global-spin) {
+  ):not(.demo-page):not(.ai-chat):not(.quota-page):not(.xn-global-spin):not(.ant-image) {
   flex: 0 0 auto;
   min-height: 100%;
   box-sizing: border-box;
+}
+
+/* 预览用隐藏 Image 不能当页面 flex 子项，否则会把列表高度挤成 0 */
+.admin-layout__page > .ant-image {
+  flex: none;
+  min-height: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  position: absolute;
 }
 
 .admin-layout.is-fullscreen .admin-layout__content {

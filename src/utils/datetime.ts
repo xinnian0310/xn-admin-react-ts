@@ -32,6 +32,15 @@ export function formatDate(
   return formatDateTime(value, format)
 }
 
+/** 对话时间：当天只显示时分，跨天显示月-日 时分 */
+export function formatChatTime(value?: string | number | Date | null): string {
+  if (value === null || value === undefined || value === '') return ''
+  const raw = typeof value === 'string' ? value.replace(' ', 'T') : value
+  const d = dayjs(raw)
+  if (!d.isValid()) return String(value)
+  return d.isSame(dayjs(), 'day') ? d.format('HH:mm') : d.format('MM-DD HH:mm')
+}
+
 /**
  * 递归把对象/数组里的 ISO 时间字符串格式化为可读时间。
  * 在 axios 响应拦截器中调用，保证所有页面拿到的时间字段已格式化。

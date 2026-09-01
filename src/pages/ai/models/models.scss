@@ -1,0 +1,131 @@
+.models-tip {
+  margin-bottom: 12px;
+}
+
+.provider-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+  padding-right: 4px;
+}
+
+.provider-logo,
+.provider-fallback {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.provider-logo {
+  object-fit: contain;
+  background: var(--app-fill-color, #fafafa);
+}
+
+.provider-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--app-color-primary, #1677ff);
+  background: var(--app-color-primary-light-9, #e6f4ff);
+}
+
+.provider-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-logo,
+.table-logo-fallback {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-logo {
+  object-fit: contain;
+  background: var(--app-fill-color, #fafafa);
+}
+
+.table-logo-fallback {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-color-primary, #1677ff);
+  background: var(--app-color-primary-light-9, #e6f4ff);
+}
+
+.key-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.is-none {
+  background: color-mix(in srgb, var(--ant-color-info, #1677ff) 35%, transparent);
+}
+
+.status-dot.is-ok {
+  background: var(--ant-color-success, #52c41a);
+}
+
+.status-dot.is-fail {
+  background: var(--ant-color-error, #ff4d4f);
+}
+
+.status-dot.is-unknown {
+  background: var(--ant-color-warning, #faad14);
+}
+
+.status-dot.is-checking {
+  background: var(--ant-color-warning, #faad14);
+  animation: status-pulse 1s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.opt-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-hint {
+  margin-top: 6px;
+  color: var(--app-text-muted, rgba(0, 0, 0, 0.45));
+  font-size: 12px;
+}
+
+.pick-search {
+  margin-bottom: 12px;
+}
+
+.pick-msg {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--app-text-muted, rgba(0, 0, 0, 0.45));
+}

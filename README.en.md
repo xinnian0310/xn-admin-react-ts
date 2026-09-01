@@ -8,7 +8,7 @@
 
 XinNian Admin frontend: React 19 + TypeScript + Vite + Ant Design.
 
-Ported from the Vue baseline **xn-admin-vue3-ts**, talking to the same backend **xn-admin-cloud**. Business features match the Vue apps (auth, dynamic menus, RBAC, CRUD, layouts, monitoring, files, jobs). Visuals use native Ant Design, not an Element look-alike. Apache License 2.0 — **free for personal and commercial use**.
+Ported from the Vue baseline **xn-admin-vue3-ts**, talking to the same backend **xn-admin-cloud**. Business features match the Vue apps (auth, dynamic menus, RBAC, CRUD, layouts, AI chat, monitoring, files, jobs). Visuals use native Ant Design, not an Element look-alike. Apache License 2.0 — **free for personal and commercial use**.
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Free-success.svg)](./LICENSE)
@@ -117,6 +117,15 @@ Ant Design captures in [`docs/images/`](./docs/images/), same filenames as the V
 | --------- | ----------------------------------------- |
 | Login     | ![Login](./docs/images/login.png)         |
 | Dashboard | ![Dashboard](./docs/images/dashboard.png) |
+
+### AI chat
+
+| Page      | Screenshot                                   |
+| --------- | -------------------------------------------- |
+| Chat      | ![AI chat](./docs/images/ai-chat.png)        |
+| Providers | ![Providers](./docs/images/ai-providers.png) |
+| Models    | ![Models](./docs/images/ai-models.png)       |
+| Quota     | ![Quota](./docs/images/ai-quota.png)         |
 
 ### Profile
 

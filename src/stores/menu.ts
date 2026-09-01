@@ -3,6 +3,17 @@ import { getAuthMenus } from '@/api/auth'
 import type { SysRoute } from '@/types'
 import type { MenuItem } from '@/types/menu'
 
+const RETIRED_MENU_PATHS = new Set(['/ai/models/trial'])
+
+function pruneRetiredRoutes(routes: SysRoute[]): SysRoute[] {
+  return routes
+    .filter((route) => !RETIRED_MENU_PATHS.has(route.path || ''))
+    .map((route) => ({
+      ...route,
+      children: route.children?.length ? pruneRetiredRoutes(route.children) : route.children,
+    }))
+}
+
 function routeToMenu(route: SysRoute): MenuItem {
   return {
     id: String(route.id),
@@ -53,9 +64,10 @@ export const useMenuStore = create<MenuState>((set) => ({
     if (fetchPromise) return fetchPromise
     fetchPromise = (async () => {
       const res = await getAuthMenus()
+      const routes = pruneRetiredRoutes(res.data)
       set({
-        sysRoutes: res.data,
-        menus: res.data.map(routeToMenu),
+        sysRoutes: routes,
+        menus: routes.map(routeToMenu),
         menuLoadFailed: false,
       })
     })().finally(() => {

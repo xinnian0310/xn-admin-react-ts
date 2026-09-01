@@ -39,6 +39,7 @@ const ELEMENT_TO_ICONIFY: Record<string, string> = {
   Message: 'mdi:email',
   Link: 'mdi:link',
   ChatDotRound: 'mdi:chat',
+  ChatLineRound: 'mdi:message-outline',
   Setting: 'mdi:cog',
   HomeFilled: 'mdi:home',
   Menu: 'mdi:menu',
@@ -151,6 +152,13 @@ export function parseIcon(value?: string | null): ParsedIcon | null {
     return { type: 'antd', value: raw, name: raw }
   }
   return { type: 'element', value: raw, name: raw }
+}
+
+/** 厂商 Logo 等：http(s)、站内路径或 data URL 才按图片渲染 */
+export function isImageSrc(value?: string | null): boolean {
+  if (!value?.trim()) return false
+  const raw = value.trim()
+  return /^(https?:\/\/|\/|data:image\/)/i.test(raw)
 }
 
 export function resolveAntdIcon(name?: string): IconComponent | undefined {
