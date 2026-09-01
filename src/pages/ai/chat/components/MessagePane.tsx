@@ -1,5 +1,14 @@
-import { forwardRef, useImperativeHandle, useMemo, useRef, useState, type MouseEvent } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent,
+} from 'react'
 import { Avatar, Button, Empty, Tag } from 'antd'
+import { ArrowDownOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import type { ChatMessage } from '@/types/ai/conversation'
 import { useUserStore } from '@/stores/user'
@@ -10,7 +19,7 @@ import { isImageSrc } from '@/utils/icons'
 import { chatModelLabel } from '@/utils/ai-model-cascader'
 
 export interface MessagePaneHandle {
-  scrollToBottom: (force: boolean) => void
+  scrollToBottom: (force: boolean, smooth?: boolean) => void
   stick: () => void
   isFollowing: () => boolean
 }
@@ -63,7 +72,11 @@ const MessagePane = forwardRef<MessagePaneHandle, Props>(function MessagePane(
 
   const bodyRef = useRef<HTMLDivElement | null>(null)
   const followRef = useRef(true)
+  const jumpingRef = useRef(false)
+  const jumpTimerRef = useRef(0)
   const [showJump, setShowJump] = useState(false)
+
+  useEffect(() => () => window.clearTimeout(jumpTimerRef.current), [])
 
   function assistantAvatarSrc(msg: ChatMessage) {
     const icon = msg.providerIcon || assistantIcon
@@ -110,24 +123,53 @@ const MessagePane = forwardRef<MessagePaneHandle, Props>(function MessagePane(
     return last.role === 'ASSISTANT' ? last.id : ''
   }, [streaming, visibleMessages])
 
+  function nearBottom(el: HTMLElement) {
+    return el.scrollHeight - el.scrollTop - el.clientHeight <= 80
+  }
+
   function onScroll() {
     const el = bodyRef.current
     if (!el) return
-    const distance = el.scrollHeight - el.scrollTop - el.clientHeight
-    if (distance > 80) {
-      followRef.current = false
-      setShowJump(true)
-    } else {
+    if (jumpingRef.current) {
+      if (nearBottom(el)) {
+        jumpingRef.current = false
+        window.clearTimeout(jumpTimerRef.current)
+        followRef.current = true
+        setShowJump(false)
+      }
+      return
+    }
+    if (nearBottom(el)) {
       followRef.current = true
       setShowJump(false)
+    } else {
+      followRef.current = false
+      setShowJump(true)
     }
   }
 
-  function scrollToBottom(force: boolean) {
+  function scrollToBottom(force: boolean, smooth = false) {
     const el = bodyRef.current
     if (!el) return
     if (!force && !followRef.current) return
-    el.scrollTop = el.scrollHeight
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (smooth && !reduceMotion) {
+      jumpingRef.current = true
+      followRef.current = true
+      setShowJump(false)
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+      window.clearTimeout(jumpTimerRef.current)
+      jumpTimerRef.current = window.setTimeout(() => {
+        jumpingRef.current = false
+        const pane = bodyRef.current
+        if (!pane) return
+        const atBottom = nearBottom(pane)
+        followRef.current = atBottom
+        setShowJump(!atBottom)
+      }, 700)
+      return
+    }
+    el.scrollTo({ top: el.scrollHeight, behavior: 'auto' })
     setShowJump(false)
   }
 
@@ -151,147 +193,152 @@ const MessagePane = forwardRef<MessagePaneHandle, Props>(function MessagePane(
   }
 
   return (
-    <div
-      ref={bodyRef}
-      className="ai-chat__body"
-      onScroll={onScroll}
-      onClick={(e) => void onCopyCode(e)}
-    >
-      {!hasModel ? (
-        <div className="ai-chat__guide">
-          <Empty description={unavailableMessage || '暂无可用模型，请先在「模型」中添加'}>
-            <Button type="primary" onClick={() => navigate('/ai/models')}>
-              去添加我的模型
-            </Button>
-          </Empty>
-        </div>
-      ) : !currentId || (!visibleMessages.length && !streaming) ? (
-        <div className="ai-chat__guide">
-          <Empty description="开始一段新对话，或点下面的示例">
-            <div className="ai-chat__hints">
-              {hints.map((q) => (
-                <Tag key={q} className="is-clickable" onClick={() => onHint(q)}>
-                  {q}
-                </Tag>
-              ))}
-            </div>
-          </Empty>
-        </div>
-      ) : (
-        <>
-          {hasMore ? (
-            <Button
-              type="link"
-              className="ai-chat__more"
-              loading={loadingMore}
-              onClick={onLoadMore}
-            >
-              加载更早的消息
-            </Button>
-          ) : null}
-          {visibleMessages.map((msg) => {
-            const versions = versionsOf(msg)
-            return (
-              <article key={msg.id} className={`ai-msg is-${msg.role.toLowerCase()}`}>
-                {msg.role !== 'USER' ? (
-                  <Avatar
-                    className="ai-msg__avatar is-assistant"
-                    size={36}
-                    src={assistantAvatarSrc(msg)}
-                  >
-                    {assistantAvatarText(msg)}
-                  </Avatar>
-                ) : null}
-                <div className="ai-msg__main">
-                  <div className="ai-msg__meta">
-                    <span>
-                      {msg.role === 'USER' ? userName : chatModelLabel(msg.modelSnapshot)}
-                    </span>
-                    {formatChatTime(msg.createdAt) ? (
-                      <span className="ai-msg__time">{formatChatTime(msg.createdAt)}</span>
-                    ) : null}
-                    {msg.status === 'STOPPED' ? (
-                      <span className="is-muted">已停止</span>
-                    ) : msg.status === 'FAILED' ? (
-                      <span className="is-danger">{failText(msg)}</span>
-                    ) : msg.status === 'STREAMING' ? (
-                      <span className="is-muted">{streaming ? '生成中…' : '已中断'}</span>
-                    ) : null}
-                    {versions.length > 1 ? (
-                      <span className="ai-msg__ver">
-                        <Button type="link" size="small" onClick={() => onShiftVersion(msg, -1)}>
-                          上一版
-                        </Button>
-                        {versionIndex(msg) + 1}/{versions.length}
-                        <Button type="link" size="small" onClick={() => onShiftVersion(msg, 1)}>
-                          下一版
-                        </Button>
+    <div className="ai-chat__pane">
+      <div
+        ref={bodyRef}
+        className="ai-chat__body"
+        onScroll={onScroll}
+        onClick={(e) => void onCopyCode(e)}
+      >
+        {!hasModel ? (
+          <div className="ai-chat__guide">
+            <Empty description={unavailableMessage || '暂无可用模型，请先在「模型」中添加'}>
+              <Button type="primary" onClick={() => navigate('/ai/models')}>
+                去添加我的模型
+              </Button>
+            </Empty>
+          </div>
+        ) : !currentId || (!visibleMessages.length && !streaming) ? (
+          <div className="ai-chat__guide">
+            <Empty description="开始一段新对话，或点下面的示例">
+              <div className="ai-chat__hints">
+                {hints.map((q) => (
+                  <Tag key={q} className="is-clickable" onClick={() => onHint(q)}>
+                    {q}
+                  </Tag>
+                ))}
+              </div>
+            </Empty>
+          </div>
+        ) : (
+          <>
+            {hasMore ? (
+              <Button
+                type="link"
+                className="ai-chat__more"
+                loading={loadingMore}
+                onClick={onLoadMore}
+              >
+                加载更早的消息
+              </Button>
+            ) : null}
+            {visibleMessages.map((msg) => {
+              const versions = versionsOf(msg)
+              return (
+                <article key={msg.id} className={`ai-msg is-${msg.role.toLowerCase()}`}>
+                  {msg.role !== 'USER' ? (
+                    <Avatar
+                      className="ai-msg__avatar is-assistant"
+                      size={36}
+                      src={assistantAvatarSrc(msg)}
+                    >
+                      {assistantAvatarText(msg)}
+                    </Avatar>
+                  ) : null}
+                  <div className="ai-msg__main">
+                    <div className="ai-msg__meta">
+                      <span>
+                        {msg.role === 'USER' ? userName : chatModelLabel(msg.modelSnapshot)}
                       </span>
-                    ) : null}
-                  </div>
-                  {msg.role === 'ASSISTANT' ? (
-                    <div className="ai-msg__bubble ai-msg__md">
-                      {thinkingOf(msg) ? (
-                        <details
-                          className="ai-msg__think"
-                          open={streaming && msg.status === 'STREAMING'}
-                        >
-                          <summary>
-                            {streaming && msg.status === 'STREAMING' && !answerOf(msg)
-                              ? '思考中…'
-                              : '深度思考'}
-                          </summary>
-                          <pre className="ai-msg__think-body">{thinkingOf(msg)}</pre>
-                        </details>
+                      {formatChatTime(msg.createdAt) ? (
+                        <span className="ai-msg__time">{formatChatTime(msg.createdAt)}</span>
                       ) : null}
-                      {answerOf(msg) ? (
-                        <div dangerouslySetInnerHTML={{ __html: renderMarkdown(answerOf(msg)) }} />
+                      {msg.status === 'STOPPED' ? (
+                        <span className="is-muted">已停止</span>
+                      ) : msg.status === 'FAILED' ? (
+                        <span className="is-danger">{failText(msg)}</span>
+                      ) : msg.status === 'STREAMING' ? (
+                        <span className="is-muted">{streaming ? '生成中…' : '已中断'}</span>
+                      ) : null}
+                      {versions.length > 1 ? (
+                        <span className="ai-msg__ver">
+                          <Button type="link" size="small" onClick={() => onShiftVersion(msg, -1)}>
+                            上一版
+                          </Button>
+                          {versionIndex(msg) + 1}/{versions.length}
+                          <Button type="link" size="small" onClick={() => onShiftVersion(msg, 1)}>
+                            下一版
+                          </Button>
+                        </span>
                       ) : null}
                     </div>
-                  ) : (
-                    <div className="ai-msg__bubble ai-msg__plain">{msg.content}</div>
-                  )}
-                  <div className="ai-msg__ops">
-                    <Button type="link" size="small" onClick={() => onCopy(copyTextOf(msg))}>
-                      复制
-                    </Button>
-                    {msg.role === 'USER' && !streaming ? (
-                      <Button type="link" size="small" onClick={() => onEdit(msg)}>
-                        编辑重发
+                    {msg.role === 'ASSISTANT' ? (
+                      <div className="ai-msg__bubble ai-msg__md">
+                        {thinkingOf(msg) ? (
+                          <details
+                            className="ai-msg__think"
+                            open={streaming && msg.status === 'STREAMING'}
+                          >
+                            <summary>
+                              {streaming && msg.status === 'STREAMING' && !answerOf(msg)
+                                ? '思考中…'
+                                : '深度思考'}
+                            </summary>
+                            <pre className="ai-msg__think-body">{thinkingOf(msg)}</pre>
+                          </details>
+                        ) : null}
+                        {answerOf(msg) ? (
+                          <div
+                            dangerouslySetInnerHTML={{ __html: renderMarkdown(answerOf(msg)) }}
+                          />
+                        ) : null}
+                      </div>
+                    ) : (
+                      <div className="ai-msg__bubble ai-msg__plain">{msg.content}</div>
+                    )}
+                    <div className="ai-msg__ops">
+                      <Button type="link" size="small" onClick={() => onCopy(copyTextOf(msg))}>
+                        复制
                       </Button>
-                    ) : null}
-                    {canRegenerateId === msg.id ? (
-                      <Button
-                        type="link"
-                        size="small"
-                        disabled={streaming}
-                        onClick={() => onRegenerate(msg)}
-                      >
-                        重新生成
-                      </Button>
-                    ) : null}
+                      {msg.role === 'USER' && !streaming ? (
+                        <Button type="link" size="small" onClick={() => onEdit(msg)}>
+                          编辑重发
+                        </Button>
+                      ) : null}
+                      {canRegenerateId === msg.id ? (
+                        <Button
+                          type="link"
+                          size="small"
+                          disabled={streaming}
+                          onClick={() => onRegenerate(msg)}
+                        >
+                          重新生成
+                        </Button>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-                {msg.role === 'USER' ? (
-                  <Avatar className="ai-msg__avatar" size={36} src={userAvatar}>
-                    {userAvatarText}
-                  </Avatar>
-                ) : null}
-              </article>
-            )
-          })}
-        </>
-      )}
-      {showJump ? (
-        <Button
-          className="ai-chat__jump"
-          type="primary"
-          shape="round"
-          onClick={() => scrollToBottom(true)}
-        >
-          回到底部
-        </Button>
-      ) : null}
+                  {msg.role === 'USER' ? (
+                    <Avatar className="ai-msg__avatar" size={36} src={userAvatar}>
+                      {userAvatarText}
+                    </Avatar>
+                  ) : null}
+                </article>
+              )
+            })}
+          </>
+        )}
+      </div>
+      <Button
+        className={`ai-chat__jump${showJump ? ' is-on' : ''}`}
+        type="primary"
+        shape="circle"
+        icon={<ArrowDownOutlined />}
+        title="回到底部"
+        aria-label="回到底部"
+        aria-hidden={!showJump}
+        tabIndex={showJump ? 0 : -1}
+        onClick={() => scrollToBottom(true, true)}
+      />
     </div>
   )
 })
